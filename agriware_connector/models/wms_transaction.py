@@ -43,6 +43,9 @@ class AgriwareWmsTransaction(models.Model):
         "stock.picking", required=True, ondelete="cascade",
     )
 
+    picking_state = fields.Selection(related="picking_id.state", string="Operation Status")
+    completed_at = fields.Datetime(related="picking_id.date_done", string="Completed On")
+
     _identity_uniq = models.Constraint(
         "unique(company_id, external_system_id, transaction_type, external_reference)",
         "This external_reference has already been used for this "

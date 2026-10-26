@@ -57,6 +57,7 @@ class AgriwareInventoryImport(models.Model):
         ("stale", "Stale -- Needs Re-Review"),
         ("approved", "Approved"),
         ("rejected", "Rejected"),
+        ("applied", "Applied Automatically"),
     ], default="pending_review", required=True)
 
     submitted_at = fields.Datetime(required=True, default=fields.Datetime.now)
@@ -68,6 +69,8 @@ class AgriwareInventoryImport(models.Model):
 
     reviewed_by = fields.Many2one("res.users", readonly=True)
     reviewed_at = fields.Datetime(readonly=True)
+    applied_by = fields.Many2one("res.users", readonly=True)
+    applied_at = fields.Datetime(readonly=True)
 
     notes = fields.Text()
 
@@ -181,6 +184,86 @@ class AgriwareInventoryImport(models.Model):
             record.state = "rejected"
             record.reviewed_by = self.env.user
             record.reviewed_at = fields.Datetime.now()
+
+    def _apply_from_api(self, external_system, api_user):
+        """Apply a WMS count as an Odoo inventory adjustment atomically.
+
+        This private method is only called by the authenticated API route.
+        It rechecks the stock snapshot, rejects quantities split across
+        owners/packages (not represented by this API contract), then uses
+        Odoo's native quant inventory workflow to create the stock moves.
+        """
+        self.ensure_one()
+        if not api_user.has_group("agriware_connector.group_agriware_api_user"):
+            raise AccessError(_("Only AgriWare API Users can apply WMS inventory counts."))
+        if (
+            self.external_system_id != external_system
+            or self.company_id != external_system.company_id
+            or self.submitted_by != api_user
+            or not external_system.active
+        ):
+            raise AccessError(_("The external system is not authorized for this import."))
+        if (
+            not external_system.allow_automatic_inventory_adjustments
+            or external_system.max_auto_inventory_delta <= 0
+        ):
+            raise AccessError(_(
+                "Automatic inventory adjustments are not enabled for this external system."
+            ))
+        if self.state != "pending_review":
+            raise UserError(_("Only a new inventory import can be applied automatically."))
+
+        Quant = self.env["stock.quant"].sudo().with_company(self.company_id)
+        for line in self.line_ids:
+            current_qty = line._read_onhand_quantity()
+            if float_compare(
+                current_qty, line.current_odoo_quantity,
+                precision_rounding=line.uom_id.rounding or 0.01,
+            ) != 0:
+                raise UserError(_(
+                    "Stock changed while this request was being processed. "
+                    "Submit a fresh count using a new external_reference."
+                ))
+            if abs(line.reported_quantity - current_qty) > external_system.max_auto_inventory_delta:
+                raise UserError(_(
+                    "Inventory variance exceeds the external system's configured limit."
+                ))
+
+            domain = [
+                ("product_id", "=", line.product_id.id),
+                ("location_id", "=", line.location_id.id),
+                ("lot_id", "=", line.lot_id.id or False),
+            ]
+            quants = Quant.search(domain)
+            if any(quant.package_id or quant.owner_id for quant in quants):
+                raise UserError(_(
+                    "Automatic adjustment is not supported for stock assigned "
+                    "to a package or owner."
+                ))
+            if len(quants) > 1 or any(quants.mapped("inventory_quantity_set")):
+                raise UserError(_(
+                    "Automatic adjustment requires one unambiguous stock quantity "
+                    "with no pending manual count. Review this stock in Odoo first."
+                ))
+            quant = quants[:1]
+            quant_model = Quant.with_context(inventory_mode=True)
+            if quant:
+                quant_model.browse(quant.id).write({
+                    "inventory_quantity_auto_apply": line.reported_quantity,
+                })
+            else:
+                quant_model.create({
+                    "product_id": line.product_id.id,
+                    "location_id": line.location_id.id,
+                    "lot_id": line.lot_id.id or False,
+                    "inventory_quantity_auto_apply": line.reported_quantity,
+                })
+
+        self.write({
+            "state": "applied",
+            "applied_by": api_user.id,
+            "applied_at": fields.Datetime.now(),
+        })
 
 
 class AgriwareInventoryImportLine(models.Model):

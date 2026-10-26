@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_agriware_products_inventory_root"
+              name="Products &amp; Inventory"
+              parent="menu_agriware_root" sequence="10"/>
+    <menuitem id="menu_agriware_warehouses_locations_root"
+              name="Warehouses &amp; Locations"
+              parent="menu_agriware_root" sequence="20"/>
+    <menuitem id="menu_agriware_warehouse_operations_root"
+              name="Warehouse Operations"
+              parent="menu_agriware_root" sequence="30"/>
+    <menuitem id="menu_agriware_suppliers_root"
+              name="Suppliers"
+              parent="menu_agriware_root" sequence="40"/>
+    <menuitem id="menu_agriware_integrations_root"
+              name="Integrations &amp; Configuration"
+              parent="menu_agriware_root" sequence="50"/>
+
+    <menuitem id="menu_agriware_dashboard"
+              name="Overview"
+              parent="menu_agriware_root"
+              action="action_agriware_dashboard"
+              sequence="1"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_agriware_products"
+              name="Products"
+              parent="menu_agriware_products_inventory_root"
+              action="stock.product_template_action_product"
+              sequence="10"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_inventory"
+              name="Inventory Overview"
+              parent="menu_agriware_products_inventory_root"
+              action="stock.stock_quant_action"
+              sequence="20"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_stock_adjustments" name="Stock Adjustments"
+              parent="menu_agriware_products_inventory_root"
+              action="stock.action_view_inventory_tree" sequence="25"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_lots"
+              name="Agricultural Lots &amp; Serial Numbers"
+              parent="menu_agriware_products_inventory_root"
+              action="stock.action_product_production_lot_form"
+              sequence="30"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_agriware_warehouses"
+              name="Warehouses"
+              parent="menu_agriware_warehouses_locations_root"
+              action="stock.action_warehouse_form"
+              sequence="10"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_locations"
+              name="Storage Locations"
+              parent="menu_agriware_warehouses_locations_root"
+              action="stock.action_location_form"
+              sequence="20"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_agriware_receipts"
+              name="Goods Received"
+              parent="menu_agriware_warehouse_operations_root"
+              action="stock.action_picking_tree_incoming"
+              sequence="10"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_dispatches"
+              name="Dispatches &amp; Deliveries"
+              parent="menu_agriware_warehouse_operations_root"
+              action="stock.action_picking_tree_outgoing"
+              sequence="20"
+              groups="stock.group_stock_user"/>
+    <menuitem id="menu_agriware_stock_movements"
+              name="Stock Movements"
+              parent="menu_agriware_warehouse_operations_root"
+              action="stock.stock_move_action"
+              sequence="30"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_agriware_external_systems_root"
+              name="Connected WMS Systems"
+              parent="menu_agriware_integrations_root"
+              sequence="10"
+              groups="agriware_connector.group_agriware_administrator"/>
+    <menuitem id="menu_agriware_sync_history"
+              name="Receipt &amp; Dispatch History"
+              parent="menu_agriware_integrations_root"
+              action="action_agriware_wms_transactions"
+              sequence="20"
+              groups="agriware_connector.group_agriware_administrator"/>
+    <menuitem id="menu_agriware_cancelled_transactions"
+              name="Cancelled WMS Operations"
+              parent="menu_agriware_integrations_root"
+              action="action_agriware_cancelled_transactions"
+              sequence="30"
+              groups="agriware_connector.group_agriware_administrator"/>
+
+    <menuitem id="menu_agriware_configuration_root"
+              name="Configuration"
+              parent="menu_agriware_integrations_root"
+              sequence="40"
+              groups="agriware_connector.group_agriware_administrator"/>
+
+    <record id="menu_agriware_api_management" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_agriware_configuration_root"/>
+    </record>
+    <!-- Keep the old category XML ID for upgrades, but remove its redundant level. -->
+    <record id="menu_agriware_external_systems_root" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="menu_agriware_external_systems" model="ir.ui.menu">
+        <field name="name">Connected WMS Systems</field>
+        <field name="parent_id" ref="menu_agriware_integrations_root"/>
+    </record>
+    <record id="menu_agriware_root" model="ir.ui.menu">
+        <field name="web_icon">agriware_connector,static/description/icon.png</field>
+    </record>
+    <record id="menu_agriware_inventory_imports" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_agriware_products_inventory_root"/>
+        <field name="sequence">40</field>
+    </record>
+    <record id="menu_agriware_external_id_mappings" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_agriware_configuration_root"/>
+    </record>
+    <record id="menu_agriware_uom_mappings" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_agriware_configuration_root"/>
+    </record>
+
+    <menuitem id="menu_agriware_user_permissions" name="User Permissions"
+              parent="menu_agriware_configuration_root" action="base.action_res_users"
+              sequence="90" groups="base.group_system"/>
+</odoo>

@@ -9,6 +9,10 @@ information, and to create and validate stock receipts and dispatches.
 picking routes, barcode scanning hardware, or any other WMS-side operation — it is the integration
 layer between an existing WMS and Odoo's Inventory app.
 
+See the [connector navigation guide](docs/CONNECTOR_NAVIGATION.md) for the current
+menu layout, dashboard, synchronization history, and role permissions. API Management
+is now under **AgriWare Connector → Integrations & Configuration → Configuration**.
+
 ## Table of contents
 
 1. [Documentation](#documentation)

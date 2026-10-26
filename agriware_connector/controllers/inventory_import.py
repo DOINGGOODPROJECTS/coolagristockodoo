@@ -1,19 +1,22 @@
 import hashlib
 import json
 import logging
+import math
 
 import psycopg2
 
 from odoo import http
 from odoo.http import request, Response
-from odoo.exceptions import AccessError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 from .api_security import require_agriware_api_user, resolve_authorized_external_system
 from .products import SUPPORTED_UNITS as HARDCODED_UNITS
 
 _logger = logging.getLogger(__name__)
 
-TOP_LEVEL_ALLOWED_FIELDS = {"external_reference", "warehouse_external_id", "lines"}
+TOP_LEVEL_ALLOWED_FIELDS = {
+    "external_reference", "warehouse_external_id", "location_external_id", "lines",
+}
 LINE_ALLOWED_FIELDS = {"product_external_id", "quantity", "unit", "lot_external_id"}
 
 # Mirrors receipts.py's existing cap on a single request's line count.
@@ -66,7 +69,9 @@ class AgriwareInventoryImportAPI(http.Controller):
         return external_system, None
 
     @staticmethod
-    def _canonical_hash(external_reference, warehouse_external_id, lines):
+    def _canonical_hash(
+        external_reference, warehouse_external_id, location_external_id, lines,
+    ):
         """A stable fingerprint of the request's meaningful content, used
         to tell an identical retry (idempotent) from a conflicting reuse
         of the same external_reference (409) -- see Phase 13.
@@ -74,8 +79,12 @@ class AgriwareInventoryImportAPI(http.Controller):
         canonical = {
             "external_reference": external_reference,
             "warehouse_external_id": warehouse_external_id,
+            "location_external_id": location_external_id,
             "lines": sorted(
-                [line["product_external_id"], line["quantity"], line["unit"]]
+                [
+                    line["product_external_id"], line["quantity"], line["unit"],
+                    line.get("lot_external_id", ""),
+                ]
                 for line in lines
             ),
         }
@@ -83,18 +92,25 @@ class AgriwareInventoryImportAPI(http.Controller):
         return hashlib.sha256(blob).hexdigest()
 
     @http.route(
-        "/agriware/api/v1/inventory-adjustments",
-        type="http",
-        auth="bearer",
-        methods=["POST"],
-        csrf=False,
-        save_session=False,
+        ["/agriware/api/v1/inventory-adjustments",
+         "/agriware/api/v1/inventory-adjustments/apply"],
+        type="http", auth="bearer", methods=["POST"],
+        csrf=False, save_session=False,
     )
     def create_inventory_import(self, **kwargs):
 
         external_system, error = self._authenticate()
         if error:
             return error
+        auto_apply = request.httprequest.path.endswith("/inventory-adjustments/apply")
+        if auto_apply and (
+            not external_system.allow_automatic_inventory_adjustments
+            or external_system.max_auto_inventory_delta <= 0
+        ):
+            return self.json_response({
+                "status": "error",
+                "message": "Automatic inventory adjustment is not enabled for this external system",
+            }, 403)
 
         try:
             payload = json.loads(request.httprequest.get_data(as_text=True))
@@ -117,6 +133,7 @@ class AgriwareInventoryImportAPI(http.Controller):
 
         external_reference = payload.get("external_reference")
         warehouse_external_id = payload.get("warehouse_external_id")
+        location_external_id = payload.get("location_external_id")
         lines = payload.get("lines")
 
         if (
@@ -134,6 +151,14 @@ class AgriwareInventoryImportAPI(http.Controller):
                 {"status": "error", "message": "Invalid warehouse_external_id"}, 400,
             )
         warehouse_external_id = warehouse_external_id.strip()
+        if location_external_id is not None and (
+            not isinstance(location_external_id, str) or not location_external_id.strip()
+        ):
+            return self.json_response(
+                {"status": "error", "message": "Invalid location_external_id"}, 400,
+            )
+        if location_external_id is not None:
+            location_external_id = location_external_id.strip()
 
         if not isinstance(lines, list) or not lines:
             return self.json_response(
@@ -168,6 +193,7 @@ class AgriwareInventoryImportAPI(http.Controller):
             if (
                 type(quantity) not in (int, float)
                 or isinstance(quantity, bool)
+                or not math.isfinite(quantity)
                 or quantity < 0
             ):
                 return self.json_response({
@@ -194,7 +220,7 @@ class AgriwareInventoryImportAPI(http.Controller):
             UomMapping = env["agriware.uom.mapping"]
 
             request_hash = self._canonical_hash(
-                external_reference, warehouse_external_id, lines,
+                external_reference, warehouse_external_id, location_external_id, lines,
             )
 
             # Idempotency pre-check (Phase 13): a retried identical
@@ -207,7 +233,9 @@ class AgriwareInventoryImportAPI(http.Controller):
                 ("external_reference", "=", external_reference),
             ], limit=1)
             if existing:
-                return self._existing_response(existing, request_hash, external_reference)
+                return self._existing_response(
+                    existing, request_hash, external_reference, auto_apply,
+                )
 
             warehouse_mapping = Mapping.resolve_mapping(
                 company, external_system, "stock.warehouse", warehouse_external_id,
@@ -222,11 +250,34 @@ class AgriwareInventoryImportAPI(http.Controller):
                     {"status": "error", "message": "Warehouse not found"}, 404,
                 )
 
-            # Phase 7: only ever the warehouse's own single, unambiguous
-            # internal stock location -- never a child location, never
-            # an arbitrary distribution across several. See
-            # docs/INITIAL_INVENTORY_IMPORT.md's Location mapping section.
             location = warehouse.lot_stock_id
+            if location_external_id:
+                location_mapping = Mapping.resolve_mapping(
+                    company, external_system, "stock.location", location_external_id,
+                )
+                if not location_mapping:
+                    return self.json_response(
+                        {"status": "error", "message": "Location not found"}, 404,
+                    )
+                location = env["stock.location"].sudo().browse(location_mapping.res_id)
+                warehouse_root = warehouse.view_location_id
+                ancestors = {
+                    int(node) for node in (location.parent_path or "").split("/")
+                    if node.isdigit()
+                }
+                if (
+                    not location.exists()
+                    or location.company_id != company
+                    or location.usage != "internal"
+                    or (
+                        location.id != warehouse_root.id
+                        and warehouse_root.id not in ancestors
+                    )
+                ):
+                    return self.json_response({
+                        "status": "error",
+                        "message": "Location is not internal to this warehouse",
+                    }, 422)
             if not location:
                 return self.json_response({
                     "status": "error",
@@ -234,6 +285,7 @@ class AgriwareInventoryImportAPI(http.Controller):
                 }, 422)
 
             line_values = []
+            seen_targets = set()
             for line in lines:
                 product_external_id = line["product_external_id"].strip()
                 quantity = float(line["quantity"])
@@ -368,6 +420,14 @@ class AgriwareInventoryImportAPI(http.Controller):
                         ),
                     }, 422)
 
+                target = (product.id, resolved_lot.id or False)
+                if target in seen_targets:
+                    return self.json_response({
+                        "status": "error",
+                        "message": "Duplicate product/lot line; combine quantities",
+                    }, 400)
+                seen_targets.add(target)
+
                 quant_domain = [
                     ("product_id", "=", product.id),
                     ("location_id", "=", location.id),
@@ -413,13 +473,22 @@ class AgriwareInventoryImportAPI(http.Controller):
                 ], limit=1)
                 if not existing:
                     raise
-                return self._existing_response(existing, request_hash, external_reference)
+                return self._existing_response(
+                    existing, request_hash, external_reference, auto_apply,
+                )
+
+            if auto_apply:
+                inventory_import._apply_from_api(external_system, request.env.user)
 
             return self.json_response({
                 "status": "success",
                 "import_id": inventory_import.id,
                 "external_reference": external_reference,
                 "state": inventory_import.state,
+                "applied_at": (
+                    inventory_import.applied_at.isoformat()
+                    if inventory_import.applied_at else None
+                ),
                 "lines": [
                     {
                         "product_external_id": lines[i]["product_external_id"],
@@ -435,6 +504,12 @@ class AgriwareInventoryImportAPI(http.Controller):
             request.env.cr.rollback()
             return self.json_response(
                 {"status": "error", "message": "Access denied"}, 403,
+            )
+
+        except UserError as exc:
+            request.env.cr.rollback()
+            return self.json_response(
+                {"status": "error", "message": str(exc)}, 409,
             )
 
         except Exception:
@@ -453,14 +528,23 @@ class AgriwareInventoryImportAPI(http.Controller):
         """
         return int(uom.parent_path.split("/")[0])
 
-    def _existing_response(self, existing, request_hash, external_reference):
+    def _existing_response(self, existing, request_hash, external_reference, auto_apply=False):
         if existing.request_hash == request_hash:
+            if auto_apply and existing.state != "applied":
+                return self.json_response({
+                    "status": "error",
+                    "message": (
+                        "external_reference already exists as a staged import; "
+                        "automatic application requires a new external_reference"
+                    ),
+                    "import_id": existing.id,
+                }, 409)
             return self.json_response({
                 "status": "success",
                 "import_id": existing.id,
                 "external_reference": external_reference,
                 "state": existing.state,
-                "note": "Idempotent repeat of an already-submitted import.",
+                "note": "Idempotent repeat of an already-processed import.",
             }, 200)
         return self.json_response({
             "status": "error",

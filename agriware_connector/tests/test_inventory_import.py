@@ -33,7 +33,10 @@ class TestAgriwareInventoryImport(AgriwareApiCommon):
         cls.serial_tracked_product.uom_id = kg
 
         cls.external_system = cls.env["agriware.external.system"].sudo().create({
-            "name": "Primary WMS", "code": "primary_wms_e", "company_id": cls.env.company.id,
+            "name": "Primary WMS", "code": "primary_wms_e",
+            "company_id": cls.env.company.id,
+            "allow_automatic_inventory_adjustments": True,
+            "max_auto_inventory_delta": 1000,
         })
 
         ApiKey = cls.env["agriware.api.key"].with_user(cls.admin_user)
@@ -114,6 +117,12 @@ class TestAgriwareInventoryImport(AgriwareApiCommon):
             "/agriware/api/v1/inventory-adjustments", json=data, headers=self._headers(key),
         )
 
+    def _post_auto(self, key, data):
+        return self.url_open(
+            "/agriware/api/v1/inventory-adjustments/apply",
+            json=data, headers=self._headers(key),
+        )
+
     def _body(self, response):
         return json.loads(response.content)
 
@@ -142,6 +151,110 @@ class TestAgriwareInventoryImport(AgriwareApiCommon):
         self.assertEqual(record.external_reference, "INITIAL-2026-001")
         self.assertEqual(record.warehouse_id, self.warehouse)
         self.assertEqual(record.location_id, self.warehouse.lot_stock_id)
+
+    def test_auto_apply_adjusts_stock_and_records_audit(self):
+        response = self._post_auto(
+            self.bound_raw_key,
+            self._payload("AUTO-ADJUST-001", [self._line(quantity=12)]),
+        )
+        self.assertEqual(response.status_code, 201, response.content)
+        body = self._body(response)
+        self.assertEqual(body["state"], "applied")
+        record = self.env["agriware.inventory.import"].sudo().browse(body["import_id"])
+        self.assertEqual(record.applied_by, self.bound_key_record.integration_user_id)
+        self.assertTrue(record.applied_at)
+        self.assertEqual(
+            self.env["stock.quant"].sudo()._get_available_quantity(
+                self.product, self.warehouse.lot_stock_id,
+            ),
+            12,
+        )
+
+    def test_auto_apply_updates_existing_stock_with_native_moves(self):
+        Quant = self.env["stock.quant"].sudo()
+        Quant._update_available_quantity(self.product, self.warehouse.lot_stock_id, 7)
+        response = self._post_auto(
+            self.bound_raw_key,
+            self._payload("AUTO-EXISTING", [self._line(quantity=12)]),
+        )
+        self.assertEqual(response.status_code, 201, response.content)
+        self.assertEqual(Quant._get_available_quantity(
+            self.product, self.warehouse.lot_stock_id), 12)
+        moves = self.env["stock.move"].search([
+            ("product_id", "=", self.product.id), ("state", "=", "done"),
+            ("is_inventory", "=", True),
+        ])
+        self.assertTrue(moves, "Automatic adjustments must leave native stock move history")
+
+    def test_auto_apply_preserves_pending_manual_count(self):
+        Quant = self.env["stock.quant"].sudo()
+        Quant._update_available_quantity(self.product, self.warehouse.lot_stock_id, 7)
+        quant = Quant.search([("product_id", "=", self.product.id),
+                              ("location_id", "=", self.warehouse.lot_stock_id.id)])
+        quant.with_context(inventory_mode=True).inventory_quantity = 9
+        response = self._post_auto(
+            self.bound_raw_key,
+            self._payload("AUTO-MANUAL-CONFLICT", [self._line(quantity=12)]),
+        )
+        self.assertEqual(response.status_code, 409, response.content)
+        quant.invalidate_recordset()
+        self.assertEqual(quant.quantity, 7)
+        self.assertEqual(quant.inventory_quantity, 9)
+
+    def test_auto_apply_requires_wms_opt_in(self):
+        self.external_system.allow_automatic_inventory_adjustments = False
+        response = self._post_auto(self.bound_raw_key, self._payload(
+            "AUTO-NO-OPT-IN", [self._line(quantity=12)]))
+        self.assertEqual(response.status_code, 403, response.content)
+
+    def test_non_finite_count_rejected(self):
+        response = self.url_open(
+            "/agriware/api/v1/inventory-adjustments/apply",
+            data=json.dumps(self._payload("AUTO-NAN", [self._line(quantity=float("nan"))])),
+            headers={"Authorization": "Bearer " + self.bound_raw_key,
+                     "Content-Type": "application/json"},
+        )
+        self.assertEqual(response.status_code, 400, response.content)
+
+    def test_auto_apply_retry_is_idempotent(self):
+        payload = self._payload("AUTO-ADJUST-RETRY", [self._line(quantity=15)])
+        first = self._post_auto(self.bound_raw_key, payload)
+        second = self._post_auto(self.bound_raw_key, payload)
+        self.assertEqual(first.status_code, 201, first.content)
+        self.assertEqual(second.status_code, 200, second.content)
+        self.assertEqual(self._body(second)["state"], "applied")
+        self.assertEqual(
+            self.env["stock.quant"].sudo()._get_available_quantity(
+                self.product, self.warehouse.lot_stock_id,
+            ),
+            15,
+        )
+
+    def test_auto_apply_rejects_reference_already_staged(self):
+        payload = self._payload("AUTO-ADJUST-STAGED", [self._line(quantity=8)])
+        staged = self._post(self.bound_raw_key, payload)
+        attempted = self._post_auto(self.bound_raw_key, payload)
+        self.assertEqual(staged.status_code, 201)
+        self.assertEqual(attempted.status_code, 409)
+        self.assertEqual(
+            self.env["stock.quant"].sudo()._get_available_quantity(
+                self.product, self.warehouse.lot_stock_id,
+            ),
+            0,
+        )
+
+    def test_auto_apply_rejects_variance_above_configured_limit(self):
+        response = self._post_auto(
+            self.bound_raw_key,
+            self._payload("AUTO-ADJUST-OVER-LIMIT", [self._line(quantity=1001)]),
+        )
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(
+            self.env["stock.quant"].sudo()._get_available_quantity(
+                self.product, self.warehouse.lot_stock_id,
+            ),
+            0,
+        )
 
     # -- 2. Multiple import lines -------------------------------------------
 

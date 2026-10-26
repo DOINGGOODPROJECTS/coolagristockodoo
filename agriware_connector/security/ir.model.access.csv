@@ -12,3 +12,4 @@ access_agriware_inventory_import_stock_manager,agriware.inventory.import.stock.m
 access_agriware_inventory_import_line_stock_user,agriware.inventory.import.line.stock.user,model_agriware_inventory_import_line,stock.group_stock_user,1,0,0,0
 access_agriware_inventory_import_line_stock_manager,agriware.inventory.import.line.stock.manager,model_agriware_inventory_import_line,stock.group_stock_manager,1,1,0,0
 access_agriware_wms_transaction_admin,agriware.wms.transaction.admin,model_agriware_wms_transaction,agriware_connector.group_agriware_administrator,1,0,0,0
+access_agriware_dashboard_stock_user,agriware.dashboard.stock.user,model_agriware_dashboard,stock.group_stock_user,1,1,1,1

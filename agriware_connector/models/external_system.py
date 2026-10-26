@@ -1,3 +1,5 @@
+import math
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
@@ -30,6 +32,21 @@ class AgriwareExternalSystem(models.Model):
 
     active = fields.Boolean(default=True)
 
+    allow_automatic_inventory_adjustments = fields.Boolean(
+        string="Allow automatic inventory adjustments",
+        default=False,
+        help="When enabled, this WMS may use the dedicated API apply endpoint. "
+             "The endpoint still enforces the configured maximum variance.",
+    )
+
+    max_auto_inventory_delta = fields.Float(
+        string="Maximum automatic inventory variance",
+        default=0.0,
+        help="Maximum absolute quantity difference per product/lot line, "
+             "in the product's Odoo unit of measure. Must be greater than "
+             "zero before automatic adjustments can be enabled.",
+    )
+
     description = fields.Text()
 
     _code_company_uniq = models.Constraint(
@@ -43,4 +60,15 @@ class AgriwareExternalSystem(models.Model):
             if not record.code or not record.code.strip():
                 raise ValidationError(_(
                     "The external system code cannot be empty."
+                ))
+
+    @api.constrains("allow_automatic_inventory_adjustments", "max_auto_inventory_delta")
+    def _check_automatic_inventory_variance(self):
+        for record in self:
+            if not math.isfinite(record.max_auto_inventory_delta) or (
+                record.allow_automatic_inventory_adjustments
+                and record.max_auto_inventory_delta <= 0
+            ):
+                raise ValidationError(_(
+                    "Automatic adjustments require a finite, positive maximum variance."
                 ))

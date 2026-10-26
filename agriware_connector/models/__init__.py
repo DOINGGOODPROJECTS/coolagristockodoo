@@ -5,3 +5,5 @@ from . import external_id_mapping
 from . import uom_mapping
 from . import inventory_import
 from . import wms_transaction
+from . import res_partner
+from . import dashboard

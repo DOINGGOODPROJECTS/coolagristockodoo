@@ -4,11 +4,38 @@ All notable changes to AgriWare Connector are documented here. Versions follow O
 `{odoo_series}.{major}.{minor}.{patch}` convention.
 
 This file covers the **WMS-first rearchitecture**: `19.0.1.0.0` (the last published marketplace
-release) through `19.0.2.0.0` (this release candidate). The entries below `19.0.2.0.0` are the
+release) through `19.0.2.0.1` (the current release). The entries below `19.0.2.0.0` are the
 per-phase development history and are kept exactly as originally written, unrewritten, even though
 none of those intermediate version numbers (`19.0.1.1.0` through `19.0.1.7.0`) was itself published.
 
 ## [19.0.2.0.0] — WMS-first general availability (release candidate)
+
+## [19.0.2.0.1] — Locations, supplier classification, and connector navigation
+
+### Added
+- Company-scoped storage-location synchronization through `GET`/`POST`/`PATCH
+  /agriware/api/v1/locations`; writes are restricted to internal locations within
+  the authorized warehouse.
+- Supplier-specific partner classification and a dedicated Supplier Records view.
+  Upgrade migration marks existing company-scoped partner mappings as suppliers.
+- A per-WMS opt-in automatic inventory adjustment route at
+  `POST /agriware/api/v1/inventory-adjustments/apply`. Odoo admins must enable it
+  and configure a positive per-line maximum variance. The original staged review
+  endpoint remains available.
+- AgriWare overview dashboard and navigation to existing Odoo Inventory records,
+  connector transaction history, and configuration.
+- Five operational navigation areas, a real-data overview with quick links, native
+  supplier contact forms, and searchable WMS transaction/import/mapping views.
+- Ordinary-user menu/action/view access regressions and company-scoped dashboard checks.
+
+### Fixed
+- Fresh-install menu load order and dashboard model access; ordinary users now use
+  Odoo's supported action loader for quick links.
+- Staged inventory API route registration alongside the new automatic apply route.
+- Automatic counts now apply through native Odoo stock moves instead of only staging
+  quantities. Pending manual counts and ambiguous stock are preserved; non-finite
+  quantities and invalid automatic variance settings are rejected.
+
 
 The umbrella release bundling everything below: Phases A through H of the WMS-first
 rearchitecture, finalized after the Step 129/130 release-preparation and verification passes. See

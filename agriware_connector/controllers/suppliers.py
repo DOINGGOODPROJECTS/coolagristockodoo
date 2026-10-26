@@ -94,6 +94,7 @@ class AgriwareSuppliersAPI(http.Controller):
 
         try:
             partners = request.env["res.partner"].search([
+                ("agriware_is_supplier", "=", True),
                 ("company_id", "in", [False, *request.env.companies.ids]),
             ], limit=100, order="id")
 
@@ -212,6 +213,7 @@ class AgriwareSuppliersAPI(http.Controller):
                 "city": payload.get("city") or False,
                 "country_id": country.id if country else False,
                 "company_id": company.id,
+                "agriware_is_supplier": True,
             })
 
             mapping, created = Mapping.create_mapping(
@@ -355,6 +357,7 @@ class AgriwareSuppliersAPI(http.Controller):
             if "country_code" in payload:
                 values["country_id"] = country.id if country else False
 
+            values["agriware_is_supplier"] = True
             partner.write(values)
 
             return self.json_response({

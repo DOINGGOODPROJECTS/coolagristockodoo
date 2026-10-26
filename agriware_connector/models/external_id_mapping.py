@@ -3,7 +3,7 @@ import logging
 import psycopg2
 
 from odoo import api, fields, models, _
-from odoo.exceptions import AccessError, ValidationError
+from odoo.exceptions import AccessError, ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ ALLOWED_MODELS = (
     "stock.warehouse",
     "res.partner",
     "stock.lot",
+    "stock.location",
 )
 
 
@@ -72,6 +73,21 @@ class AgriwareExternalIdMapping(models.Model):
         "This record is already mapped to a different external ID for "
         "this company and external system.",
     )
+
+    def action_open_record(self):
+        self.ensure_one()
+        self.check_access("read")
+        if self.res_model not in ALLOWED_MODELS:
+            raise UserError(_("Unsupported mapped record type."))
+        record = self.env[self.res_model].browse(self.res_id).exists()
+        if not record:
+            raise UserError(_("The mapped Odoo record no longer exists."))
+        record.check_access("read")
+        return {
+            "type": "ir.actions.act_window", "name": record.display_name,
+            "res_model": self.res_model, "res_id": record.id,
+            "view_mode": "form", "target": "current",
+        }
 
     @api.constrains("res_model")
     def _check_res_model(self):

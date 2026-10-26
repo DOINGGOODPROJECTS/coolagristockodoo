@@ -10,6 +10,7 @@ from . import test_external_systems
 from . import test_external_id_mapping
 from . import test_product_sync
 from . import test_warehouse_sync
+from . import test_location_sync
 from . import test_api_key_isolation_security
 from . import test_api_key_lifecycle_security
 from . import test_supplier_sync

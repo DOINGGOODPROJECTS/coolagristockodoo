@@ -5,7 +5,7 @@
         <field name="name">agriware.inventory.import.list</field>
         <field name="model">agriware.inventory.import</field>
         <field name="arch" type="xml">
-            <list string="Inventory Imports" decoration-warning="state == 'stale'" decoration-muted="state == 'rejected'" decoration-success="state == 'approved'">
+            <list string="Inventory Imports" decoration-warning="state == 'stale'" decoration-muted="state == 'rejected'" decoration-success="state in ('approved', 'applied')">
                 <field name="external_reference"/>
                 <field name="external_system_id"/>
                 <field name="warehouse_id"/>
@@ -13,6 +13,7 @@
                 <field name="submitted_at"/>
                 <field name="submitted_by"/>
                 <field name="state" widget="badge"/>
+                <field name="applied_at"/>
             </list>
         </field>
     </record>
@@ -31,14 +32,21 @@
                             confirm="Approving only records a review decision -- it does NOT change Odoo's actual stock. Applying the counted quantities still requires a separate, manual step in Inventory's own Physical Inventory screen. Continue?"/>
                     <button name="action_reject" type="object" string="Reject"
                             invisible="state not in ('pending_review', 'stale')"/>
-                    <field name="state" widget="statusbar" statusbar_visible="pending_review,stale,approved,rejected"/>
+                    <field name="applied_by"/>
+                    <field name="applied_at"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending_review,stale,approved,rejected,applied"/>
                 </header>
                 <sheet>
-                    <div class="alert alert-info" role="alert" invisible="state in ('approved', 'rejected')">
+                    <div class="alert alert-info" role="alert"
+                         invisible="state not in ('pending_review', 'stale', 'approved')">
                         This is a staged WMS stock observation, not an applied inventory count.
-                        Odoo's actual on-hand quantities are unchanged by anything on this screen,
-                        including Approve. See docs/INITIAL_INVENTORY_IMPORT.md for how to apply
-                        an approved import using Inventory's native Physical Inventory screen.
+                        Approve records a human review decision but does not change stock.
+                        See the import mode and native inventory adjustment instructions in
+                        docs/INITIAL_INVENTORY_IMPORT.md.
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="state != 'applied'">
+                        This count was applied automatically by an explicitly enabled WMS integration.
+                        The submitting integration user and application time are recorded above.
                     </div>
                     <group>
                         <group>
@@ -81,6 +89,28 @@
         </field>
     </record>
 
+    <record id="view_agriware_inventory_import_search" model="ir.ui.view">
+        <field name="name">agriware.inventory.import.search</field>
+        <field name="model">agriware.inventory.import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_reference"/>
+                <field name="external_system_id"/>
+                <field name="warehouse_id"/>
+                <filter name="attention" string="Needs Review" domain="[('state', 'in', ['pending_review', 'stale'])]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="applied" string="Applied Automatically" domain="[('state', '=', 'applied')]"/>
+                <separator/>
+                <filter name="submitted" string="Submitted" date="submitted_at"/>
+                <group>
+                    <filter name="state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="system" string="WMS" context="{'group_by': 'external_system_id'}"/>
+                    <filter name="warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="action_agriware_inventory_imports" model="ir.actions.act_window">
         <field name="name">Inventory Imports</field>
         <field name="res_model">agriware.inventory.import</field>
@@ -90,13 +120,10 @@
                 No inventory imports staged yet.
             </p>
             <p>
-                A WMS submits its own stock observations here through
-                <code>POST /agriware/api/v1/inventory-adjustments</code>.
-                Nothing here ever changes Odoo's actual stock by itself --
-                an Inventory Manager reviews each one and either rejects it
-                or approves it as a recorded decision, then applies it
-                manually (if still warranted) in Inventory's own Physical
-                Inventory screen.
+                Review inventory counts received from your WMS, including
+                automatically applied adjustments. Inventory managers can approve
+                or reject staged counts. Automatic application is configured
+                separately for each connected WMS, with a maximum allowed variance.
             </p>
         </field>
     </record>
@@ -104,7 +131,7 @@
     <menuitem
         id="menu_agriware_inventory_imports"
         name="Inventory Imports"
-        parent="stock.menu_stock_warehouse_mgmt"
+        parent="menu_agriware_root"
         action="action_agriware_inventory_imports"
         sequence="95"
         groups="stock.group_stock_user"

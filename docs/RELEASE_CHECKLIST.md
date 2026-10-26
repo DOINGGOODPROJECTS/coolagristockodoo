@@ -109,3 +109,41 @@ from you (or whoever holds the relevant access) before anyone carries it out —
 
 **None of the above has been done by this session.** This checklist exists so you can approve each
 step individually rather than as one bundled "yes."
+
+
+---
+
+## 19.0.2.0.1 — Connector navigation, dashboard, location sync, supplier classification
+
+Extends the `19.0.2.0.0` checklist above. All code and test work is done.
+
+### Completed in this session
+
+- [x] **Navigation** — five-area menu tree replacing flat legacy layout; all XML IDs preserved
+  for upgrade compatibility; redundant intermediate WMS category deactivated.
+- [x] **Overview dashboard** — `agriware.dashboard` TransientModel; live company-scoped counts;
+  eight quick-access buttons tested as ordinary inventory user and connector administrator.
+- [x] **History views** — list/search/form for `agriware.wms.transaction`; picking-status badge;
+  "Cancelled WMS Operations" domain-filtered action (distinguishes from API failures).
+- [x] **Supplier classification** — `agriware_is_supplier` on `res.partner`; native contact form
+  reused; upgrade migration for existing mapped partners.
+- [x] **Location sync API** — `GET`/`POST`/`PATCH /agriware/api/v1/locations`; company-scoped;
+  internal-location-only write restriction.
+- [x] **Automatic inventory adjustments** — apply route with per-WMS opt-in and variance limit;
+  native Odoo stock moves; pending-count and ambiguous-quant protection.
+- [x] **Tests** — 290 total (up from 271), 0 failures, 0 errors on a fresh-install database.
+- [x] **Release artifacts** built:
+  - `agriware_connector-19.0.2.0.1.zip` (SHA-256 `1c2867aa...`)
+  - `agriware_connector-19.0.2.0.1-marketplace.zip` (SHA-256 `6a4dfde3...`)
+- [x] **Pre-Task-4 database backup** — `backups/agriwareodoo_before_task4_20261026.dump`
+- [x] **`docs/CONNECTOR_NAVIGATION.md`** — navigation reference added.
+- [x] **`docs/PUBLICATION_PACKAGE_19.0.2.0.1.md`** — publication guide for this version.
+
+### Requires explicit approval before execution
+
+- [ ] **Commit working-tree changes** — git index read-only in the dev session; commit must be
+  done manually (command in `docs/PUBLICATION_PACKAGE_19.0.2.0.1.md` Section 3).
+- [ ] **Push, PR, merge, tag** `v19.0.2.0.1`.
+- [ ] **Publish GitHub release** with `agriware_connector-19.0.2.0.1.zip`.
+- [ ] **Upload marketplace zip** `agriware_connector-19.0.2.0.1-marketplace.zip` to Odoo Apps.
+- [ ] **Production database backup** before any customer upgrade.

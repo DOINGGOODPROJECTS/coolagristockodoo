@@ -86,6 +86,7 @@ class TestAgriwareSupplierSync(AgriwareApiCommon):
         body = self._body(response)
         partner = self.env["res.partner"].sudo().browse(body["supplier_id"])
         self.assertEqual(partner.country_id.code, "CI")
+        self.assertTrue(partner.agriware_is_supplier)
         # Phase D, Step 5: new suppliers are company-scoped, not shared.
         self.assertEqual(partner.company_id, self.env.company)
 
@@ -107,11 +108,16 @@ class TestAgriwareSupplierSync(AgriwareApiCommon):
 
     def test_get_suppliers(self):
         self._post(self.bound_raw_key, {"external_id": "SUP-GET", "name": "Listed Supplier"})
+        unrelated = self.env["res.partner"].sudo().create({
+            "name": "Ordinary Customer Contact",
+            "company_id": self.env.company.id,
+        })
         response = self.url_open(
             "/agriware/api/v1/suppliers", headers=self._headers(self.bound_raw_key),
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("suppliers", self._body(response))
+        ids = {item["id"] for item in self._body(response)["suppliers"]}
+        self.assertNotIn(unrelated.id, ids)
 
     # -- Supplier updates -------------------------------------------------
 

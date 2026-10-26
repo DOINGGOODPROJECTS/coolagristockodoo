@@ -10,6 +10,9 @@
                 <field name="code"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="active" widget="boolean_toggle"/>
+                <field name="allow_automatic_inventory_adjustments"/>
+                <field name="max_auto_inventory_delta"
+                       invisible="not allow_automatic_inventory_adjustments"/>
             </list>
         </field>
     </record>
@@ -27,6 +30,9 @@
                         <field name="name" placeholder="e.g. Main Warehouse WMS"/>
                         <field name="code" placeholder="e.g. primary_wms"/>
                         <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="allow_automatic_inventory_adjustments"/>
+                        <field name="max_auto_inventory_delta"
+                               invisible="not allow_automatic_inventory_adjustments"/>
                     </group>
                     <group string="Description">
                         <field name="description" nolabel="1"/>
@@ -54,7 +60,7 @@
     </record>
 
     <!-- Read-only: mappings are created and managed by the mapping
-         service (future REST endpoints), not hand-edited by
+         service (inbound REST endpoints), not hand-edited by
          administrators; see security/ir.model.access.csv, which
          grants this group read access only. -->
     <record id="view_agriware_external_id_mapping_list" model="ir.ui.view">
@@ -67,8 +73,31 @@
                 <field name="res_model"/>
                 <field name="external_id"/>
                 <field name="res_id"/>
-                <field name="create_date" string="Created"/>
+                <field name="create_date" string="Mapping Created"/>
+                <button name="action_open_record" type="object" string="Open Odoo Record" icon="fa-external-link"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_agriware_external_id_mapping_search" model="ir.ui.view">
+        <field name="name">agriware.external.id.mapping.search</field>
+        <field name="model">agriware.external.id.mapping</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_id"/>
+                <field name="external_system_id"/>
+                <field name="res_model"/>
+                <field name="res_id"/>
+                <filter name="products" string="Products" domain="[('res_model', '=', 'product.product')]"/>
+                <filter name="warehouses" string="Warehouses" domain="[('res_model', '=', 'stock.warehouse')]"/>
+                <filter name="locations" string="Locations" domain="[('res_model', '=', 'stock.location')]"/>
+                <filter name="lots" string="Lots" domain="[('res_model', '=', 'stock.lot')]"/>
+                <filter name="suppliers" string="Suppliers" domain="[('res_model', '=', 'res.partner')]"/>
+                <group>
+                    <filter name="system" string="WMS" context="{'group_by': 'external_system_id'}"/>
+                    <filter name="model" string="Record Type" context="{'group_by': 'res_model'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

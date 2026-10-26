@@ -8,3 +8,4 @@ from . import warehouses
 from . import suppliers
 from . import inventory_import
 from . import lots
+from . import locations
