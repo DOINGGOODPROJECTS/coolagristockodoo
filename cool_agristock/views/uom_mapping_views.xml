@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cool_agristock_uom_mapping_list" model="ir.ui.view">
+        <field name="name">cool_agristock.uom.mapping.list</field>
+        <field name="model">cool_agristock.uom.mapping</field>
+        <field name="arch" type="xml">
+            <list string="UOM Mappings">
+                <field name="external_unit_code"/>
+                <field name="uom_id"/>
+                <field name="external_system_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_uom_mapping_form" model="ir.ui.view">
+        <field name="name">cool_agristock.uom.mapping.form</field>
+        <field name="model">cool_agristock.uom.mapping</field>
+        <field name="arch" type="xml">
+            <form string="UOM Mapping">
+                <header>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="external_unit_code" placeholder="e.g. bag_50kg"/>
+                        <field name="uom_id"/>
+                        <field name="external_system_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="description" nolabel="1"
+                               placeholder="e.g. 'bag' means this WMS's standard 50kg bag for fertilizer products only -- verify before reuse for other products."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_uom_mappings" model="ir.actions.act_window">
+        <field name="name">UOM Mappings</field>
+        <field name="res_model">cool_agristock.uom.mapping</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No UOM mappings configured yet.
+            </p>
+            <p>
+                Map an external WMS's own unit codes (e.g. "bag_50kg")
+                to an existing Odoo unit of measure. Cool Agristock
+                never invents a conversion factor -- it only references
+                a unit of measure already configured in Odoo
+                (Settings &gt; Technical &gt; Units of Measure).
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_cool_agristock_uom_mappings"
+        name="UOM Mappings"
+        parent="menu_cool_agristock_external_systems_root"
+        action="action_cool_agristock_uom_mappings"
+        sequence="30"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+</odoo>

@@ -9,10 +9,11 @@
 backups/
 *.dump
 *.sql
+!scripts/*.sql
 *.backup
 
 # Temporary API keys and test files
-.agriware_test_key.tmp
+.cool_agristock_test_key.tmp
 *.tmp
 
 # Python cache

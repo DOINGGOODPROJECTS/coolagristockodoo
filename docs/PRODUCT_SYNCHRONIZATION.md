@@ -12,7 +12,7 @@ never get stock quantities from this phase; that's a separate, not-yet-built con
 
 ## Endpoints
 
-### `POST /agriware/api/v1/products`
+### `POST /cool_agristock/api/v1/products`
 
 Creates a new product, identified going forward by your own `external_id`.
 
@@ -39,7 +39,7 @@ Response `409` (external_id already mapped — no new product created):
 {"status": "error", "message": "external_id already mapped", "product_id": 53}
 ```
 
-### `PATCH /agriware/api/v1/products/{external_id}`
+### `PATCH /cool_agristock/api/v1/products/{external_id}`
 
 Partial update — only send the fields you want to change.
 
@@ -61,17 +61,17 @@ Response `404` (no product mapped under this external_id, for this company/exter
 **`PATCH` never creates a product.** If `external_id` doesn't resolve to an existing mapping, the
 request fails — it does not fall back to creating one.
 
-### `GET /agriware/api/v1/products` — unchanged
+### `GET /cool_agristock/api/v1/products` — unchanged
 
 Still exactly what it was before this phase: read-only, no authentication beyond the existing
-Bearer + AgriWare API User requirement, no binding to an external system required. A key with no
+Bearer + Cool Agristock API User requirement, no binding to an external system required. A key with no
 external-system binding can still call this freely — see
 [Backward compatibility](#backward-compatibility).
 
 ## API key binding
 
 Product write endpoints require the authenticated key to be bound to an **active**
-`agriware.external.system`. Binding happens once, at key-generation time, via the **Generate API
+`cool_agristock.external.system`. Binding happens once, at key-generation time, via the **Generate API
 Key** wizard's new **Authorized External System** field (Administrator-only, same screen as
 before) — it cannot be changed afterward on an existing key, matching how every other field on a
 generated key is already locked once created.
@@ -80,7 +80,7 @@ generated key is already locked once created.
 limitation.** The first version of this feature resolved authorization from the authenticated
 *user*, not the specific key. Odoo's own Bearer-token verification
 (`_check_apikey_credentials`) only ever returns *which user* authenticated, never *which specific
-key row* — and at the time, every `agriware.api.key` for one company shared **one** integration
+key row* — and at the time, every `cool_agristock.api.key` for one company shared **one** integration
 user (the pre-existing, unchanged design for unbound keys). The consequence, reproduced directly
 via a real HTTP request against a disposable Odoo 19 database: a key generated with **no** binding
 authenticated a product-write request and succeeded (`201`), inheriting authorization from an
@@ -90,7 +90,7 @@ for Phase A's original deferral decision, which Phase B's first implementation (
 
 **Fixed:** a key that requests a binding now gets its **own, dedicated integration user**, created
 fresh at generation time and never shared with any other key —
-`agriware.api.key._create_dedicated_integration_user()`. A bearer token now maps to exactly one
+`cool_agristock.api.key._create_dedicated_integration_user()`. A bearer token now maps to exactly one
 user, which maps to exactly one key, which resolves to exactly one external system. Keys generated
 with **no** binding are entirely unaffected — they continue sharing the one per-company user
 exactly as before, since that path never changed. Re-verified directly after the fix: the same
@@ -147,7 +147,7 @@ client-controllable.
 
 **Update (Phase D): the database-backed UOM mapping is now implemented** — see
 [UOM_MAPPING.md](UOM_MAPPING.md) for the full reference. `unit` resolution now checks, in order:
-(1) an administrator-configured `agriware.uom.mapping` row for the caller's company and external
+(1) an administrator-configured `cool_agristock.uom.mapping` row for the caller's company and external
 system, then (2) the small hardcoded set below, which remains exactly as it was in Phase B for
 full backward compatibility — an integration that has never configured a mapping is entirely
 unaffected.
@@ -190,7 +190,7 @@ same `external_id`:
 |---|---|
 | 400 | Invalid JSON, missing/empty `name`, missing/invalid `external_id`, unsupported field, unsupported unit |
 | 401 | Missing, malformed, invalid, expired, or revoked API key (same as every existing endpoint) |
-| 403 | Authenticated but not an AgriWare API User; or authenticated but the key isn't bound to an active external system; or the identity is ambiguously bound to more than one external system |
+| 403 | Authenticated but not a Cool Agristock API User; or authenticated but the key isn't bound to an active external system; or the identity is ambiguously bound to more than one external system |
 | 404 | (`PATCH` only) No product mapped for this `external_id` |
 | 409 | `external_id` already mapped (create), with the existing `product_id` included |
 | 500 | Unexpected server-side error (transaction rolled back; no stack trace in the response body) |
@@ -201,7 +201,7 @@ same `external_id`:
   side — **never** from anything in the request body. There is no `external_system_id` field a
   client can send; it would be ignored even if sent, since the controller never reads it from the
   payload at all.
-- Requires real, auditable ORM access: the AgriWare API User group was granted explicit `create`/
+- Requires real, auditable ORM access: the Cool Agristock API User group was granted explicit `create`/
   `write` access to `product.product` **and** `product.template` (the latter discovered necessary
   only by testing against the real installation — see [Known limitations](#known-limitations)) —
   no `sudo()` bypass of ordinary access control for these writes.
@@ -222,7 +222,7 @@ Every existing endpoint's behavior is unchanged, confirmed by the full pre-exist
 - A key generated with no `external_system_id` (the default — this field is optional) continues to
   work for every endpoint it already worked with; it's rejected only by the two new product-write
   endpoints.
-- `agriware.api.key`'s existing fields, `generate_key()`'s existing call signature (the new
+- `cool_agristock.api.key`'s existing fields, `generate_key()`'s existing call signature (the new
   `external_system` parameter is optional, defaulting to `None`), and `action_revoke()`/
   `action_create_replacement()` are all unchanged in behavior for callers that don't pass the new
   parameter.
@@ -249,7 +249,7 @@ Every existing endpoint's behavior is unchanged, confirmed by the full pre-exist
 - **All 106 tests pass** against a fresh database: all 84 from Phase A at their original counts,
   plus 22 new tests covering the full security/behavior matrix for this phase.
 - **A real bug was found and fixed by testing against the installed Odoo 19, not by inspection:**
-  granting `product.product` create/write access to the AgriWare API User group was not sufficient
+  granting `product.product` create/write access to the Cool Agristock API User group was not sufficient
   — creating a `product.product` without an existing template also requires `create` access to the
   underlying `product.template` record (delegation inheritance). The first test run failed with
   `Access Denied by ACLs for operation: create ... model: product.template` on every product-
@@ -264,6 +264,6 @@ Every existing endpoint's behavior is unchanged, confirmed by the full pre-exist
   recorded) → updated it to "Fresh Cassava" (`PATCH`, `200`) → repeated the original creation
   request (`409`, same product id returned) → confirmed via direct SQL that exactly one
   `product_product` row with that `default_code` exists, its name is "Fresh Cassava", and the
-  `agriware_external_id_mapping` row correctly points `AGRI-001` → that one product id.
-- The pre-existing `/agriware/api/v1/health` and `GET /products` endpoints were confirmed still
+  `cool_agristock_external_id_mapping` row correctly points `AGRI-001` → that one product id.
+- The pre-existing `/cool_agristock/api/v1/health` and `GET /products` endpoints were confirmed still
   responding correctly with this phase's code installed.

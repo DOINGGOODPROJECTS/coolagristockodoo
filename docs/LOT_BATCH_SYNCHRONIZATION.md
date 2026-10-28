@@ -14,7 +14,7 @@ engine is reused directly, never duplicated.
 
 ## Endpoints
 
-### `POST /agriware/api/v1/lots`
+### `POST /cool_agristock/api/v1/lots`
 
 ```json
 {"external_id": "LOT-001", "product_external_id": "AGRI-001", "name": "COCOA-2026-001"}
@@ -25,12 +25,12 @@ Response `201`:
 {"status": "success", "lot_id": 42, "external_id": "LOT-001", "name": "COCOA-2026-001", "product_external_id": "AGRI-001"}
 ```
 
-### `GET /agriware/api/v1/lots`
+### `GET /cool_agristock/api/v1/lots`
 
 Read-only, same pattern as every other `GET` — no external-system binding required, capped at 100,
 company-scoped.
 
-### `PATCH /agriware/api/v1/lots/{external_id}`
+### `PATCH /cool_agristock/api/v1/lots/{external_id}`
 
 ```json
 {"name": "COCOA-2026-001-R2"}
@@ -98,7 +98,7 @@ API with its real fields is a better-scoped future phase.
 
 ## Lot-level inventory import integration (extends Phase E)
 
-`POST /agriware/api/v1/inventory-adjustments` lines gained an optional `lot_external_id`:
+`POST /cool_agristock/api/v1/inventory-adjustments` lines gained an optional `lot_external_id`:
 
 ```json
 {
@@ -171,9 +171,9 @@ indirectly, so this module can pin the lot the WMS actually asked for.
 
 ## Security
 
-Identical pattern to every other phase: Bearer token → AgriWare API User group →
+Identical pattern to every other phase: Bearer token → Cool Agristock API User group →
 `resolve_authorized_external_system()`, server-derived. **A real, favorable finding, not assumed:**
-`stock.group_stock_user` (already implied by the AgriWare API User group since Phase B) already has
+`stock.group_stock_user` (already implied by the Cool Agristock API User group since Phase B) already has
 full native `create`/`read`/`write`/`unlink` access to `stock.lot` in this Odoo 19 installation —
 checked directly against `ir.model.access`, the same way every prior phase's ACL gaps were found.
 Unlike suppliers/warehouses/inventory-import, **no gated `sudo()` pattern and no new
@@ -186,7 +186,7 @@ calls `stock.lot.create()`/`.write()` directly under the authenticated API user'
 |---|---|
 | 400 | Invalid JSON, missing/invalid field, unsupported field (including any expiration-related field), empty name |
 | 401 | Missing/invalid/revoked/expired API key |
-| 403 | Not an AgriWare API User; key not bound to an active external system; inactive external system |
+| 403 | Not a Cool Agristock API User; key not bound to an active external system; inactive external system |
 | 404 | Unknown `external_id` (lot or product); unknown `lot_external_id` on import/receipt/dispatch |
 | 409 | Duplicate `external_id`; conflicting lot name for the same product/company; lot name change after stock history; insufficient stock in the named lot (dispatch) |
 | 422 | Product not lot/serial-tracked but a lot was given (or vice versa); lot belongs to a different product; serial quantity != 1 |

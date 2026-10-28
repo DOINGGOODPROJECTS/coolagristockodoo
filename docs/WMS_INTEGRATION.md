@@ -1,7 +1,7 @@
 # WMS Integration Guide
 
 This guide is for the developer configuring or building the connection between an existing
-Warehouse Management System (WMS) and Odoo 19, via AgriWare Connector. It explains the integration
+Warehouse Management System (WMS) and Odoo 19, via Cool Agristock. It explains the integration
 model and walks through each supported operation with real request/response examples.
 
 For the complete field-by-field API reference (every parameter, every error condition), see
@@ -12,7 +12,7 @@ Odoo, see [INSTALLATION.md](INSTALLATION.md).
 
 ```text
 +----------------+        HTTPS + Bearer token         +----------------------+
-|  External WMS  |  ------------------------------->    |  AgriWare Connector  |
+|  External WMS  |  ------------------------------->    |  Cool Agristock  |
 |  (your system) |  <-------------------------------    |  (Odoo 19 module)    |
 +----------------+     JSON request / JSON response      +----------------------+
                                                                     |
@@ -30,11 +30,11 @@ Odoo, see [INSTALLATION.md](INSTALLATION.md).
                                                            +---------------+
 ```
 
-**Every request in this integration is initiated by your WMS.** AgriWare Connector exposes a REST
+**Every request in this integration is initiated by your WMS.** Cool Agristock exposes a REST
 API that your system calls — it never calls out to your WMS. There is no webhook, callback, or
 scheduled push of data in either direction. If your WMS needs up-to-date product, warehouse, or
 inventory data, your WMS must call the relevant `GET` endpoint again whenever it needs fresh data
-(see [Product synchronization](#product-synchronization) below) — AgriWare Connector does not run
+(see [Product synchronization](#product-synchronization) below) — Cool Agristock does not run
 any polling, cron job, or background task of its own.
 
 ## API base URL
@@ -42,7 +42,7 @@ any polling, cron job, or background task of its own.
 All endpoints are rooted at:
 
 ```text
-https://YOUR_ODOO_URL/agriware/api/v1
+https://YOUR_ODOO_URL/cool_agristock/api/v1
 ```
 
 Replace `YOUR_ODOO_URL` with your actual Odoo instance's address (e.g.
@@ -57,11 +57,11 @@ explicitly in its response body (`"api_version": "1.0"`).
 ## Authentication
 
 Every endpoint except the health check requires an `Authorization: Bearer <key>` header, where
-`<key>` is a real Odoo API key generated through **AgriWare Connector → API Management → Generate
+`<key>` is a real Odoo API key generated through **Cool Agristock → API Management → Generate
 API Key** inside Odoo (see [INSTALLATION.md](INSTALLATION.md)). There is no separate
-AgriWare-specific credential or OAuth flow — it is Odoo's own API key mechanism.
+Cool Agristock-specific credential or OAuth flow — it is Odoo's own API key mechanism.
 
-Odoo validates the key **before** any AgriWare code runs. An invalid, missing, expired, or revoked
+Odoo validates the key **before** any Cool Agristock code runs. An invalid, missing, expired, or revoked
 key gets a plain-text HTML `401` response, not JSON:
 
 ```http
@@ -78,9 +78,9 @@ Content-Type: text/html
 Your integration code must check the HTTP status code before attempting to parse the response body
 as JSON.
 
-Beyond a valid key, the key's underlying account must also carry the **AgriWare API User** role.
+Beyond a valid key, the key's underlying account must also carry the **Cool Agristock API User** role.
 Keys generated through the wizard already have this; if you ever see
-`{"status": "error", "message": "Access denied: AgriWare API User role required"}`, the key or its
+`{"status": "error", "message": "Access denied: Cool Agristock API User role required"}`, the key or its
 account was altered outside the normal generation flow.
 
 ## Required HTTP headers
@@ -94,27 +94,27 @@ account was altered outside the normal generation flow.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/agriware/api/v1/health` | Confirm the API is reachable (no auth) |
-| GET | `/agriware/api/v1/products` | Retrieve products |
-| GET | `/agriware/api/v1/warehouses` | Retrieve warehouses |
-| GET | `/agriware/api/v1/inventory` | Retrieve on-hand inventory |
-| POST | `/agriware/api/v1/receipts` | Create a draft incoming receipt |
-| POST | `/agriware/api/v1/receipts/{id}/validate` | Confirm a receipt |
-| POST | `/agriware/api/v1/dispatches` | Create a draft outgoing dispatch |
-| POST | `/agriware/api/v1/dispatches/{id}/validate` | Confirm a dispatch |
+| GET | `/cool_agristock/api/v1/health` | Confirm the API is reachable (no auth) |
+| GET | `/cool_agristock/api/v1/products` | Retrieve products |
+| GET | `/cool_agristock/api/v1/warehouses` | Retrieve warehouses |
+| GET | `/cool_agristock/api/v1/inventory` | Retrieve on-hand inventory |
+| POST | `/cool_agristock/api/v1/receipts` | Create a draft incoming receipt |
+| POST | `/cool_agristock/api/v1/receipts/{id}/validate` | Confirm a receipt |
+| POST | `/cool_agristock/api/v1/dispatches` | Create a draft outgoing dispatch |
+| POST | `/cool_agristock/api/v1/dispatches/{id}/validate` | Confirm a dispatch |
 
 All list endpoints (`products`, `warehouses`, `inventory`) return at most 100 records per call —
 there is currently no pagination parameter (see [Known limitations](#known-limitations)).
 
 ## Product synchronization
 
-Call `GET /agriware/api/v1/products` whenever your WMS needs an up-to-date product list — on
+Call `GET /cool_agristock/api/v1/products` whenever your WMS needs an up-to-date product list — on
 startup, on a schedule your WMS controls, or on demand before creating a receipt/dispatch. There is
 no change-notification mechanism, so "synchronization" here means **your WMS polling this endpoint
-on its own schedule**, not AgriWare Connector pushing updates.
+on its own schedule**, not Cool Agristock pushing updates.
 
 ```bash
-curl -s https://YOUR_ODOO_URL/agriware/api/v1/products \
+curl -s https://YOUR_ODOO_URL/cool_agristock/api/v1/products \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -134,7 +134,7 @@ Use `id` as the stable key when referencing a product in later receipt/dispatch 
 ## Warehouse information retrieval
 
 ```bash
-curl -s https://YOUR_ODOO_URL/agriware/api/v1/warehouses \
+curl -s https://YOUR_ODOO_URL/cool_agristock/api/v1/warehouses \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -153,7 +153,7 @@ curl -s https://YOUR_ODOO_URL/agriware/api/v1/warehouses \
 ## Inventory retrieval
 
 ```bash
-curl -s https://YOUR_ODOO_URL/agriware/api/v1/inventory \
+curl -s https://YOUR_ODOO_URL/cool_agristock/api/v1/inventory \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -186,11 +186,11 @@ then validate it once goods are physically counted in.
 **1. Create the draft receipt:**
 
 ```bash
-curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/receipts \
+curl -s -X POST https://YOUR_ODOO_URL/cool_agristock/api/v1/receipts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-RCPT-00042",
+        "external_reference": "COOL_AGRISTOCK-RCPT-00042",
         "warehouse_id": 1,
         "supplier_id": 37,
         "products": [{"product_id": 14, "quantity": 500}]
@@ -198,27 +198,27 @@ curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/receipts \
 ```
 
 ```json
-{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "AGRIWARE-RCPT-00042", "state": "draft"}
+{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "COOL_AGRISTOCK-RCPT-00042", "state": "draft"}
 ```
 
 `external_reference` is a string **you** choose (1–128 chars); it must start with
-`AGRIWARE-RCPT-` if you intend to validate this receipt later (see
+`COOL_AGRISTOCK-RCPT-` if you intend to validate this receipt later (see
 [Duplicate transaction protection](#duplicate-transaction-protection--idempotency)).
 
 **2. Validate the receipt once goods are counted:**
 
 ```bash
-curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/receipts/102/validate \
+curl -s -X POST https://YOUR_ODOO_URL/cool_agristock/api/v1/receipts/102/validate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-RCPT-00042",
+        "external_reference": "COOL_AGRISTOCK-RCPT-00042",
         "received_quantities": [{"product_id": 14, "quantity": 500}]
       }'
 ```
 
 ```json
-{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "AGRIWARE-RCPT-00042", "state": "done"}
+{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "COOL_AGRISTOCK-RCPT-00042", "state": "done"}
 ```
 
 `received_quantities` must list exactly the same products as the draft receipt, with exactly
@@ -237,11 +237,11 @@ create-then-validate pattern.
 **1. Create the draft dispatch:**
 
 ```bash
-curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/dispatches \
+curl -s -X POST https://YOUR_ODOO_URL/cool_agristock/api/v1/dispatches \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-DISP-00017",
+        "external_reference": "COOL_AGRISTOCK-DISP-00017",
         "warehouse_id": 1,
         "customer_id": 52,
         "products": [{"product_id": 14, "quantity": 120}]
@@ -249,23 +249,23 @@ curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/dispatches \
 ```
 
 ```json
-{"status": "success", "dispatch_id": 58, "dispatch_reference": "WH/OUT/00017", "external_reference": "AGRIWARE-DISP-00017", "state": "draft"}
+{"status": "success", "dispatch_id": 58, "dispatch_reference": "WH/OUT/00017", "external_reference": "COOL_AGRISTOCK-DISP-00017", "state": "draft"}
 ```
 
 **2. Validate the dispatch once the goods are picked:**
 
 ```bash
-curl -s -X POST https://YOUR_ODOO_URL/agriware/api/v1/dispatches/58/validate \
+curl -s -X POST https://YOUR_ODOO_URL/cool_agristock/api/v1/dispatches/58/validate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-DISP-00017",
+        "external_reference": "COOL_AGRISTOCK-DISP-00017",
         "dispatched_quantities": [{"product_id": 14, "quantity": 120}]
       }'
 ```
 
 ```json
-{"status": "success", "dispatch_id": 58, "dispatch_reference": "WH/OUT/00017", "external_reference": "AGRIWARE-DISP-00017", "state": "done"}
+{"status": "success", "dispatch_id": 58, "dispatch_reference": "WH/OUT/00017", "external_reference": "COOL_AGRISTOCK-DISP-00017", "state": "done"}
 ```
 
 Dispatch validation additionally requires the stock to be available/reservable; an under-stocked
@@ -284,7 +284,7 @@ record's id, so your WMS can detect "this was already processed" instead of crea
 ```
 
 To validate a receipt or dispatch later, its `external_reference` **must** use the matching
-prefix — `AGRIWARE-RCPT-` for receipts, `AGRIWARE-DISP-` for dispatches — or validation is rejected
+prefix — `COOL_AGRISTOCK-RCPT-` for receipts, `COOL_AGRISTOCK-DISP-` for dispatches — or validation is rejected
 with `403`. Choose your reference scheme with this in mind from the start.
 
 ## API error handling
@@ -337,8 +337,8 @@ duplicate references, state mismatches, and quantity mismatches, each with a dif
   [LOT_BATCH_SYNCHRONIZATION.md](LOT_BATCH_SYNCHRONIZATION.md).
 - Multiple move lines for the same product on one receipt are not supported.
 - No automatic or scheduled synchronization — every request is initiated by your WMS; there is no
-  polling, cron job, or push notification from AgriWare Connector.
-- No bidirectional synchronization — AgriWare Connector never calls out to your WMS.
+  polling, cron job, or push notification from Cool Agristock.
+- No bidirectional synchronization — Cool Agristock never calls out to your WMS.
 - No built-in, WMS-specific adapters — this is one generic REST API; translating it to your WMS's
   native protocol, if needed, is integration work on your side (optionally available as a paid
   service — see the [README](../README.md#free-software-and-paid-services)).

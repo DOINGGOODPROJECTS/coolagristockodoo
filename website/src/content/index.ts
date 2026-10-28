@@ -8,5 +8,5 @@ export function getDictionary(lang: Lang): Dictionary {
   return dictionaries[lang];
 }
 
-export const GITHUB_REPO_URL = "https://github.com/DOINGGOODPROJECTS/agriwareodoo";
+export const GITHUB_REPO_URL = "https://github.com/DOINGGOODPROJECTS/coolagristockodoo";
 export const MARKETPLACE_URL = "https://apps.odoo.com/apps/modules/19.0/agriware_connector";

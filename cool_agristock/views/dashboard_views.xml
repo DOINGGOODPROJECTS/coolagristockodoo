@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cool_agristock_dashboard_form" model="ir.ui.view">
+        <field name="name">cool_agristock.dashboard.form</field>
+        <field name="model">cool_agristock.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Cool Agristock Overview" create="0" edit="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Cool Agristock Overview</h1>
+                        <p>Live counts for the active companies. The API is inbound: connected WMS clients call Odoo.</p>
+                    </div>
+                    <group string="API Configuration" col="4">
+                        <field name="active_system_count" string="Registered Active WMS Systems"/>
+                        <field name="active_api_key_count" string="Active API Keys"/>
+                    </group>
+                    <group string="WMS Transaction Activity" col="4">
+                        <field name="receipt_count" string="Receipts Created"/>
+                        <field name="dispatch_count" string="Dispatches Created"/>
+                        <field name="completed_transaction_count" string="Completed Operations"/>
+                        <field name="cancelled_transaction_count" string="Cancelled Operations"/>
+                        <field name="last_transaction_at" string="Latest Transaction"/>
+                    </group>
+                    <group string="Inventory Review" col="2">
+                        <field name="pending_import_count" string="Counts Awaiting Review"/>
+                        <field name="rejected_import_count" string="Rejected Counts"/>
+                        <field name="mapping_count" string="Catalog Records Linked to WMS"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        API request failures are returned to the WMS client and are not stored as synchronization error records.
+                        Transaction counts above come from real Odoo picking records linked to WMS references.
+                    </div>
+                    <p>Active keys indicate configured API access, not a live connection test. WMS clients initiate requests; no heartbeat is tracked.</p>
+                    <group string="Recent Completed Operations" groups="cool_agristock.group_cool_agristock_administrator">
+                        <field name="recent_transaction_ids" nolabel="1">
+                            <list create="0" edit="0" delete="0">
+                                <field name="external_reference"/>
+                                <field name="external_system_id"/>
+                                <field name="transaction_type"/>
+                                <field name="completed_at"/>
+                                <field name="picking_id"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Quick Access" col="4">
+                        <button name="action_open_products" type="object" string="Products" class="btn-primary"/>
+                        <button name="action_open_inventory" type="object" string="Inventory Overview"/>
+                        <button name="action_open_warehouses" type="object" string="Warehouses"/>
+                        <button name="action_open_lots" type="object" string="Lots &amp; Serial Numbers"/>
+                        <button name="action_open_receipts" type="object" string="Goods Received"/>
+                        <button name="action_open_dispatches" type="object" string="Dispatches &amp; Deliveries"/>
+                        <button name="action_open_suppliers" type="object" string="Supplier Records"/>
+                        <button name="action_open_inventory_imports" type="object" string="Inventory Imports"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_dashboard" model="ir.actions.act_window">
+        <field name="name">Overview</field>
+        <field name="res_model">cool_agristock.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_cool_agristock_dashboard_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <record id="view_cool_agristock_wms_transaction_list" model="ir.ui.view">
+        <field name="name">cool_agristock.wms.transaction.list</field>
+        <field name="model">cool_agristock.wms.transaction</field>
+        <field name="arch" type="xml">
+            <list string="Synchronization History" create="0" delete="0">
+                <field name="create_date" string="Received"/>
+                <field name="transaction_type"/>
+                <field name="external_reference"/>
+                <field name="external_system_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="picking_id"/>
+                <field name="picking_state" widget="badge"/>
+                <field name="completed_at" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_wms_transaction_search" model="ir.ui.view">
+        <field name="name">cool_agristock.wms.transaction.search</field>
+        <field name="model">cool_agristock.wms.transaction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_reference"/>
+                <field name="external_system_id"/>
+                <field name="picking_id"/>
+                <filter name="completed" string="Completed" domain="[('picking_state', '=', 'done')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('picking_state', '=', 'cancel')]"/>
+                <filter name="pending" string="In Progress" domain="[('picking_state', 'not in', ['done', 'cancel'])]"/>
+                <separator/>
+                <filter name="received" string="Received" date="create_date"/>
+                <group>
+                    <filter name="system" string="WMS" context="{'group_by': 'external_system_id'}"/>
+                    <filter name="category" string="Category" context="{'group_by': 'transaction_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_cool_agristock_wms_transaction_form" model="ir.ui.view">
+        <field name="name">cool_agristock.wms.transaction.form</field>
+        <field name="model">cool_agristock.wms.transaction</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <field name="external_reference"/>
+                        <field name="external_system_id"/>
+                        <field name="transaction_type"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="create_date" string="Received"/>
+                        <field name="picking_id"/>
+                        <field name="picking_state"/>
+                        <field name="completed_at"/>
+                    </group>
+                    <p>Open the transfer to review or process the warehouse operation. Cancellation is an operation status, not an API failure.</p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_wms_transactions" model="ir.actions.act_window">
+        <field name="name">Receipt &amp; Dispatch History</field>
+        <field name="res_model">cool_agristock.wms.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_cool_agristock_wms_transaction_list"/>
+    </record>
+
+    <record id="action_cool_agristock_cancelled_transactions" model="ir.actions.act_window">
+        <field name="name">Cancelled WMS Operations</field>
+        <field name="res_model">cool_agristock.wms.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_cool_agristock_wms_transaction_list"/>
+        <field name="domain">[('picking_id.state', '=', 'cancel')]</field>
+    </record>
+
+</odoo>

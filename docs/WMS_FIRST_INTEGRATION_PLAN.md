@@ -12,10 +12,10 @@ and endpoint schemas.
 ## External ID mapping design
 
 **This section's design shipped largely as described below** — the
-`agriware.external.id.mapping` model, its two database-level unique constraints, and the
+`cool_agristock.external.id.mapping` model, its two database-level unique constraints, and the
 resolve/create/update/remove service all exist and are tested. One refinement made during
 implementation, not anticipated here: external systems are now their own explicit model
-(`agriware.external.system`), not a bare `external_system` string field, giving them company
+(`cool_agristock.external.system`), not a bare `external_system` string field, giving them company
 scoping, an active flag, and an admin UI — see
 [EXTERNAL_ID_MAPPING.md](EXTERNAL_ID_MAPPING.md#external-system-identity) for why and exactly what
 exists today, rather than re-reading this section as current.
@@ -25,10 +25,10 @@ exists today, rather than re-reading this section as current.
 Every existing endpoint (`receipts.py`, `dispatches.py`, confirmed by reading the code) requires
 the caller to already know Odoo's internal integer ID for a product, warehouse, or partner. A
 WMS-first integration needs the opposite: the WMS should be able to refer to its *own* identifiers
-(`WMS-PRODUCT-001`) and have AgriWare Connector resolve or create the corresponding Odoo record
+(`WMS-PRODUCT-001`) and have Cool Agristock resolve or create the corresponding Odoo record
 transparently.
 
-### Proposed model: `agriware.external.id.mapping`
+### Proposed model: `cool_agristock.external.id.mapping`
 
 A single, generic mapping model — not a bespoke mapping table per record type — so the same
 mechanism covers products, warehouses, suppliers, and lots without new infrastructure per phase.
@@ -36,7 +36,7 @@ mechanism covers products, warehouses, suppliers, and lots without new infrastru
 | Field | Type | Notes |
 |---|---|---|
 | `company_id` | Many2one `res.company`, required | Scopes the mapping to one company, matching the existing isolation pattern. |
-| `external_system` | Char, required | A short identifier for *which* external integration this mapping belongs to (e.g. `"primary_wms"`). Deliberately **not** a reference to `agriware.api.key` — a mapping must survive key rotation/replacement; tying it to a specific key's lifecycle would orphan every mapping when a business rotates its credentials. |
+| `external_system` | Char, required | A short identifier for *which* external integration this mapping belongs to (e.g. `"primary_wms"`). Deliberately **not** a reference to `cool_agristock.api.key` — a mapping must survive key rotation/replacement; tying it to a specific key's lifecycle would orphan every mapping when a business rotates its credentials. |
 | `res_model` | Char, required | e.g. `"product.product"`, `"stock.warehouse"`, `"res.partner"`, `"stock.lot"`. |
 | `res_id` | Integer, required | The Odoo record's own database ID. Not a formal `Many2one` (the target model varies), consistent with Odoo's own generic-reference conventions. |
 | `external_id` | Char, required | The WMS's own identifier string, e.g. `"WMS-PRODUCT-001"`. |
@@ -52,7 +52,7 @@ mechanism covers products, warehouses, suppliers, and lots without new infrastru
 
 Every proposed `POST` (create) endpoint follows the same algorithm:
 
-1. Look up `agriware.external.id.mapping` for `(company, external_system, res_model, external_id)`.
+1. Look up `cool_agristock.external.id.mapping` for `(company, external_system, res_model, external_id)`.
 2. **If found:** reject with `409 Conflict`, same pattern as the existing receipt/dispatch
    duplicate-reference check — the existing record's Odoo ID is included in the response.
 3. **If not found:** create the Odoo record (via the allow-listed fields only — see
@@ -91,14 +91,14 @@ more round-trips for no real benefit).
 the sketch below is preserved for history but the shipped allow-list differs slightly (no
 `is_storable` as a request field — it's fixed server-side; `description` was added).
 
-- `POST /agriware/api/v1/products` creates a `product.product` (consistent with the existing
+- `POST /cool_agristock/api/v1/products` creates a `product.product` (consistent with the existing
   `GET /products` endpoint, which also operates on `product.product`, not `product.template`).
 - Allow-listed fields (WMS-owned): `name`, `default_code`, `barcode`, `is_storable` (fixed `true`
   for anything synced this way — non-storable products aren't a warehouse-operations concept),
   `uom_id` (resolved via the UOM mapping below, not a raw Odoo UOM ID).
 - **Not exposed, by design:** `list_price`, `standard_price`, tax fields, accounting category
   fields, supplier pricelists — all Odoo-owned per the ownership matrix.
-- `PATCH /agriware/api/v1/products/{external_id}` updates only the fields above, when present in
+- `PATCH /cool_agristock/api/v1/products/{external_id}` updates only the fields above, when present in
   the request body.
 
 ### 3. Warehouse creation and mapping
@@ -110,22 +110,22 @@ routes/resupply/valuation fields anticipated here — changing a warehouse's cod
 locations and sequences are already named from it was identified as unsafe during design, not
 merely out of scope.
 
-- `POST /agriware/api/v1/warehouses` creates a `stock.warehouse`.
+- `POST /cool_agristock/api/v1/warehouses` creates a `stock.warehouse`.
 - Allow-listed fields: `name`, `code`.
 - **Not exposed:** anything related to multi-step routes, resupply rules, or accounting valuation
   settings tied to the warehouse — those remain Odoo/operations-team-configured, since they affect
   how Odoo's own stock engine behaves internally, not just data mirroring.
-- `PATCH /agriware/api/v1/warehouses/{external_id}` — same pattern as products, minus `code`.
+- `PATCH /cool_agristock/api/v1/warehouses/{external_id}` — same pattern as products, minus `code`.
 
 ### 4. Supplier creation and updates
 
-- `POST /agriware/api/v1/suppliers` creates a `res.partner` with `supplier_rank` set so it behaves
+- `POST /cool_agristock/api/v1/suppliers` creates a `res.partner` with `supplier_rank` set so it behaves
   as a vendor in Odoo's own logic.
 - Allow-listed fields: `name`, `email`, `phone`, `street`, `city`, `country_id` (resolved from an
   ISO country code, not a raw Odoo ID — same external-identifier principle applied to a
   well-known reference list).
 - **Not exposed:** payment terms, fiscal position, accounting-related partner fields.
-- `PATCH /agriware/api/v1/suppliers/{external_id}` — same pattern.
+- `PATCH /cool_agristock/api/v1/suppliers/{external_id}` — same pattern.
 
 **Customers, not just suppliers:** the existing `dispatches.py` already accepts a `customer_id`
 the same way `receipts.py` accepts `supplier_id` — both are `res.partner` records. The supplier
@@ -139,7 +139,7 @@ code path with one flag's value different.
 UOM is a smaller, bounded problem: Odoo ships a fixed, well-known set of base UOMs (kg, units,
 liters, etc.). Rather than letting a WMS create arbitrary new UOM records (high risk of duplicate
 or inconsistent units — "kg" vs "Kg" vs "kilogram" all meaning the same thing), the proposed design
-is a **mapping-only** endpoint: the WMS supplies its own UOM code/name, and AgriWare Connector
+is a **mapping-only** endpoint: the WMS supplies its own UOM code/name, and Cool Agristock
 resolves it to an existing Odoo `uom.uom` record via a small, explicit lookup table (seeded with
 common agricultural units: kg, ton, liter, unit/piece, bag). No `POST /uom` creation endpoint is
 proposed — if a WMS uses a unit with no sensible Odoo equivalent, that's a conflict to surface
@@ -147,7 +147,7 @@ loudly (`400`, with a clear message), not silently invent a new unit.
 
 ### 6. External WMS identifier mapping
 
-Covered above by the `agriware.external.id.mapping` model — applies uniformly to products,
+Covered above by the `cool_agristock.external.id.mapping` model — applies uniformly to products,
 warehouses, suppliers, and (Phase F) lots.
 
 ### Conflict-handling rules (summary)
@@ -207,7 +207,7 @@ existing Odoo mechanism rather than inventing an approval workflow from scratch.
   same "validate everything, then write" pattern `receipts.py` already uses for its product lines.
   An invalid product/warehouse reference in one line fails the whole batch with a clear line-level
   error, rather than partially applying a bulk import.
-- **Audit logging:** proposed new model `agriware.inventory.import.log` — one row per batch,
+- **Audit logging:** proposed new model `cool_agristock.inventory.import.log` — one row per batch,
   recording the external batch reference, company, line count, submission timestamp, submitting
   integration (`external_system`), and whether it was later applied (and by whom, which Odoo
   already tracks natively on the resulting `stock.quant` write). This exists because a 500-line
@@ -228,8 +228,8 @@ code that would still apply the adjustment anyway, just from inside a method thi
 calls directly — the application happens inside Odoo's own field-write plumbing instead, which is
 not actually safer.
 
-**What Phase E shipped instead:** `agriware.inventory.import`/`agriware.inventory.import.line` (not
-`agriware.inventory.import.log`, and not touching `stock.quant` at all until a human later works
+**What Phase E shipped instead:** `cool_agristock.inventory.import`/`cool_agristock.inventory.import.line` (not
+`cool_agristock.inventory.import.log`, and not touching `stock.quant` at all until a human later works
 inside Odoo's own Physical Inventory screen by hand) — a plain staging area that only ever *reads*
 `stock.quant.quantity`, never writes `inventory_quantity` or any other quant field. See
 [INITIAL_INVENTORY_IMPORT.md's Native adjustment handoff](INITIAL_INVENTORY_IMPORT.md#native-adjustment-handoff-phase-11--deferred-by-design-not-by-oversight)
@@ -249,11 +249,11 @@ change to that behavior is proposed for earlier phases.
 - Odoo 19's existing `product.product.tracking` field (`none` / `lot` / `serial`) and existing
   `stock.lot` model are reused as-is — no new tracking mechanism, no bypass of Odoo's own
   lot-validity rules (e.g. Odoo already prevents moving more of a lot than exists).
-- **External lot identifiers:** the same generic `agriware.external.id.mapping` model handles
+- **External lot identifiers:** the same generic `cool_agristock.external.id.mapping` model handles
   `stock.lot` the same way it handles products/warehouses — no bespoke lot-mapping table.
-- `POST /agriware/api/v1/lots` creates a `stock.lot` tied to a product (resolved via that product's
+- `POST /cool_agristock/api/v1/lots` creates a `stock.lot` tied to a product (resolved via that product's
   own external ID, not a raw Odoo product ID — consistent with the rest of this design).
-- `GET /agriware/api/v1/lots` lists lots, filterable by product, scoped by company — read access
+- `GET /cool_agristock/api/v1/lots` lists lots, filterable by product, scoped by company — read access
   only, matching the existing read-endpoint pattern.
 - **Product relationship:** a lot belongs to exactly one product, enforced by Odoo's own model
   already (`stock.lot.product_id`) — nothing new to build here beyond passing it through correctly.
@@ -293,7 +293,7 @@ Mostly built as sketched above, with small, worth-recording corrections:
   case, not a parallel mechanism.
 - **Resolving a lot requires a bound API key**, exactly like every other mapping-touching
   capability in this module — not mentioned explicitly in the original sketch above, but a direct
-  consequence of reusing `agriware.external.id.mapping`, which is itself always
+  consequence of reusing `cool_agristock.external.id.mapping`, which is itself always
   `(company, external_system)`-scoped. A legacy caller that never sends `lot_external_id` never
   triggers that requirement, preserving the backward compatibility this plan promised.
 
@@ -329,7 +329,7 @@ Mostly built as sketched above, with two corrections:
   order.
 - **Idempotency did gain a second concept, deliberately, for the new path only**: the legacy
   `products[]` schema's advisory-lock/`origin`-match mechanism is untouched, exactly as promised
-  above. The new `lines[]` schema uses a real `agriware.wms.transaction` row with a database unique
+  above. The new `lines[]` schema uses a real `cool_agristock.wms.transaction` row with a database unique
   constraint instead, because it also needed to support `GET` status retrieval by
   `(company, external_system, external_reference)` — a lookup the legacy mechanism was never
   designed to serve. See
@@ -340,10 +340,10 @@ Mostly built as sketched above, with two corrections:
 Every new model and endpoint follows the existing, verified pattern rather than inventing a new
 one:
 
-- **`agriware.external.id.mapping`, `agriware.inventory.import.log`, and any new models:** row-level
-  `ir.rule` scoped by `company_id`, mirroring `rule_agriware_api_key_company` exactly.
-- **`ir.model.access.csv`:** new rows grant the **AgriWare Administrator** group read/write access
-  (matching the existing pattern for `agriware.api.key`); the **AgriWare API User** group gets
+- **`cool_agristock.external.id.mapping`, `cool_agristock.inventory.import.log`, and any new models:** row-level
+  `ir.rule` scoped by `company_id`, mirroring `rule_cool_agristock_api_key_company` exactly.
+- **`ir.model.access.csv`:** new rows grant the **Cool Agristock Administrator** group read/write access
+  (matching the existing pattern for `cool_agristock.api.key`); the **Cool Agristock API User** group gets
   **no direct model access** — exactly like today, all access to these models is mediated through
   controller code calling `sudo()` only after the controller's own permission checks pass (the same
   architecture `api_key.py`'s `generate_key()` already uses). This means a compromised or
@@ -356,7 +356,7 @@ one:
   filtered by `company_id in env.companies.ids`, identically to how `receipts.py` already scopes
   its warehouse lookup today. One company's integration can never see, create against, or modify
   another company's products, warehouses, suppliers, lots, or mappings.
-- **Least privilege, open decision:** today there is one API-calling role (AgriWare API User) with
+- **Least privilege, open decision:** today there is one API-calling role (Cool Agristock API User) with
   one fixed permission set. A finer-grained split (e.g., "can sync inventory counts" vs. "can
   create new products") is a legitimate future enhancement, flagged in the final report as an open
   decision, and deliberately **not** part of the initial roadmap phases — introducing it prematurely

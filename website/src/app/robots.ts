@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://agriware.agricarecentres.com/sitemap.xml",
+    sitemap: "https://coolagristock.agricarecentres.com/sitemap.xml",
   };
 }

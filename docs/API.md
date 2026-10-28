@@ -1,6 +1,6 @@
-# AgriWare Connector API Reference
+# Cool Agristock API Reference
 
-Complete technical reference for external WMS developers integrating with AgriWare Connector.
+Complete technical reference for external WMS developers integrating with Cool Agristock.
 
 ## Contents
 
@@ -28,14 +28,14 @@ Complete technical reference for external WMS developers integrating with AgriWa
 
 ## API overview
 
-AgriWare Connector exposes a REST API on top of Odoo 19's Inventory app. An external WMS calls
+Cool Agristock exposes a REST API on top of Odoo 19's Inventory app. An external WMS calls
 this API to read product, warehouse, and inventory data, and to create and validate incoming
 receipts and outgoing dispatches. Every request is initiated by the external WMS — Odoo never
 calls out to the WMS (there is no webhook or callback mechanism in either direction beyond the
 WMS's own requests and Odoo's responses to them).
 
 ```text
-External WMS  --(HTTPS + API key)-->  AgriWare Connector  --(Odoo ORM)-->  Odoo 19  -->  PostgreSQL
+External WMS  --(HTTPS + API key)-->  Cool Agristock  --(Odoo ORM)-->  Odoo 19  -->  PostgreSQL
 ```
 
 The connector translates WMS actions into standard Odoo stock operations (`stock.picking` /
@@ -45,8 +45,8 @@ operation in Odoo's stock workflow).
 
 ## Base URL
 
-All endpoints are rooted at `/agriware/api/v1`. In local development this is
-`http://localhost:8069/agriware/api/v1`. In this document, `YOUR_ODOO_URL` stands in for your
+All endpoints are rooted at `/cool_agristock/api/v1`. In local development this is
+`http://localhost:8069/cool_agristock/api/v1`. In this document, `YOUR_ODOO_URL` stands in for your
 instance's actual base URL.
 
 ## API versioning
@@ -62,8 +62,8 @@ no deprecation or version-negotiation mechanism exists yet.
 | Health check | `public` | None |
 | All other endpoints | `bearer` | `Authorization: Bearer <odoo-api-key>` header |
 
-The Bearer token is a real **Odoo API key** — not a separate AgriWare-specific credential format.
-Odoo's HTTP layer validates the key *before* any AgriWare controller code runs. If the header is
+The Bearer token is a real **Odoo API key** — not a separate Cool Agristock-specific credential format.
+Odoo's HTTP layer validates the key *before* any Cool Agristock controller code runs. If the header is
 missing, malformed, or the key is invalid/revoked/expired, Odoo itself returns a **plain-text HTML
 401 response** (not JSON):
 
@@ -84,7 +84,7 @@ when the status code indicates a controller-level response.
 ## Generating API keys
 
 Keys are generated inside Odoo's UI, not via a REST call — there is no "create API key" HTTP
-endpoint. A user in the **AgriWare Administrator** group opens **AgriWare Connector → API
+endpoint. A user in the **Cool Agristock Administrator** group opens **Cool Agristock → API
 Management → Generate API Key**, supplies an integration name, and chooses an expiration date or
 **Never Expires**. The raw key is shown exactly once, immediately, in a dialog; it cannot be
 retrieved again afterward, and only a salted hash is ever stored (matching how Odoo stores all API
@@ -92,15 +92,15 @@ keys). Store it in the external system's secret manager, never in source control
 
 This is a narrower requirement than Odoo's own built-in self-service key management (which is
 normally limited to managing your own keys, and reserves "never expires" for Odoo System
-Administrators): AgriWare Connector's generate/revoke/replace actions run with elevated privileges
-internally, but only after verifying the caller holds **AgriWare Administrator** for the specific
+Administrators): Cool Agristock's generate/revoke/replace actions run with elevated privileges
+internally, but only after verifying the caller holds **Cool Agristock Administrator** for the specific
 company the key belongs to.
 
 ## API key expiration
 
 If an expiration date is set, Odoo's own API key infrastructure rejects the key at authentication
 time once that date passes — this check happens in the database query that validates the Bearer
-token, before any AgriWare code runs, so it cannot be bypassed by this module's own logic. No
+token, before any Cool Agristock code runs, so it cannot be bypassed by this module's own logic. No
 separate expiry check exists or is needed in the controllers.
 
 ## Never-expiring keys
@@ -110,7 +110,7 @@ no automatic expiry for such keys.
 
 ## API key revocation
 
-**AgriWare Connector → API Management → API Keys**, then **Revoke** on the relevant row. Revocation
+**Cool Agristock → API Management → API Keys**, then **Revoke** on the relevant row. Revocation
 deletes the underlying Odoo API key record immediately; the very next request using that key fails
 authentication, with no propagation delay or caching involved.
 
@@ -125,29 +125,29 @@ independent credentials; the old one stays revoked/expired even after a replacem
 
 A generated key authenticates as a dedicated, password-less Odoo user (one per company), which
 Odoo creates automatically the first time a key is generated for that company. That user belongs to
-the **AgriWare API User** group and nothing else — it has exactly the permissions documented in
+the **Cool Agristock API User** group and nothing else — it has exactly the permissions documented in
 [Authorization](#authorization) below, no more. It cannot log in interactively (it has no usable
 password), so the key is the only way to act as that identity.
 
 ## Authorization
 
 Once authenticated, every non-public endpoint additionally requires the authenticated user to
-belong to the **AgriWare API User** group (`agriware_connector.group_agriware_api_user`), or a
-group that implies it (**AgriWare Administrator**). This check happens inside the controller, so a
+belong to the **Cool Agristock API User** group (`cool_agristock.group_cool_agristock_api_user`), or a
+group that implies it (**Cool Agristock Administrator**). This check happens inside the controller, so a
 valid API key alone is **not** sufficient — the key's owning user must also carry the group.
 Requests from an authenticated user lacking the group receive a JSON 403 response:
 
 ```json
-{"status": "error", "message": "Access denied: AgriWare API User role required"}
+{"status": "error", "message": "Access denied: Cool Agristock API User role required"}
 ```
 
 ## Company access restrictions
 
 Record-level access is scoped to the warehouses/companies the authenticated user has access to
 (`warehouse.company_id in env.companies.ids`); product/partner lookups are similarly company-scoped
-where relevant. Separately, the `agriware.api.key` records themselves are protected by a
+where relevant. Separately, the `cool_agristock.api.key` records themselves are protected by a
 PostgreSQL-level record rule restricting each company's administrators to their own company's keys
-— one company's AgriWare Administrators can never view, generate for, or revoke another company's
+— one company's Cool Agristock Administrators can never view, generate for, or revoke another company's
 keys. There is currently no per-warehouse allow-list within a company; see
 [Known limitations](#known-limitations).
 
@@ -209,12 +209,12 @@ that includes the existing record's id. To validate a receipt or dispatch, its `
 
 | Operation | Required prefix |
 |---|---|
-| Receipt | `AGRIWARE-RCPT-` |
-| Dispatch | `AGRIWARE-DISP-` |
+| Receipt | `COOL_AGRISTOCK-RCPT-` |
+| Dispatch | `COOL_AGRISTOCK-DISP-` |
 
 This prevents the API from being used to validate draft stock operations that were not created by
-AgriWare (e.g. pickings created manually in the Odoo UI). A validate call against a reference
-without the correct prefix returns `403` with `"<Receipt|Dispatch> is not managed by AgriWare"`.
+Cool Agristock (e.g. pickings created manually in the Odoo UI). A validate call against a reference
+without the correct prefix returns `403` with `"<Receipt|Dispatch> is not managed by Cool Agristock"`.
 
 ## Integration examples
 
@@ -225,54 +225,54 @@ real values for these placeholders.**
 **1. Check the API is reachable (no authentication needed):**
 
 ```bash
-curl -s YOUR_ODOO_URL/agriware/api/v1/health
+curl -s YOUR_ODOO_URL/cool_agristock/api/v1/health
 ```
 ```json
-{"status": "success", "service": "AgriWare Connector", "api_version": "1.0", "message": "AgriWare API is running"}
+{"status": "success", "service": "Cool Agristock", "api_version": "1.0", "message": "Cool Agristock API is running"}
 ```
 
 **2. Look up a product to receive:**
 
 ```bash
-curl -s YOUR_ODOO_URL/agriware/api/v1/products \
+curl -s YOUR_ODOO_URL/cool_agristock/api/v1/products \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 **3. Create a receipt for that product:**
 
 ```bash
-curl -s -X POST YOUR_ODOO_URL/agriware/api/v1/receipts \
+curl -s -X POST YOUR_ODOO_URL/cool_agristock/api/v1/receipts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-RCPT-00042",
+        "external_reference": "COOL_AGRISTOCK-RCPT-00042",
         "warehouse_id": 1,
         "supplier_id": 37,
         "products": [{"product_id": 14, "quantity": 500}]
       }'
 ```
 ```json
-{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "AGRIWARE-RCPT-00042", "state": "draft"}
+{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "COOL_AGRISTOCK-RCPT-00042", "state": "draft"}
 ```
 
 **4. Once the goods are physically counted, validate the receipt:**
 
 ```bash
-curl -s -X POST YOUR_ODOO_URL/agriware/api/v1/receipts/102/validate \
+curl -s -X POST YOUR_ODOO_URL/cool_agristock/api/v1/receipts/102/validate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "external_reference": "AGRIWARE-RCPT-00042",
+        "external_reference": "COOL_AGRISTOCK-RCPT-00042",
         "received_quantities": [{"product_id": 14, "quantity": 500}]
       }'
 ```
 ```json
-{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "AGRIWARE-RCPT-00042", "state": "done"}
+{"status": "success", "receipt_id": 102, "receipt_reference": "WH/IN/00042", "external_reference": "COOL_AGRISTOCK-RCPT-00042", "state": "done"}
 ```
 
 Dispatches follow the same create-then-validate pattern; see
-[`POST /dispatches`](#7-post-agriwareapiv1dispatches) and
-[`POST /dispatches/{id}/validate`](#8-post-agriwareapiv1dispatchesdispatch_idvalidate) below. Some
+[`POST /dispatches`](#7-post-cool_agristockapiv1dispatches) and
+[`POST /dispatches/{id}/validate`](#8-post-cool_agristockapiv1dispatchesdispatch_idvalidate) below. Some
 WMS platforms will need custom integration development to speak this API natively — see the
 project [README](../README.md#free-software-and-paid-services).
 
@@ -283,23 +283,23 @@ project [README](../README.md#free-software-and-paid-services).
 - Prefer an expiration date over Never Expires unless the integration genuinely needs a long-lived
   credential.
 - Revoke a key immediately if you suspect it has leaked, then issue a replacement.
-- Run AgriWare Connector behind HTTPS in any environment beyond local development — Bearer tokens
+- Run Cool Agristock behind HTTPS in any environment beyond local development — Bearer tokens
   sent over plain HTTP are visible on the network path.
-- Grant the **AgriWare Administrator** group only to business users who should be trusted to
+- Grant the **Cool Agristock Administrator** group only to business users who should be trusted to
   generate and revoke API credentials.
-- Choose `external_reference` values with the correct `AGRIWARE-RCPT-`/`AGRIWARE-DISP-` prefix
+- Choose `external_reference` values with the correct `COOL_AGRISTOCK-RCPT-`/`COOL_AGRISTOCK-DISP-` prefix
   from the start if you intend to validate that record later.
 
 ## Known limitations
 
 - No pagination: list endpoints (`products`, `warehouses`, `inventory`) hard-cap at 100 records,
   with no offset/cursor parameter.
-- No per-warehouse access control: any user in the AgriWare API User group can act on any warehouse
+- No per-warehouse access control: any user in the Cool Agristock API User group can act on any warehouse
   within their allowed companies — there is no way to restrict one integration identity to a
   specific warehouse subset.
 - Partial receipts and partial dispatches are not supported; quantities must match exactly.
 - **Lot/serial-tracked products are supported as of Phase F.** `POST`/`GET`/`PATCH
-  /agriware/api/v1/lots` creates and resolves native `stock.lot` records, and both receipt and
+  /cool_agristock/api/v1/lots` creates and resolves native `stock.lot` records, and both receipt and
   dispatch validation accept an optional `lot_external_id` per line — see
   [LOT_BATCH_SYNCHRONIZATION.md](LOT_BATCH_SYNCHRONIZATION.md) for the full reference. A tracked
   product with **no** `lot_external_id` on its line is still rejected with `409`
@@ -308,13 +308,13 @@ project [README](../README.md#free-software-and-paid-services).
 - Multiple move lines for the same product on one receipt are not supported.
 - No automatic or scheduled synchronization: every request is initiated by the external WMS; there
   is no polling, cron job, or background task in this module.
-- No bidirectional synchronization: AgriWare Connector never calls out to the WMS.
+- No bidirectional synchronization: Cool Agristock never calls out to the WMS.
 - No built-in WMS-specific adapters: this is one generic REST API, not a library of per-WMS
   connectors.
 
 ## Endpoints
 
-### 1. `GET /agriware/api/v1/health`
+### 1. `GET /cool_agristock/api/v1/health`
 
 Public health check. No authentication required.
 
@@ -322,19 +322,19 @@ Public health check. No authentication required.
 ```json
 {
   "status": "success",
-  "service": "AgriWare Connector",
+  "service": "Cool Agristock",
   "api_version": "1.0",
-  "message": "AgriWare API is running"
+  "message": "Cool Agristock API is running"
 }
 ```
 
 ---
 
-### 2. `GET /agriware/api/v1/products`
+### 2. `GET /cool_agristock/api/v1/products`
 
 Returns up to 100 products, ordered by id.
 
-**Auth:** Bearer API key + AgriWare API User group.
+**Auth:** Bearer API key + Cool Agristock API User group.
 
 **Response 200**
 ```json
@@ -352,11 +352,11 @@ Returns up to 100 products, ordered by id.
 
 ---
 
-### 3. `GET /agriware/api/v1/warehouses`
+### 3. `GET /cool_agristock/api/v1/warehouses`
 
 Returns up to 100 warehouses, ordered by id.
 
-**Auth:** Bearer API key + AgriWare API User group.
+**Auth:** Bearer API key + Cool Agristock API User group.
 
 **Response 200**
 ```json
@@ -373,11 +373,11 @@ Returns up to 100 warehouses, ordered by id.
 
 ---
 
-### 4. `GET /agriware/api/v1/inventory`
+### 4. `GET /cool_agristock/api/v1/inventory`
 
 Returns up to 100 non-zero stock quants in internal locations, ordered by id.
 
-**Auth:** Bearer API key + AgriWare API User group.
+**Auth:** Bearer API key + Cool Agristock API User group.
 
 **Response 200**
 ```json
@@ -402,16 +402,16 @@ Returns up to 100 non-zero stock quants in internal locations, ordered by id.
 
 ---
 
-### 5. `POST /agriware/api/v1/receipts`
+### 5. `POST /cool_agristock/api/v1/receipts`
 
 Creates a draft incoming stock receipt (`stock.picking` of the warehouse's incoming type).
 
-**Auth:** Bearer API key + AgriWare API User group + `create` rights on `stock.picking`/`stock.move`.
+**Auth:** Bearer API key + Cool Agristock API User group + `create` rights on `stock.picking`/`stock.move`.
 
 **Request body**
 ```json
 {
-  "external_reference": "AGRIWARE-RCPT-00042",
+  "external_reference": "COOL_AGRISTOCK-RCPT-00042",
   "warehouse_id": 1,
   "supplier_id": 37,
   "products": [
@@ -422,7 +422,7 @@ Creates a draft incoming stock receipt (`stock.picking` of the warehouse's incom
 
 | Field | Type | Constraints |
 |---|---|---|
-| `external_reference` | string | Required, 1–128 chars, must use the `AGRIWARE-RCPT-` prefix if it will later be validated |
+| `external_reference` | string | Required, 1–128 chars, must use the `COOL_AGRISTOCK-RCPT-` prefix if it will later be validated |
 | `warehouse_id` | integer | Required, > 0, must resolve to a warehouse in the caller's companies |
 | `supplier_id` | integer | Required, > 0, must resolve to an existing partner |
 | `products` | array | Required, 1–100 entries |
@@ -435,7 +435,7 @@ Creates a draft incoming stock receipt (`stock.picking` of the warehouse's incom
   "status": "success",
   "receipt_id": 102,
   "receipt_reference": "WH/IN/00042",
-  "external_reference": "AGRIWARE-RCPT-00042",
+  "external_reference": "COOL_AGRISTOCK-RCPT-00042",
   "state": "draft"
 }
 ```
@@ -456,16 +456,16 @@ requests arrive at the same time; the second resolves to the `409` duplicate res
 
 ---
 
-### 6. `POST /agriware/api/v1/receipts/{receipt_id}/validate`
+### 6. `POST /cool_agristock/api/v1/receipts/{receipt_id}/validate`
 
 Confirms a draft receipt and records received quantities, then validates it in Odoo.
 
-**Auth:** Bearer API key + AgriWare API User group + `read`/`write` rights on `stock.picking`, `write` on `stock.move`.
+**Auth:** Bearer API key + Cool Agristock API User group + `read`/`write` rights on `stock.picking`, `write` on `stock.move`.
 
 **Request body**
 ```json
 {
-  "external_reference": "AGRIWARE-RCPT-00042",
+  "external_reference": "COOL_AGRISTOCK-RCPT-00042",
   "received_quantities": [
     {"product_id": 14, "quantity": 500}
   ]
@@ -474,7 +474,7 @@ Confirms a draft receipt and records received quantities, then validates it in O
 
 | Field | Type | Constraints |
 |---|---|---|
-| `external_reference` | string | Required, must match the receipt's stored origin exactly, must use `AGRIWARE-RCPT-` prefix |
+| `external_reference` | string | Required, must match the receipt's stored origin exactly, must use `COOL_AGRISTOCK-RCPT-` prefix |
 | `received_quantities` | array | Required, 1–100 entries, no duplicate `product_id` |
 | `received_quantities[].product_id` | integer | Required, > 0 |
 | `received_quantities[].quantity` | number | Required, finite, `0 < quantity <= 1,000,000,000` |
@@ -491,7 +491,7 @@ lot/serial-tracked product line is accepted when it names the exact lot via `lot
   "status": "success",
   "receipt_id": 102,
   "receipt_reference": "WH/IN/00042",
-  "external_reference": "AGRIWARE-RCPT-00042",
+  "external_reference": "COOL_AGRISTOCK-RCPT-00042",
   "state": "done"
 }
 ```
@@ -501,7 +501,7 @@ lot/serial-tracked product line is accepted when it names the exact lot via `lot
 | Code | Condition |
 |---|---|
 | 400 | Invalid JSON / invalid fields / receipt has no active lines / products don't match receipt |
-| 403 | Not authorized / insufficient rights / `external_reference` lacks the `AGRIWARE-RCPT-` prefix |
+| 403 | Not authorized / insufficient rights / `external_reference` lacks the `COOL_AGRISTOCK-RCPT-` prefix |
 | 404 | Receipt not found (or not an incoming operation in the caller's companies); or unknown `lot_external_id` |
 | 409 | `external_reference` mismatch, receipt already validated/cancelled/not in draft, quantity mismatch, tracked product with no `lot_external_id`, or Odoo rejects the validation |
 | 422 | `lot_external_id` resolves to a lot belonging to a different product |
@@ -512,16 +512,16 @@ concurrent validate calls on the same receipt cannot both succeed.
 
 ---
 
-### 7. `POST /agriware/api/v1/dispatches`
+### 7. `POST /cool_agristock/api/v1/dispatches`
 
 Creates a draft outgoing stock dispatch (`stock.picking` of the warehouse's outgoing type).
 
-**Auth:** Bearer API key + AgriWare API User group + `create` rights on `stock.picking`/`stock.move`.
+**Auth:** Bearer API key + Cool Agristock API User group + `create` rights on `stock.picking`/`stock.move`.
 
 **Request body**
 ```json
 {
-  "external_reference": "AGRIWARE-DISP-00017",
+  "external_reference": "COOL_AGRISTOCK-DISP-00017",
   "warehouse_id": 1,
   "customer_id": 52,
   "products": [
@@ -532,7 +532,7 @@ Creates a draft outgoing stock dispatch (`stock.picking` of the warehouse's outg
 
 | Field | Type | Constraints |
 |---|---|---|
-| `external_reference` | string | Required, 1–128 chars, must use `AGRIWARE-DISP-` prefix if it will later be validated |
+| `external_reference` | string | Required, 1–128 chars, must use `COOL_AGRISTOCK-DISP-` prefix if it will later be validated |
 | `warehouse_id` | integer | Required, > 0, must resolve to a warehouse in the caller's companies |
 | `customer_id` | integer | Required, > 0, must resolve to an existing partner |
 | `products` | array | Required, 1–100 entries, no duplicate `product_id` |
@@ -545,7 +545,7 @@ Creates a draft outgoing stock dispatch (`stock.picking` of the warehouse's outg
   "status": "success",
   "dispatch_id": 58,
   "dispatch_reference": "WH/OUT/00017",
-  "external_reference": "AGRIWARE-DISP-00017",
+  "external_reference": "COOL_AGRISTOCK-DISP-00017",
   "state": "draft"
 }
 ```
@@ -556,16 +556,16 @@ transaction-scoped advisory lock.
 
 ---
 
-### 8. `POST /agriware/api/v1/dispatches/{dispatch_id}/validate`
+### 8. `POST /cool_agristock/api/v1/dispatches/{dispatch_id}/validate`
 
 Confirms a draft dispatch, reserves stock, records picked quantities, and validates it.
 
-**Auth:** Bearer API key + AgriWare API User group + `read`/`write` rights on `stock.picking` and `stock.move`.
+**Auth:** Bearer API key + Cool Agristock API User group + `read`/`write` rights on `stock.picking` and `stock.move`.
 
 **Request body**
 ```json
 {
-  "external_reference": "AGRIWARE-DISP-00017",
+  "external_reference": "COOL_AGRISTOCK-DISP-00017",
   "dispatched_quantities": [
     {"product_id": 14, "quantity": 120}
   ]
@@ -574,7 +574,7 @@ Confirms a draft dispatch, reserves stock, records picked quantities, and valida
 
 | Field | Type | Constraints |
 |---|---|---|
-| `external_reference` | string | Required, must match the dispatch's stored origin exactly, must use `AGRIWARE-DISP-` prefix |
+| `external_reference` | string | Required, must match the dispatch's stored origin exactly, must use `COOL_AGRISTOCK-DISP-` prefix |
 | `dispatched_quantities` | array | Required, 1–100 entries, no duplicate `product_id` |
 | `dispatched_quantities[].product_id` | integer | Required, > 0 |
 | `dispatched_quantities[].quantity` | number | Required, finite, `0 < quantity <= 1,000,000,000` |
@@ -590,7 +590,7 @@ dispatch must be fully reserved before Odoo will validate it.
   "status": "success",
   "dispatch_id": 58,
   "dispatch_reference": "WH/OUT/00017",
-  "external_reference": "AGRIWARE-DISP-00017",
+  "external_reference": "COOL_AGRISTOCK-DISP-00017",
   "state": "done"
 }
 ```
@@ -600,7 +600,7 @@ dispatch must be fully reserved before Odoo will validate it.
 | Code | Condition |
 |---|---|
 | 400 | Invalid JSON / invalid fields / no active move lines |
-| 403 | Not authorized / insufficient rights / `external_reference` lacks the `AGRIWARE-DISP-` prefix |
+| 403 | Not authorized / insufficient rights / `external_reference` lacks the `COOL_AGRISTOCK-DISP-` prefix |
 | 404 | Dispatch not found (or not an outgoing operation in the caller's companies); or unknown `lot_external_id` |
 | 409 | Lock unavailable (concurrent validation in progress), reference mismatch, state mismatch, product/quantity mismatch, tracked product with no `lot_external_id`, insufficient stock in the named lot, or Odoo rejects the validation |
 | 422 | `lot_external_id` resolves to a lot belonging to a different product |

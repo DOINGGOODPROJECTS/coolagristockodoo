@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://agriware.agricarecentres.com"),
+  metadataBase: new URL("https://coolagristock.agricarecentres.com"),
   icons: {
     icon: "/images/icon.png",
     apple: "/images/icon.png",

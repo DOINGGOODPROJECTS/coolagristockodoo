@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: agriware-odoo:19.0
+    image: cool-agristock-odoo:19.0
 
     depends_on:
       - db
@@ -32,7 +32,7 @@ services:
       - ./component_event:/mnt/extra-addons/component_event:ro
       - ./connector:/mnt/extra-addons/connector:ro
       - ./queue_job:/mnt/extra-addons/queue_job:ro
-      - ./agriware_connector:/mnt/extra-addons/agriware_connector:ro
+      - ./cool_agristock:/mnt/extra-addons/cool_agristock:ro
 
     restart: unless-stopped
 

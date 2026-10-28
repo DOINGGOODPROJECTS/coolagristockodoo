@@ -1,17 +1,17 @@
 # Customer Onboarding
 
-A simple, high-level checklist for a business taking AgriWare Connector from "never heard of it"
+A simple, high-level checklist for a business taking Cool Agristock from "never heard of it"
 to "connected to our WMS in production." Each step links to the detailed how-to guide — this page
 is the checklist, not a restatement of those steps.
 
-**Before you start:** AgriWare Connector does not connect to just any WMS automatically. Your WMS
+**Before you start:** Cool Agristock does not connect to just any WMS automatically. Your WMS
 must either already speak the documented REST API, or be adapted to do so (self-built, or via
 [professional integration services](INTEGRATION_SERVICES.md)). Installing the module does not, by
 itself, establish a connection to anything.
 
-## Step 1 — Download AgriWare Connector
+## Step 1 — Download Cool Agristock
 
-From the Odoo Apps Marketplace. See [INSTALLATION.md, step 1](INSTALLATION.md#1-download-agriware-connector-from-odoo-apps).
+From the Odoo Apps Marketplace. See [INSTALLATION.md, step 1](INSTALLATION.md#1-download-cool_agristock-connector-from-odoo-apps).
 
 *Done when:* you have the zip file, and you've confirmed your hosting type supports installing it
 (self-hosted and Odoo.sh — not Odoo Online; see [INSTALLATION.md](INSTALLATION.md#before-you-start-how-is-your-odoo-hosted)).
@@ -20,15 +20,15 @@ From the Odoo Apps Marketplace. See [INSTALLATION.md, step 1](INSTALLATION.md#1-
 
 See [INSTALLATION.md, steps 2-3](INSTALLATION.md#2-extract-the-package-and-place-it-in-your-odoo-addons-path).
 
-*Done when:* AgriWare Connector shows as installed in **Apps**, and the **AgriWare Connector** menu
+*Done when:* Cool Agristock shows as installed in **Apps**, and the **Cool Agristock** menu
 appears for an administrator.
 
 ## Step 3 — Assign the appropriate permissions
 
 See [INSTALLATION.md, step 4](INSTALLATION.md#4-assign-the-appropriate-user-permissions).
 
-*Done when:* the person who will manage API keys has the **AgriWare Administrator** access right,
-and can see **AgriWare Connector → API Management**.
+*Done when:* the person who will manage API keys has the **Cool Agristock Administrator** access right,
+and can see **Cool Agristock → API Management**.
 
 ## Step 4 — Generate an API key
 
@@ -54,15 +54,15 @@ settings. See [INSTALLATION.md, step 9](INSTALLATION.md#9-configure-your-existin
 [WMS_INTEGRATION.md](WMS_INTEGRATION.md#api-base-url).
 
 *Done when:* your WMS is configured to send an `Authorization: Bearer <key>` header to your Odoo
-instance's `/agriware/api/v1` base URL.
+instance's `/cool_agristock/api/v1` base URL.
 
 ## Step 7 — Test API connectivity
 
 See [INSTALLATION.md, step 10](INSTALLATION.md#10-test-the-connection-using-the-rest-api) for the
 health-check and authenticated-request examples.
 
-*Done when:* `/agriware/api/v1/health` returns `200`, and an authenticated call (e.g.
-`/agriware/api/v1/products`) returns your real data, not a `401`/`403`.
+*Done when:* `/cool_agristock/api/v1/health` returns `200`, and an authenticated call (e.g.
+`/cool_agristock/api/v1/products`) returns your real data, not a `401`/`403`.
 
 ## Step 8 — Test supported inventory workflows
 
@@ -78,7 +78,7 @@ quantities changing as expected in Odoo.
 
 ## Step 9 — Begin operational use
 
-Only after your own acceptance testing (step 8) passes against your real workflows. AgriWare
+Only after your own acceptance testing (step 8) passes against your real workflows. Cool Agristock
 Connector and its maintainers do not perform this acceptance testing for you — it's your
 business's own sign-off that the integration behaves the way your operations need.
 

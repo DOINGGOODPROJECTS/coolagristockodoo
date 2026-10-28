@@ -1,4 +1,4 @@
-# AgriWare Connector — Commercial Strategy
+# Cool Agristock — Commercial Strategy
 
 **Status:** Draft for management review. Not yet published or acted upon.
 
@@ -11,7 +11,7 @@ customer, or market-size statistic is asserted as confirmed anywhere in this doc
 
 ## 1. Executive Summary
 
-AgriWare Connector is a free, open-source Odoo 19 module (LGPL-3.0) that lets a compatible external
+Cool Agristock is a free, open-source Odoo 19 module (LGPL-3.0) that lets a compatible external
 Warehouse Management System (WMS) exchange product, warehouse, and inventory data with Odoo
 Inventory over a documented REST API. The software itself will never carry a license fee. This
 strategy's only proposed revenue source is **optional professional services** — installation help,
@@ -51,12 +51,12 @@ discoverable and reachable each segment is, not a measured conversion rate.
 
 | Segment | Main warehouse challenge | Why Odoo integration helps | Likely integration requirements | Professional-services demand potential | Acquisition difficulty |
 |---|---|---|---|---|---|
-| **1. Agricultural cooperatives** | Often track stock on paper or spreadsheets across scattered collection points; poor visibility into aggregate inventory | Odoo Inventory + AgriWare gives a single system of record if they already run or adopt a WMS at collection points | Usually need a WMS selected/implemented first — likely a **Package 2 or 3** candidate | High for installation + WMS selection guidance | **Hard** — fragmented, often low digital maturity, requires in-person trust-building |
+| **1. Agricultural cooperatives** | Often track stock on paper or spreadsheets across scattered collection points; poor visibility into aggregate inventory | Odoo Inventory + Cool Agristock gives a single system of record if they already run or adopt a WMS at collection points | Usually need a WMS selected/implemented first — likely a **Package 2 or 3** candidate | High for installation + WMS selection guidance | **Hard** — fragmented, often low digital maturity, requires in-person trust-building |
 | **2. Agricultural produce distributors** | Manage inbound receipts from many small suppliers and outbound dispatches to retail/export; reconciliation errors | REST API enables near-real-time stock sync if they already use a WMS for the warehouse floor | Typically already have barcode/WMS software — needs a **custom adapter (Package 3)** unless it happens to speak the documented API | High — adapter work is the most labor-intensive, highest-value package | **Medium** — identifiable via trade associations and distribution hubs |
-| **3. Food processing businesses** | Input/output inventory (raw produce in, processed goods out) often tracked in separate systems from ERP | Odoo's stock workflow plus AgriWare's receipt/dispatch model fits raw-material-in, product-out flows | May need workflow customization for processing-specific steps (not currently a documented AgriWare feature — see Known Limitations) | High for **Package 4** (workflow customization) | **Medium** — more formalized businesses, easier to find decision-makers |
-| **4. Cold-storage operators** | Need accurate, timely inventory to avoid spoilage; often run specialized cold-chain WMS | Could use AgriWare as the Odoo-side bridge if their cold-chain WMS can be adapted | Cold-chain WMS software is usually proprietary/vertical-specific — high likelihood of needing **Package 3** | High, if WMS compatibility is confirmed | **Hard** — small number of operators, highly specialized software, may not have REST capability at all |
+| **3. Food processing businesses** | Input/output inventory (raw produce in, processed goods out) often tracked in separate systems from ERP | Odoo's stock workflow plus Cool Agristock's receipt/dispatch model fits raw-material-in, product-out flows | May need workflow customization for processing-specific steps (not currently a documented Cool Agristock feature — see Known Limitations) | High for **Package 4** (workflow customization) | **Medium** — more formalized businesses, easier to find decision-makers |
+| **4. Cold-storage operators** | Need accurate, timely inventory to avoid spoilage; often run specialized cold-chain WMS | Could use Cool Agristock as the Odoo-side bridge if their cold-chain WMS can be adapted | Cold-chain WMS software is usually proprietary/vertical-specific — high likelihood of needing **Package 3** | High, if WMS compatibility is confirmed | **Hard** — small number of operators, highly specialized software, may not have REST capability at all |
 | **5. Agricultural warehouses (generic)** | General stock visibility, manual counts | Lowest-friction segment if they already have any REST-capable WMS | Depends entirely on existing WMS — could be **Package 2** (basic) if compatible | Medium | **Medium** |
-| **6. Exporters and importers** | Need accurate stock for compliance/customs documentation and to avoid overselling | Odoo Inventory already commonly used for trade documentation; AgriWare bridges to warehouse-floor WMS | Integration requirements vary widely by existing software stack | Medium-High | **Medium** — identifiable via trade/export associations |
+| **6. Exporters and importers** | Need accurate stock for compliance/customs documentation and to avoid overselling | Odoo Inventory already commonly used for trade documentation; Cool Agristock bridges to warehouse-floor WMS | Integration requirements vary widely by existing software stack | Medium-High | **Medium** — identifiable via trade/export associations |
 | **7. Agribusinesses already using Odoo** | Already have Odoo but their WMS isn't connected — manual double-entry | Lowest-friction segment: they already run Odoo, so only the WMS side needs work | Narrowest requirement — likely **Package 2** | Medium-High, and fastest to close | **Easiest** — existing Odoo users are reachable through Odoo partners (see Acquisition Channels) and don't need an Odoo sales pitch, only a WMS-integration one |
 | **8. Companies using separate WMS and ERP (any ERP, not just Odoo)** | Classic double-entry/reconciliation pain | Requires them to also adopt Odoo Inventory, or at minimum evaluate it — a bigger ask | Both an ERP decision and a WMS-integration decision | High total contract value, but long sales cycle | **Hard** — two decisions bundled into one sale |
 
@@ -72,7 +72,7 @@ since been individually confirmed directly on Odoo's own official partner direct
 (odoo.com/partners), not just the third-party directory used initially — see
 [Verified Odoo Partners](#verified-odoo-partners-côte-divoire) below for the full record. This
 confirms Odoo has genuine market presence in Côte d'Ivoire; it does **not** confirm demand for
-AgriWare Connector specifically, which has not been tested with any real customer yet.
+Cool Agristock specifically, which has not been tested with any real customer yet.
 
 **Expansion markets — important currency/language caveat:** Côte d'Ivoire and Senegal both use the
 West African CFA franc (XOF) and are primarily Francophone. **Ghana uses the Ghanaian cedi (GHS)
@@ -102,7 +102,7 @@ marked UNVERIFIED; all five were found and confirmed as real, currently-listed O
 **What this does and doesn't establish:** this confirms each company is a real, currently-active
 Odoo partner with a public contact channel. It does **not** confirm any of them has agreed to a
 referral relationship, has agribusiness clients needing WMS integration, or has any awareness of
-AgriWare Connector — those are still Month 1-2 actions (Section 8), not completed outreach. **No
+Cool Agristock — those are still Month 1-2 actions (Section 8), not completed outreach. **No
 company listed here has been contacted** as part of this verification pass.
 
 ## 3. Value Proposition
@@ -110,7 +110,7 @@ company listed here has been contacted** as part of this verification pass.
 **Core message** (unchanged from existing documentation, restated here as the commercial
 positioning anchor):
 
-> AgriWare Connector is a free, open-source Odoo 19 application that enables compatible external
+> Cool Agristock is a free, open-source Odoo 19 application that enables compatible external
 > warehouse management systems to exchange warehouse and inventory information with Odoo through a
 > REST API.
 
@@ -118,7 +118,7 @@ positioning anchor):
 
 - Free and open-source (LGPL-3.0) — no license fee, ever.
 - Self-service API key management — generate, name, expire, revoke, replace, without contacting
-  AgriWare.
+  Cool Agristock.
 - Product information retrieval.
 - Warehouse information retrieval.
 - Inventory visibility (on-hand quantities).
@@ -165,17 +165,17 @@ pegged to the euro, so it moves with EUR/USD, not independently.
 Pricing below is built from a single third-party vendor blog's cited day rate for Abidjan-based
 developers (100,000–200,000 FCFA/day, per Kolonell — see Sources) and the same source's cited
 custom-module cost range (2.5–6M FCFA). **This is one vendor's publicly stated pricing, not
-validated market research, not a benchmark survey, and not a confirmed rate AgriWare/Cool Agristock
+validated market research, not a benchmark survey, and not a confirmed rate Cool Agristock/Cool Agristock
 has ever charged.** Treat every figure below as a starting planning assumption to be replaced with
 real data after the first 2-3 engagements.
 
 ### Package 1 — Odoo Installation and Configuration
 
-- **Target customers:** Segment 7 (already-Odoo businesses needing AgriWare installed) and any
+- **Target customers:** Segment 7 (already-Odoo businesses needing Cool Agristock installed) and any
   segment choosing self-hosted/Odoo.sh deployment without in-house Odoo expertise.
-- **Services included:** Installing AgriWare Connector and its bundled OCA dependencies, assigning
+- **Services included:** Installing Cool Agristock and its bundled OCA dependencies, assigning
   user permissions, generating the first API key, confirming the health-check endpoint responds.
-- **Expected deliverables:** A working, tested AgriWare Connector install with documented
+- **Expected deliverables:** A working, tested Cool Agristock install with documented
   credentials handoff (never the raw key itself in a deliverable document).
 - **Estimated implementation effort:** 0.5–2 days, depending on hosting complexity.
 - **Required technical resources:** One person familiar with Odoo deployment (Docker/on-premise or
@@ -188,8 +188,8 @@ real data after the first 2-3 engagements.
 ### Package 2 — Basic WMS Integration
 
 - **Target customers:** Segments 5 and 7 — any customer whose WMS already speaks a REST API
-  compatible (or near-compatible) with AgriWare's documented contract.
-- **Services included:** Configuring the customer's existing WMS against AgriWare Connector's REST
+  compatible (or near-compatible) with Cool Agristock's documented contract.
+- **Services included:** Configuring the customer's existing WMS against Cool Agristock's REST
   API, testing the connection, validating one receipt and one dispatch end-to-end against test
   data, handing off to the customer's own acceptance testing (per `CUSTOMER_ONBOARDING.md`).
 - **Expected deliverables:** A documented, tested connection; a short runbook for the customer's
@@ -207,8 +207,8 @@ real data after the first 2-3 engagements.
 - **Target customers:** Segments 2 and 4 (distributors, cold-storage) and any customer whose WMS
   cannot speak the documented API without a translation layer.
 - **Services included:** Building a custom adapter between the customer's WMS's native protocol and
-  AgriWare Connector's REST API; this is new code, developed against the customer's specific WMS,
-  not a change to AgriWare Connector itself (see `docs/INTEGRATION_SERVICES.md`'s process).
+  Cool Agristock's REST API; this is new code, developed against the customer's specific WMS,
+  not a change to Cool Agristock itself (see `docs/INTEGRATION_SERVICES.md`'s process).
 - **Expected deliverables:** A working adapter, test results against disposable data, documentation
   of the adapter's own configuration.
 - **Estimated implementation effort:** 2–6 weeks, highly variable — this is the package most
@@ -227,7 +227,7 @@ real data after the first 2-3 engagements.
 ### Package 4 — Advanced Inventory Workflow Customization
 
 - **Target customers:** Segment 3 (food processors) and any customer whose operational workflow
-  doesn't map cleanly onto AgriWare's current receipt/dispatch model.
+  doesn't map cleanly onto Cool Agristock's current receipt/dispatch model.
 - **Services included:** Customization work on top of (not a change to) the documented API —
   e.g. orchestration scripts, Odoo-side automation, or process documentation adapting the
   customer's workflow to what the API supports today.
@@ -297,7 +297,7 @@ hardest and slowest segment).
 ## 7. Customer Sales Funnel
 
 ```text
-CUSTOMER DISCOVERS AGRIWARE
+CUSTOMER DISCOVERS COOL_AGRISTOCK
            |
            v
 VISITS MARKETPLACE OR GITHUB
@@ -423,7 +423,7 @@ the other two scenarios to look better.
 | Risk | Likelihood/impact (reasoned, not measured) | Mitigation |
 |---|---|---|
 | **Low brand awareness / unproven track record** | High likelihood, medium impact | Lead with the Odoo-partner channel (Section 6) rather than cold outreach — borrowed credibility matters more than ads for an unproven product |
-| **Local Odoo partners build competing in-house integrations instead of referring** | Medium likelihood, medium impact | Position AgriWare explicitly as complementary (open-source, they can inspect/extend it) rather than as a competitor to their implementation services — most partners make money on implementation/support, not on building REST connectors from scratch |
+| **Local Odoo partners build competing in-house integrations instead of referring** | Medium likelihood, medium impact | Position Cool Agristock explicitly as complementary (open-source, they can inspect/extend it) rather than as a competitor to their implementation services — most partners make money on implementation/support, not on building REST connectors from scratch |
 | **Documentation is English-only in a primarily Francophone target market** | **Confirmed fact, not a projection** — every doc in this repo is English-only; Côte d'Ivoire and Senegal are Francophone | Translate at minimum `QUICK_START.md` and `CUSTOMER_ONBOARDING.md` to French before scaling outreach in Month 2-3; do not wait until a French-speaking customer asks and then scramble |
 | **Currency/economic volatility (XOF pegged to EUR, moves with EUR/USD)** | Medium likelihood, low-medium impact | Quote in FCFA to local customers (removes their FX risk), re-verify the live rate before every quote rather than relying on this document's rounded figure |
 | **Reliance on unmodified OCA dependencies (component/connector/queue_job)** | Low likelihood (pinned versions, verified compatible), low impact today | Already mitigated by pinning exact commits (see `README.md`); re-verify compatibility before any future Odoo version bump |

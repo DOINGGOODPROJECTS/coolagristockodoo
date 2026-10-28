@@ -8,7 +8,7 @@ export function Footer({ dict }: { dict: Dictionary; lang: Lang }) {
         <p className="mt-2 text-sm font-medium text-brand-700">{dict.footer.freeOpenSource}</p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <a
-            href="https://github.com/DOINGGOODPROJECTS/agriwareodoo"
+            href="https://github.com/DOINGGOODPROJECTS/coolagristockodoo"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm font-medium text-gray-700 underline hover:text-brand-700"

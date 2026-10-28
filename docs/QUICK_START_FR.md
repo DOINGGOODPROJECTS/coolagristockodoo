@@ -4,14 +4,14 @@
 intégration WMS, référence API) ne sont pour l'instant disponibles qu'en anglais — les liens
 ci-dessous pointent vers ces documents anglais.*
 
-Le chemin le plus rapide pour comprendre comment AgriWare Connector s'articule. Pour le détail
+Le chemin le plus rapide pour comprendre comment Cool Agristock s'articule. Pour le détail
 complet, voir [INSTALLATION.md](INSTALLATION.md) (installation étape par étape) et
 [WMS_INTEGRATION.md](WMS_INTEGRATION.md) (guide d'intégration complet pour développeurs).
 
 ## Le flux de travail de base
 
 ```text
-INSTALLER AGRIWARE CONNECTOR
+INSTALLER COOL_AGRISTOCK CONNECTOR
           |
           v
 ATTRIBUER LES DROITS UTILISATEUR
@@ -29,17 +29,17 @@ TESTER LA CONNEXION API
 ÉCHANGER LES DONNÉES D'ENTREPÔT
 ```
 
-1. **Installer AgriWare Connector** — depuis la marketplace Odoo Apps, sur votre instance Odoo 19.
+1. **Installer Cool Agristock** — depuis la marketplace Odoo Apps, sur votre instance Odoo 19.
    Le téléchargement inclut déjà ses dépendances OCA requises : il n'y a rien d'autre à récupérer.
-   Voir [INSTALLATION.md](INSTALLATION.md#1-download-agriware-connector-from-odoo-apps).
-2. **Attribuer les droits utilisateur** — accordez le droit d'accès **AgriWare Administrator** à la
+   Voir [INSTALLATION.md](INSTALLATION.md#1-download-cool_agristock-connector-from-odoo-apps).
+2. **Attribuer les droits utilisateur** — accordez le droit d'accès **Cool Agristock Administrator** à la
    personne qui gérera les clés API. Voir
    [INSTALLATION.md](INSTALLATION.md#4-assign-the-appropriate-user-permissions).
-3. **Générer une clé API** — depuis **AgriWare Connector → API Management → Generate API Key**, en
+3. **Générer une clé API** — depuis **Cool Agristock → API Management → Generate API Key**, en
    choisissant une date d'expiration ou **Never Expires** (n'expire jamais). Voir
    [INSTALLATION.md](INSTALLATION.md#6-generate-an-api-key).
 4. **Configurer votre WMS externe** — avec l'URL de base de votre instance Odoo
-   (`https://VOTRE_URL_ODOO/agriware/api/v1`) et la clé API, en utilisant l'authentification par
+   (`https://VOTRE_URL_ODOO/cool_agristock/api/v1`) et la clé API, en utilisant l'authentification par
    jeton Bearer (Bearer token).
 5. **Tester la connexion API** — vérifiez que le contrôle de santé (*health check*) et un appel
    authentifié fonctionnent tous les deux (exemple ci-dessous).
@@ -56,7 +56,7 @@ réellement générée (ne jamais enregistrer de vraies valeurs dans un dépôt 
 export ODOO_URL="https://VOTRE_URL_ODOO"
 export API_KEY="VOTRE_CLE_API"
 
-curl -s "$ODOO_URL/agriware/api/v1/products" \
+curl -s "$ODOO_URL/cool_agristock/api/v1/products" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -86,7 +86,7 @@ Si vous obtenez une page HTML `401` au lieu de ce JSON, vérifiez le jeton Beare
 - Déployez votre instance derrière HTTPS dans tout environnement au-delà du développement local —
   un jeton Bearer envoyé en clair (HTTP) est visible sur le réseau.
 
-## Ce qu'AgriWare Connector n'est pas
+## Ce que Cool Agristock n'est pas
 
 - Ce n'est pas un WMS en soi — c'est la couche d'intégration entre votre WMS existant et
   l'Inventaire Odoo.

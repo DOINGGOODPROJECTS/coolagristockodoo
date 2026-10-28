@@ -32,7 +32,7 @@ Read directly from the installed Odoo 19 source
 
 ## Endpoints
 
-### `POST /agriware/api/v1/warehouses`
+### `POST /cool_agristock/api/v1/warehouses`
 
 Request:
 ```json
@@ -49,7 +49,7 @@ Response `409` (duplicate `external_id`, name, or code):
 {"status": "error", "message": "external_id already mapped", "warehouse_id": 23}
 ```
 
-### `PATCH /agriware/api/v1/warehouses/{external_id}`
+### `PATCH /cool_agristock/api/v1/warehouses/{external_id}`
 
 Request:
 ```json
@@ -71,7 +71,7 @@ Response `400` (attempting to change `code`):
 {"status": "error", "message": "code cannot be changed once a warehouse is created (its locations and sequences are already named from it) -- create a new warehouse instead if the code must change"}
 ```
 
-### `GET /agriware/api/v1/warehouses` — unchanged
+### `GET /cool_agristock/api/v1/warehouses` — unchanged
 
 Confirmed byte-for-byte unchanged by the full pre-existing test suite passing at its original
 count. No binding is required to call it — exactly like `GET /products`.
@@ -99,7 +99,7 @@ additionally enforced read-only by Odoo itself, independent of this module's own
 
 ## External ID mapping
 
-Reuses Phase A's `agriware.external.id.mapping` exactly as designed — no separate
+Reuses Phase A's `cool_agristock.external.id.mapping` exactly as designed — no separate
 warehouse-specific mapping table. `res_model = "stock.warehouse"`:
 
 ```text
@@ -157,7 +157,7 @@ outcomes the task explicitly forbids.
    same `ir.rule` pattern already applied everywhere else); no existing mapping already claims that
    external ID, or that warehouse, for that external system (Phase A's own unique constraints would
    catch this anyway, but a clean pre-check gives a better error message).
-4. Only on confirmation does it call `agriware.external.id.mapping.create_mapping()` — the exact
+4. Only on confirmation does it call `cool_agristock.external.id.mapping.create_mapping()` — the exact
    same service method `POST /warehouses` uses, so adopted and natively-created mappings are
    indistinguishable afterward; this is a second path to the same well-tested write operation, not
    a separate, less-tested one.
@@ -172,13 +172,13 @@ piece of work, not squeezed into this phase alongside the two REST endpoints.
 
 ## Security
 
-- Authentication and external-system resolution are identical to Phase B: Bearer token → AgriWare
+- Authentication and external-system resolution are identical to Phase B: Bearer token → Cool Agristock
   API User group → `resolve_authorized_external_system()`, server-derived, never trusted from the
   request body. See [PRODUCT_SYNCHRONIZATION.md's API key binding](PRODUCT_SYNCHRONIZATION.md#api-key-binding)
   for the authorization-isolation fix (each bound key gets its own dedicated integration user,
   found necessary by a pre-Phase-D security review) — confirmed to apply identically to warehouse
   endpoints by `tests/test_api_key_isolation_security.py`'s dedicated warehouse-side assertions.
-- **Deliberate security design difference from Phase B:** Phase B granted the AgriWare API User
+- **Deliberate security design difference from Phase B:** Phase B granted the Cool Agristock API User
   group explicit, auditable `ir.model.access.csv` rows on `product.product`/`product.template`.
   This phase does **not** grant any new `ir.model.access` rows at all. Warehouse creation cascades
   into `stock.location`, `stock.picking.type`, `stock.route`, `stock.rule`, and `ir.sequence` —
@@ -202,7 +202,7 @@ piece of work, not squeezed into this phase alongside the two REST endpoints.
 |---|---|
 | 400 | Invalid JSON, missing/empty `name` or `code`, unsupported field, attempting to `PATCH` `code` |
 | 401 | Missing, malformed, invalid, expired, or revoked API key |
-| 403 | Not an AgriWare API User; key not bound to an active external system; identity ambiguously bound to more than one |
+| 403 | Not a Cool Agristock API User; key not bound to an active external system; identity ambiguously bound to more than one |
 | 404 | (`PATCH` only) No warehouse mapped for this `external_id` |
 | 409 | `external_id`, warehouse `name`, or warehouse `code` already in use |
 | 422 | `code` longer than 5 characters (Odoo's own hard limit) |
@@ -234,5 +234,5 @@ piece of work, not squeezed into this phase alongside the two REST endpoints.
   `stock_location` rows exist for the view location (named "ANY", `usage='view'`) and the internal
   stock location (named "Stock", `usage='internal'`), and real picking types are assigned
   (`in_type_id`, `out_type_id` both set).
-- The pre-existing `/agriware/api/v1/health`, `GET /warehouses`, product-sync, and receipt/dispatch
+- The pre-existing `/cool_agristock/api/v1/health`, `GET /warehouses`, product-sync, and receipt/dispatch
   endpoints were confirmed still responding correctly with this phase's code installed.

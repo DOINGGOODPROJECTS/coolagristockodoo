@@ -1,8 +1,8 @@
 {
-  "name": "agriware-connector-website",
+  "name": "cool-agristock-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Marketing and documentation website for AgriWare Connector (separate from the Odoo addon).",
+  "description": "Marketing and documentation website for Cool Agristock (separate from the Odoo addon).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
