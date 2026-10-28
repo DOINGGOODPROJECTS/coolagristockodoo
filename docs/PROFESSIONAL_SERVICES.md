@@ -1,6 +1,6 @@
 # Professional Services
 
-AgriWare Connector's software is, and always will be, free and open-source — there is no license
+Cool Agristock's software is, and always will be, free and open-source — there is no license
 fee, subscription, or paid tier of the module itself. This page covers the **separate, optional**
 paid services available to businesses that want hands-on help beyond what's in the docs.
 
@@ -8,9 +8,9 @@ paid services available to businesses that want hands-on help beyond what's in t
 
 Included at no cost, forever (LGPL-3.0):
 
-- The AgriWare Connector source code itself.
+- The Cool Agristock source code itself.
 - Every documented REST API capability — see [API.md](API.md).
-- Self-service API key management (generate, name, expire, revoke, replace) — no AgriWare
+- Self-service API key management (generate, name, expire, revoke, replace) — no Cool Agristock
   involvement needed.
 - Self-service integration: if your WMS already speaks the documented API, you can connect it
   yourself using [INSTALLATION.md](INSTALLATION.md) and [WMS_INTEGRATION.md](WMS_INTEGRATION.md).
@@ -21,9 +21,9 @@ Included at no cost, forever (LGPL-3.0):
 These are professional services performed by people, not software features you unlock by paying.
 No prices are listed here — pricing is discussed per request, since scope varies per engagement.
 
-1. **Odoo installation and configuration** — setting up AgriWare Connector (and its OCA
+1. **Odoo installation and configuration** — setting up Cool Agristock (and its OCA
    dependencies) on your Odoo 19 instance, for businesses without in-house Odoo expertise.
-2. **External WMS integration** — connecting your specific WMS to AgriWare Connector's REST API
+2. **External WMS integration** — connecting your specific WMS to Cool Agristock's REST API
    end-to-end, including your own configuration on the WMS side.
 3. **Custom WMS adapter development** — if your WMS can't be configured to speak the documented
    API directly, building a translation layer between its native protocol and this API.
@@ -38,7 +38,7 @@ No prices are listed here — pricing is discussed per request, since scope vari
 
 ## What's never for sale
 
-- The AgriWare Connector module itself, or any license to use it — it's LGPL-3.0, always free.
+- The Cool Agristock module itself, or any license to use it — it's LGPL-3.0, always free.
 - Any documented REST API functionality — see [Known limitations](API.md#known-limitations) for
   what genuinely isn't implemented yet; paid work can extend functionality but doesn't unlock
   anything already built and gated behind payment.
@@ -47,7 +47,7 @@ No prices are listed here — pricing is discussed per request, since scope vari
 
 ## How to request a paid service
 
-These services are provided by **Cool Agristock**, the team behind AgriWare Connector. Email:
+These services are provided by **Cool Agristock**, the team behind Cool Agristock. Email:
 
 <team@agricarecentres.com>
 

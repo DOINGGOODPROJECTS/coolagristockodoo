@@ -1,6 +1,6 @@
 # Integration Services
 
-If your WMS doesn't already speak AgriWare Connector's documented REST API, connecting it is
+If your WMS doesn't already speak Cool Agristock's documented REST API, connecting it is
 custom integration work — a [paid professional service](PROFESSIONAL_SERVICES.md), not something
 the free module does automatically. This page explains the process and what to include in a
 request.
@@ -16,11 +16,11 @@ there's no reason to send the actual secret itself.
    [How to request](#how-to-request) below) using the questionnaire in this document.
 2. **Cool Agristock reviews the customer's WMS** — based on the questionnaire answers and any
    public documentation the customer can point to for their WMS's own API or integration points.
-3. **Technical compatibility is assessed** — whether the WMS can call AgriWare Connector's REST API
+3. **Technical compatibility is assessed** — whether the WMS can call Cool Agristock's REST API
    directly, or needs a translation layer (adapter) in between. **No integration is promised until
    this assessment is complete** — compatibility depends entirely on the specific WMS's own API or
    lack of one, so it cannot be judged from the questionnaire alone before this step.
-4. **Required API adaptations are identified** — on the WMS side (most common, since AgriWare
+4. **Required API adaptations are identified** — on the WMS side (most common, since Cool Agristock
    Connector's API itself isn't modified per customer — see
    [Known limitations](API.md#known-limitations) for what the API does and doesn't support today).
 5. **Project scope is agreed** — what's being built, by when, and any constraints, agreed directly
@@ -55,7 +55,7 @@ publicly)
 (describe generically, e.g. "API key in header," "OAuth2" — no real credentials)
 
 **Required inventory workflows**
-(e.g. receiving, dispatching, stock lookups, product sync — which of AgriWare Connector's
+(e.g. receiving, dispatching, stock lookups, product sync — which of Cool Agristock's
 documented operations you need: see [Supported REST endpoints](WMS_INTEGRATION.md#supported-rest-endpoints))
 
 **Number of warehouses**
@@ -79,7 +79,7 @@ workflows that must be demonstrated, who signs off)
 
 ## How to request
 
-Email the questionnaire above, filled in, to **Cool Agristock** (the team behind AgriWare
+Email the questionnaire above, filled in, to **Cool Agristock** (the team behind Cool Agristock
 Connector):
 
 <team@agricarecentres.com>

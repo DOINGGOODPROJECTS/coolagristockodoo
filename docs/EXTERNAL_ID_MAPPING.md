@@ -13,7 +13,7 @@ still design-only; see [WMS_FIRST_INTEGRATION_PLAN.md](WMS_FIRST_INTEGRATION_PLA
 
 ## External system identity
 
-**Model: `agriware.external.system`**
+**Model: `cool_agristock.external.system`**
 
 | Field | Type | Notes |
 |---|---|---|
@@ -39,18 +39,18 @@ includes `company_id`.
 
 ### API-key binding: reviewed, not implemented
 
-The approval task asked whether an existing `agriware.api.key` should be associated with a
+The approval task asked whether an existing `cool_agristock.api.key` should be associated with a
 specific external system. **Reviewed and deferred, not implemented:**
 
-- `agriware.api.key` was **not modified** in this phase — zero changes to an existing, already-
+- `cool_agristock.api.key` was **not modified** in this phase — zero changes to an existing, already-
   shipped, already-tested model. Authentication behavior is unchanged, confirmed by the full
   existing test suite passing unmodified (see [Verification](#verification-performed) below).
 - Rationale for deferring rather than building it now: there is no current call site that would
-  consume such a binding (no REST endpoint uses `agriware.external.system` yet), and building it
+  consume such a binding (no REST endpoint uses `cool_agristock.external.system` yet), and building it
   speculatively would mean touching authentication-adjacent code for a feature nothing calls —
   exactly the kind of premature complexity this project avoids elsewhere.
 - **Compatibility implication, documented in case this is revisited:** if a future phase does add
-  an optional `external_system_id` field to `agriware.api.key`, it should be **nullable**, with
+  an optional `external_system_id` field to `cool_agristock.api.key`, it should be **nullable**, with
   existing keys defaulting to no binding — this is non-breaking by construction as long as nothing
   is made to *require* the field. Any design that makes it required, or that changes how an
   existing key authenticates based on this field, would need its own explicit compatibility review
@@ -58,12 +58,12 @@ specific external system. **Reviewed and deferred, not implemented:**
 
 ## Mapping schema
 
-**Model: `agriware.external.id.mapping`**
+**Model: `cool_agristock.external.id.mapping`**
 
 | Field | Type | Notes |
 |---|---|---|
 | `company_id` | Many2one `res.company`, required | Defaults to the current company. |
-| `external_system_id` | Many2one `agriware.external.system`, required | `ondelete="restrict"` — an external system in active use cannot be deleted out from under its mappings. |
+| `external_system_id` | Many2one `cool_agristock.external.system`, required | `ondelete="restrict"` — an external system in active use cannot be deleted out from under its mappings. |
 | `res_model` | Char, required | Restricted to an explicit allow-list — see below. |
 | `external_id` | Char, required | The external system's own identifier string, e.g. `WMS-PRODUCT-001`. Non-empty enforced. |
 | `res_id` | Integer, required | The id of the record in `res_model` this `external_id` refers to. |
@@ -92,7 +92,7 @@ with no current or planned caller.
 
 ## Uniqueness constraints
 
-Two real Postgres unique constraints (confirmed present via `\d agriware_external_id_mapping`
+Two real Postgres unique constraints (confirmed present via `\d cool_agristock_external_id_mapping`
 against a live Odoo 19 install, not just declared in code):
 
 ```sql
@@ -118,15 +118,15 @@ anywhere in Odoo core itself, in an unrelated module).
 
 - **Row-level isolation:** both models carry a company-scoped `ir.rule`
   (`[('company_id', 'in', company_ids)]`), identical in form to the existing
-  `rule_agriware_api_key_company` rule. One company's integration can never see or act on another
+  `rule_cool_agristock_api_key_company` rule. One company's integration can never see or act on another
   company's external systems or mappings — tested directly, including an attempt to force it via
   direct ORM search.
 - **Direct model access (`ir.model.access.csv`):**
 
-  | Model | AgriWare Administrator | AgriWare API User |
+  | Model | Cool Agristock Administrator | Cool Agristock API User |
   |---|---|---|
-  | `agriware.external.system` | Full CRUD | **No access at all** |
-  | `agriware.external.id.mapping` | **Read-only** (no write/create/unlink) | **No access at all** |
+  | `cool_agristock.external.system` | Full CRUD | **No access at all** |
+  | `cool_agristock.external.id.mapping` | **Read-only** (no write/create/unlink) | **No access at all** |
 
   Administrators manage external systems through the admin UI (below). Nobody — not even an
   Administrator — can hand-edit a mapping row directly; mappings are written only through the
@@ -135,7 +135,7 @@ anywhere in Odoo core itself, in an unrelated module).
   `sudo()` calls, made only after that layer's own authorization check passes.
 - **Service-layer authorization (`_check_mapping_access`):** every write operation
   (`create_mapping`, `update_mapping`, `remove_mapping`) independently re-verifies that the calling
-  user holds the **AgriWare API User** group and that the target company is one of their allowed
+  user holds the **Cool Agristock API User** group and that the target company is one of their allowed
   companies — the same two checks a REST controller would perform at the HTTP layer, duplicated
   here so the service itself never silently trusts a caller that reached it through some other
   path. `resolve_mapping` (read-only) checks company membership only, not the group, matching the
@@ -151,7 +151,7 @@ anywhere in Odoo core itself, in an unrelated module).
 ## Mapping lifecycle
 
 ```python
-Mapping = env["agriware.external.id.mapping"]
+Mapping = env["cool_agristock.external.id.mapping"]
 
 # Create (or discover it already exists)
 record, created = Mapping.create_mapping(
@@ -209,7 +209,7 @@ in `tests/test_external_id_mapping.py`).
 | `create_mapping()`/`update_mapping()` with a `res_model` outside the allow-list | `ValidationError`, raised before any database write is attempted. |
 | `update_mapping()`/`remove_mapping()` for an identity with no existing mapping | `update_mapping` raises `ValidationError`; `remove_mapping` returns `False` (idempotent, not an error). |
 | A mapping's target record doesn't exist, or belongs to a different company | `ValidationError`, enforced by an `@api.constrains` check that runs on every create/write, not just through the service layer. |
-| Caller lacks the AgriWare API User group, or the target company isn't theirs | `AccessError`, from the service layer's own authorization check. |
+| Caller lacks the Cool Agristock API User group, or the target company isn't theirs | `AccessError`, from the service layer's own authorization check. |
 | Direct ORM access to either model by a non-Administrator | `AccessError`, from `ir.model.access.csv` — enforced before any of the above logic even runs. |
 
 ## Future API integration
@@ -236,10 +236,10 @@ This document will be updated again as each further phase starts consuming this 
 
 ## Verification performed
 
-- **Module installs cleanly** into a fresh, disposable Odoo 19 database (`agriware_feature_test`,
+- **Module installs cleanly** into a fresh, disposable Odoo 19 database (`cool_agristock_feature_test`,
   dropped after use — the persistent dev database was never touched), confirmed via direct
   `ir_module_module` query (`state = 'installed'`, version `19.0.1.1.0`).
-- **Module upgrades cleanly** from the prior installed state (`-u agriware_connector` against the
+- **Module upgrades cleanly** from the prior installed state (`-u cool_agristock` against the
   same throwaway database), zero errors.
 - **Both new tables and both SQL constraints exist exactly as designed**, confirmed via `\d` against
   the live Postgres schema, not just by reading the Python source.

@@ -7,7 +7,7 @@ for where this fits.
 
 ## What this is
 
-`POST /agriware/api/v1/receipts` and `POST /agriware/api/v1/dispatches` now accept **two
+`POST /cool_agristock/api/v1/receipts` and `POST /cool_agristock/api/v1/dispatches` now accept **two
 request shapes in the same route**, distinguished by which top-level key is present:
 
 - **`products`** — the original, Phase-A-era schema: raw Odoo integer IDs, no external-system
@@ -21,7 +21,7 @@ the same two routes handle both a legacy-created and a Phase-G-created picking i
 
 ## Endpoints
 
-### `POST /agriware/api/v1/receipts` (WMS-first schema)
+### `POST /cool_agristock/api/v1/receipts` (WMS-first schema)
 
 ```json
 {
@@ -53,11 +53,11 @@ WMS-first caller can later call the *unchanged* `/validate` endpoint, which stil
 `product_id` per the original Phase A/B schema (see
 [Why validation wasn't also rewritten](#why-validation-wasnt-also-rewritten) below).
 
-`POST /agriware/api/v1/dispatches` is the same shape, minus `supplier_external_id` (dispatches
+`POST /cool_agristock/api/v1/dispatches` is the same shape, minus `supplier_external_id` (dispatches
 have no required customer reference in this phase — matching the task's own example payload,
 which doesn't include one either; `partner_id` is left unset on the picking, which Odoo allows).
 
-### `GET /agriware/api/v1/receipts/{external_reference}` / `GET /agriware/api/v1/dispatches/{external_reference}`
+### `GET /cool_agristock/api/v1/receipts/{external_reference}` / `GET /cool_agristock/api/v1/dispatches/{external_reference}`
 
 Requires a **bound** API key (unlike the catalog `GET` endpoints) — a bare `external_reference` is
 only meaningful within one external system's own namespace, so resolving it requires knowing which
@@ -82,7 +82,7 @@ identity row (see [Transaction identity](#transaction-identity) below).
 
 ## Transaction identity
 
-New model `agriware.wms.transaction`: `company_id`, `external_system_id`, `transaction_type`
+New model `cool_agristock.wms.transaction`: `company_id`, `external_system_id`, `transaction_type`
 (`receipt`/`dispatch`), `external_reference`, `request_hash`, `picking_id`. Unique constraint on
 `(company_id, external_system_id, transaction_type, external_reference)` — a real database
 constraint, not just an application-level check.
@@ -92,7 +92,7 @@ mechanism (a PostgreSQL advisory lock + a `picking.origin`/`picking_type_id` mat
 reading `receipts.py`/`dispatches.py` directly) serializes concurrent requests correctly, but has
 no real database-level uniqueness and no `external_system_id` dimension at all — it predates this
 module's external-system-binding concept entirely. Rather than retrofit that mechanism (and risk
-the legacy path's own, already-tested behavior), this phase adds `agriware.wms.transaction`
+the legacy path's own, already-tested behavior), this phase adds `cool_agristock.wms.transaction`
 specifically for the new WMS-first path, leaving the legacy path's original mechanism **completely
 untouched** for `products`-schema requests. This also directly serves the new `GET` status
 endpoints, which need a reliable `(company, external_system, type, reference) → picking` lookup
@@ -134,19 +134,19 @@ this if real integrations find round-tripping the numeric id awkward.
 
 ## Security
 
-Identical pattern to every other phase: Bearer token → AgriWare API User group →
+Identical pattern to every other phase: Bearer token → Cool Agristock API User group →
 `resolve_authorized_external_system()`, required only for the WMS-first schema and the `GET` status
 endpoints — the legacy `products` schema requires no binding at all, exactly as before this phase.
-`agriware.wms.transaction` has no `ir.model.access.csv` grant for the API User group at all (same
-as `agriware.external.id.mapping`) — every read/write goes through `sudo()` after the controller's
+`cool_agristock.wms.transaction` has no `ir.model.access.csv` grant for the API User group at all (same
+as `cool_agristock.external.id.mapping`) — every read/write goes through `sudo()` after the controller's
 own explicit auth check, never a standing capability.
 
 **A real compatibility bug was found and fixed by this phase's own testing, not just avoided by
-design:** `/validate`'s existing guard ("this picking must actually be AgriWare-managed") checked
-only for the legacy `AGRIWARE-RCPT-`/`AGRIWARE-DISP-` prefix convention — which a Phase G
+design:** `/validate`'s existing guard ("this picking must actually be Cool Agristock-managed") checked
+only for the legacy `COOL_AGRISTOCK-RCPT-`/`COOL_AGRISTOCK-DISP-` prefix convention — which a Phase G
 `external_reference` like `WMS-REC-001` would never match, meaning a WMS-first receipt could be
 created successfully and then **never validated at all**. Fixed by recognizing a picking as
-AgriWare-managed if *either* the legacy prefix matches *or* a real `agriware.wms.transaction` row
+Cool Agristock-managed if *either* the legacy prefix matches *or* a real `cool_agristock.wms.transaction` row
 references it — the only way to have gotten one is through this module's own creation path.
 
 ## Known limitations

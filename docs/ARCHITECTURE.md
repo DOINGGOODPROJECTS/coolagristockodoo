@@ -1,10 +1,10 @@
-# AgriWare Connector — Architecture
+# Cool Agristock — Architecture
 
 **This document covers two things, kept clearly separate:**
 
 1. **Current architecture** — verified directly against the code in this repository (controllers,
    models, security files, tests) as of this writing. Everything in that section exists and works.
-2. **Target (WMS-first) architecture** — the proposed direction agreed for AgriWare Connector's next
+2. **Target (WMS-first) architecture** — the proposed direction agreed for Cool Agristock's next
    development phase. **Every statement in that section is a design proposal. Nothing in it is
    implemented.** See [WMS_FIRST_INTEGRATION_PLAN.md](WMS_FIRST_INTEGRATION_PLAN.md) for the detailed
    functional design and [API_ROADMAP.md](API_ROADMAP.md) for the phased build plan.
@@ -43,20 +43,20 @@ review and why it's deferred rather than decided here.
 
 ### What exists today
 
-Verified by reading `agriware_connector/controllers/`, `agriware_connector/models/`,
-`agriware_connector/security/`, and `agriware_connector/tests/` directly:
+Verified by reading `cool_agristock/controllers/`, `cool_agristock/models/`,
+`cool_agristock/security/`, and `cool_agristock/tests/` directly:
 
-- **Models:** `agriware.api.key` (self-service API key management), `agriware.connection`
+- **Models:** `cool_agristock.api.key` (self-service API key management), `cool_agristock.connection`
   (an unused, hidden model from an earlier design — see
-  [Known limitations](API.md#known-limitations)); `agriware.external.system` and
-  `agriware.external.id.mapping` (Phase A's external-ID mapping infrastructure — see
+  [Known limitations](API.md#known-limitations)); `cool_agristock.external.system` and
+  `cool_agristock.external.id.mapping` (Phase A's external-ID mapping infrastructure — see
   [EXTERNAL_ID_MAPPING.md](EXTERNAL_ID_MAPPING.md)); and, as of Phase D,
-  `agriware.uom.mapping` (database-backed unit mapping — see [UOM_MAPPING.md](UOM_MAPPING.md)); and,
-  as of Phase E, `agriware.inventory.import`/`.line` (staged WMS stock observations — see
+  `cool_agristock.uom.mapping` (database-backed unit mapping — see [UOM_MAPPING.md](UOM_MAPPING.md)); and,
+  as of Phase E, `cool_agristock.inventory.import`/`.line` (staged WMS stock observations — see
   [INITIAL_INVENTORY_IMPORT.md](INITIAL_INVENTORY_IMPORT.md)). Phase F adds no new model of its
   own — it reuses Odoo's native `stock.lot` directly, mapped through the same Phase A service (see
   [LOT_BATCH_SYNCHRONIZATION.md](LOT_BATCH_SYNCHRONIZATION.md)). As of Phase G,
-  `agriware.wms.transaction` (receipt/dispatch identity for the new WMS-first creation path — see
+  `cool_agristock.wms.transaction` (receipt/dispatch identity for the new WMS-first creation path — see
   [WMS_TRANSACTION_SYNCHRONIZATION.md](WMS_TRANSACTION_SYNCHRONIZATION.md)).
   Product (Phase B), warehouse (Phase C), supplier (Phase D), initial inventory import (Phase E),
   lot/serial synchronization (Phase F), and WMS-first receipt/dispatch synchronization (Phase G)
@@ -78,11 +78,11 @@ Verified by reading `agriware_connector/controllers/`, `agriware_connector/model
     (`product_id`, `warehouse_id`, `supplier_id`) — confirmed by reading
     `controllers/receipts.py` and `controllers/dispatches.py` directly.
 - **Authentication:** Bearer token = a real Odoo API key (`res.users.apikeys`), validated by Odoo's
-  own framework before controller code runs. Additionally requires the **AgriWare API User** group.
-- **Security groups:** **AgriWare Administrator** (manage API keys) implies **AgriWare API User**
+  own framework before controller code runs. Additionally requires the **Cool Agristock API User** group.
+- **Security groups:** **Cool Agristock Administrator** (manage API keys) implies **Cool Agristock API User**
   (call the REST API), which implies `stock.group_stock_user`. Company isolation is enforced both
   by explicit `company_id in env.companies.ids` filters in controller queries and by an `ir.rule`
-  record rule on `agriware.api.key` itself.
+  record rule on `cool_agristock.api.key` itself.
 - **Duplicate protection:** a PostgreSQL transaction-scoped advisory lock keyed on
   `external_reference`, used only for receipt/dispatch creation today.
 - **Tests:** 8 test files (`test_authentication.py`, `test_authorization.py`,
@@ -93,7 +93,7 @@ Verified by reading `agriware_connector/controllers/`, `agriware_connector/model
 ### Current architecture diagram
 
 ```text
-External WMS  --(HTTPS + API key, WMS-initiated)-->  AgriWare Connector  --(Odoo ORM)-->  Odoo 19  -->  PostgreSQL
+External WMS  --(HTTPS + API key, WMS-initiated)-->  Cool Agristock  --(Odoo ORM)-->  Odoo 19  -->  PostgreSQL
 ```
 
 Every request is initiated by the external WMS; Odoo never calls out to the WMS. All data lives in
@@ -104,7 +104,7 @@ Odoo's own database — the connector adds no separate datastore. This part of t
 
 ### The problem this solves
 
-Today, a business can only use AgriWare Connector if its products, warehouses, and suppliers
+Today, a business can only use Cool Agristock if its products, warehouses, and suppliers
 **already exist inside Odoo**, created through Odoo's own UI. A business that already runs its
 warehouse operations in an external WMS — with its own product catalog, its own warehouse codes,
 its own supplier list — currently has to re-create all of that by hand inside Odoo before the API
@@ -114,7 +114,7 @@ becomes useful at all. That's backwards for a business whose WMS is their real s
 
 ```text
 ┌─────────────────────┐        ┌───────────────────────┐        ┌─────────────────────┐
-│    CUSTOMER WMS      │        │   AGRIWARE CONNECTOR   │        │      ODOO 19         │
+│    CUSTOMER WMS      │        │   COOL_AGRISTOCK CONNECTOR   │        │      ODOO 19         │
 │                      │        │                        │        │                      │
 │ Primary source of    │──────▶│ Secure integration and  │──────▶│ ERP: accounting,     │
 │ warehouse operational│  REST │ synchronization layer   │  ORM  │ invoicing,           │
@@ -131,7 +131,7 @@ becomes useful at all. That's backwards for a business whose WMS is their real s
   exist, what warehouses exist, what's physically on the shelf, which lots/batches are in play, and
   confirmation that a receipt or dispatch physically happened. The WMS still **initiates every
   request** — this does not change.
-- **AgriWare Connector** — becomes an explicit synchronization layer, not just a pass-through API.
+- **Cool Agristock** — becomes an explicit synchronization layer, not just a pass-through API.
   It translates the WMS's own identifiers into Odoo records (creating them on first sight, updating
   them on change), enforces which side owns which field (Part 2's
   [Data Ownership Matrix](#data-ownership-matrix) below), and always acts *through* Odoo's own
@@ -142,13 +142,13 @@ becomes useful at all. That's backwards for a business whose WMS is their real s
   it becomes a *receiver and processor* of warehouse data rather than the place that data
   originates.
 
-**Important clarification — this does not mean building N vendor-specific integrations.** AgriWare
+**Important clarification — this does not mean building N vendor-specific integrations.** Cool Agristock
 Connector remains **one generic REST API**. A WMS that can call REST and JSON speaks to the exact
-same endpoints regardless of vendor. AgriWare Connector does not need, and will not gain, direct
+same endpoints regardless of vendor. Cool Agristock does not need, and will not gain, direct
 proprietary-protocol access to any specific WMS vendor's own API — a WMS that can't speak this
 generic API needs a custom adapter (an existing, already-documented paid service — see
 [PROFESSIONAL_SERVICES.md](PROFESSIONAL_SERVICES.md)), built as a separate translation layer in
-front of this same unchanged API, not as new code inside AgriWare Connector itself.
+front of this same unchanged API, not as new code inside Cool Agristock itself.
 
 ### Data Ownership Matrix
 
@@ -163,7 +163,7 @@ front of this same unchanged API, not as new code inside AgriWare Connector itse
 | Accounting configuration (chart of accounts, journals) | **Odoo** | Never touched by any WMS-facing endpoint. |
 | Tax settings | **Odoo** | Never exposed to the API at all. |
 | Financial reporting | **Odoo** | Out of scope for this integration entirely. |
-| Customer invoices | **Odoo** | Out of scope — AgriWare Connector has no invoicing endpoints, proposed or otherwise. |
+| Customer invoices | **Odoo** | Out of scope — Cool Agristock has no invoicing endpoints, proposed or otherwise. |
 | ERP-specific commercial settings (payment terms, pricelists) | **Odoo** | Not writable by any proposed endpoint. |
 
 **Enforcement principle:** every proposed write endpoint (Phase 3/5 below) exposes an explicit
@@ -199,7 +199,7 @@ used in production by at least one real integration — it is **not** part of th
 ### Security model (current, extended by proposal)
 
 Unchanged principles that every new endpoint must also follow: Bearer-token authentication via
-real Odoo API keys, the AgriWare API User/Administrator group split, company-scoped queries, and
+real Odoo API keys, the Cool Agristock API User/Administrator group split, company-scoped queries, and
 controller-level `has_access()` checks before any write (exactly as `receipts.py` already does for
 `stock.picking`/`stock.move`). Full detail on how this extends to the new models and endpoints is
 in [WMS_FIRST_INTEGRATION_PLAN.md](WMS_FIRST_INTEGRATION_PLAN.md#security-and-multi-company-design).

@@ -1,6 +1,6 @@
 # Matériel de prospection client
 
-*Modèles à usage interne pour la prospection commerciale d'AgriWare Connector en Côte d'Ivoire.
+*Modèles à usage interne pour la prospection commerciale de Cool Agristock en Côte d'Ivoire.
 **Aucun message ci-dessous n'a été envoyé** — ce sont des brouillons à adapter et à valider avant
 tout envoi réel. Chaque modèle contient des champs entre crochets `[ ]` à compléter.*
 
@@ -11,7 +11,7 @@ tout envoi réel. Chaque modèle contient des champs entre crochets `[ ]` à com
 ```text
 Bonjour [Nom du contact],
 
-Je me permets de vous contacter au sujet d'AgriWare Connector, une application Odoo 19 gratuite
+Je me permets de vous contacter au sujet de Cool Agristock, une application Odoo 19 gratuite
 et open-source qui permet de connecter un système de gestion d'entrepôt (WMS) existant à Odoo
 Inventaire, via une API REST documentée.
 
@@ -31,7 +31,7 @@ Si cela vous intéresse, je serais heureux d'échanger brièvement sur votre sys
 
 Cordialement,
 [Nom]
-Cool Agristock — équipe AgriWare Connector
+Cool Agristock — équipe Cool Agristock
 team@agricarecentres.com
 ```
 
@@ -46,7 +46,7 @@ En tant que partenaire Odoo [vérifié via odoo.com/partners — tier à confirm
 accompagnez probablement des clients dans les secteurs agricole, de la distribution ou de la
 transformation alimentaire.
 
-AgriWare Connector est un module Odoo 19 gratuit et open-source que nous avons développé pour
+Cool Agristock est un module Odoo 19 gratuit et open-source que nous avons développé pour
 connecter un WMS externe à Odoo Inventaire via une API REST. Il est complémentaire à votre travail
 d'implémentation Odoo — nous ne proposons pas de services d'implémentation Odoo générale,
 seulement l'intégration WMS spécifique.
@@ -60,14 +60,14 @@ certains de vos clients ?
 
 Cordialement,
 [Nom]
-Cool Agristock — équipe AgriWare Connector
+Cool Agristock — équipe Cool Agristock
 team@agricarecentres.com
 ```
 
 ## C. Message court LinkedIn
 
 ```text
-Bonjour [Prénom], je travaille sur AgriWare Connector, un module Odoo 19 gratuit et open-source
+Bonjour [Prénom], je travaille sur Cool Agristock, un module Odoo 19 gratuit et open-source
 qui connecte un WMS existant à Odoo Inventaire via une API REST. Si votre entreprise (ou vos
 clients) utilise Odoo et un système d'entrepôt séparé, ça pourrait réduire la double saisie entre
 les deux. Ouvert à en discuter si ça vous intéresse ?
@@ -96,7 +96,7 @@ réels)
 
 **Opérations d'inventaire nécessaires**
 (réception, expédition, consultation de stock, synchronisation produits — lesquelles des
-opérations documentées d'AgriWare Connector vous sont utiles)
+opérations documentées de Cool Agristock vous sont utiles)
 
 **Nombre d'entrepôts**
 
@@ -116,12 +116,12 @@ opérations documentées d'AgriWare Connector vous sont utiles)
 
 ## E. Message de relance pour prospects intéressés
 
-**Objet :** Suite à notre échange — AgriWare Connector
+**Objet :** Suite à notre échange — Cool Agristock
 
 ```text
 Bonjour [Nom du contact],
 
-Merci pour notre échange au sujet d'AgriWare Connector. Pour rappel, voici les points discutés :
+Merci pour notre échange au sujet de Cool Agristock. Pour rappel, voici les points discutés :
 
 - [Résumé en une ligne du besoin exprimé]
 - [Système WMS/ERP actuel mentionné]
@@ -133,7 +133,7 @@ N'hésitez pas à me recontacter si vous avez des questions entre-temps.
 
 Cordialement,
 [Nom]
-Cool Agristock — équipe AgriWare Connector
+Cool Agristock — équipe Cool Agristock
 team@agricarecentres.com
 ```
 

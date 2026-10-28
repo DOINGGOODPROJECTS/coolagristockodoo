@@ -8,7 +8,7 @@ and [UOM_MAPPING.md](UOM_MAPPING.md) for the other half of Phase D.
 
 ## Endpoints
 
-### `POST /agriware/api/v1/suppliers`
+### `POST /cool_agristock/api/v1/suppliers`
 
 Request:
 ```json
@@ -31,7 +31,7 @@ Response `409` (duplicate `external_id`):
 {"status": "error", "message": "external_id already mapped", "supplier_id": 138}
 ```
 
-### `PATCH /agriware/api/v1/suppliers/{external_id}`
+### `PATCH /cool_agristock/api/v1/suppliers/{external_id}`
 
 Partial update. Request:
 ```json
@@ -42,9 +42,9 @@ Response `200`: same shape as creation. Response `404` if `external_id` isn't ma
 `409` if the mapped record is a **shared** partner (see
 [Shared partner protection](#shared-partner-protection) below) — refused, not silently applied.
 
-### `GET /agriware/api/v1/suppliers`
+### `GET /cool_agristock/api/v1/suppliers`
 
-Read-only, same authentication requirement (Bearer + AgriWare API User) as every other `GET`
+Read-only, same authentication requirement (Bearer + Cool Agristock API User) as every other `GET`
 endpoint — **no external-system binding required**, matching `GET /products`/`GET /warehouses`.
 Lists partners visible to the caller's company (`company_id` in `[False, company_id]`), capped at
 100, ordered by id.
@@ -106,8 +106,8 @@ back, never left orphaned.
 ## Security
 
 - Authentication and external-system resolution: identical to Phases B/C — Bearer token →
-  AgriWare API User group → `resolve_authorized_external_system()`, server-derived.
-- **Security design choice, verified empirically before writing any code:** the AgriWare API User
+  Cool Agristock API User group → `resolve_authorized_external_system()`, server-derived.
+- **Security design choice, verified empirically before writing any code:** the Cool Agristock API User
   group has no native `create`/`write` access to `res.partner` (checked the same way the
   Phase B product.template gap and Phase C warehouse-model gaps were found). Rather than grant a
   standing `ir.model.access.csv` row — which would hand the API User group broad write access to
@@ -126,7 +126,7 @@ back, never left orphaned.
 |---|---|
 | 400 | Invalid JSON, missing/empty `name`, unsupported field, unrecognized `country_code` |
 | 401 | Missing, malformed, invalid, expired, or revoked API key |
-| 403 | Not an AgriWare API User; key not bound to an active external system; ambiguous binding |
+| 403 | Not a Cool Agristock API User; key not bound to an active external system; ambiguous binding |
 | 404 | (`PATCH` only) No supplier mapped for this `external_id` |
 | 409 | `external_id` already mapped (create); mapped target is a shared partner (update) |
 | 500 | Unexpected server-side error (transaction rolled back) |

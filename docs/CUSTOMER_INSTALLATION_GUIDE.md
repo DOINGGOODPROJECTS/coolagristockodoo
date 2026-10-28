@@ -1,6 +1,6 @@
 # Customer Installation Guide
 
-**Status:** covers AgriWare Connector as implemented through Phase G (branch
+**Status:** covers Cool Agristock as implemented through Phase G (branch
 `feature/wms-transaction-sync` @ `8b88d50`), verified live on a disposable Odoo 19 database as part
 of the Phase H production-readiness assessment. Every step below was actually performed, not
 assumed — see [PRODUCTION_READINESS_REPORT.md](PRODUCTION_READINESS_REPORT.md) for the full
@@ -30,11 +30,11 @@ note on this.
 
 ## 3. Installation procedure
 
-1. Place `agriware_connector` (and, if not already present in your Odoo addons environment, the
+1. Place `cool_agristock` (and, if not already present in your Odoo addons environment, the
    `connector`/`component`/`component_event`/`queue_job` OCA modules it depends on) on your Odoo
    19 instance's addons path.
-2. From **Apps**, search for "AgriWare Connector" and click **Install** — or, from the command
-   line: `odoo -d <your_database> -i agriware_connector`.
+2. From **Apps**, search for "Cool Agristock" and click **Install** — or, from the command
+   line: `odoo -d <your_database> -i cool_agristock`.
 3. No configuration file changes, no environment variables, and no post-install script are
    required — everything from here on is done through the Odoo web interface.
 
@@ -49,7 +49,7 @@ note on this.
 
 ## 5. API-key creation
 
-1. Go to **Settings → Users & Companies → API Keys** (AgriWare's own API Keys menu, visible to
+1. Go to **Settings → Users & Companies → API Keys** (Cool Agristock's own API Keys menu, visible to
    Administrators).
 2. Click **New**, give the key a name, and — this is the important part — select the **External
    System** you just created in the key's own binding field.
@@ -58,7 +58,7 @@ note on this.
    cannot be retrieved again; if lost, revoke it and generate a new one.
 4. **What happens automatically, with no developer involvement:** generating a *bound* key (one
    tied to an external system) silently creates a dedicated, single-purpose integration user behind
-   the scenes (named something like `agriware-api-service-<company>-<random>@agriware.local`). This
+   the scenes (named something like `cool_agristock-api-service-<company>-<random>@cool_agristock.local`). This
    is the security mechanism that keeps two different WMS integrations on the same company from
    ever being able to act as each other — verified directly as part of this guide's own preparation
    (confirmed a fresh dedicated user is created per bound key, not shared).
@@ -71,21 +71,21 @@ Odoo administrator UI work.
 Configure your WMS (or integration middleware) with:
 - **Base URL:** your Odoo instance's URL, e.g. `https://your-odoo-instance.example.com`
 - **Authorization header:** `Authorization: Bearer <the raw key from step 5>`
-- **Health check:** `GET /agriware/api/v1/health` — call this first to confirm connectivity before
+- **Health check:** `GET /cool_agristock/api/v1/health` — call this first to confirm connectivity before
   anything else; it requires no authentication at all.
 
 Verify the key works before building anything further:
 ```bash
-curl -H "Authorization: Bearer <your-key>" https://your-odoo-instance.example.com/agriware/api/v1/products
+curl -H "Authorization: Bearer <your-key>" https://your-odoo-instance.example.com/cool_agristock/api/v1/products
 ```
 A `200` with `{"status": "success", ...}` confirms the key is valid and bound correctly. A `401`
-means the key itself is wrong; a `403` means it's valid but not an AgriWare API User, or not bound
+means the key itself is wrong; a `403` means it's valid but not a Cool Agristock API User, or not bound
 to an active external system (depending on the endpoint).
 
 ## 7. Product synchronization
 
 ```bash
-POST /agriware/api/v1/products
+POST /cool_agristock/api/v1/products
 {"external_id": "CASSAVA-001", "name": "Cassava", "unit": "kg"}
 ```
 
@@ -95,7 +95,7 @@ POST /agriware/api/v1/products
   units like bags).
 - Repeating the same `external_id` is safe — it returns `409` with the existing product's id, never
   a duplicate.
-- `PATCH /agriware/api/v1/products/{external_id}` updates `name`/`default_code`/`barcode`/
+- `PATCH /cool_agristock/api/v1/products/{external_id}` updates `name`/`default_code`/`barcode`/
   `description` only — pricing, accounting, and tax fields are never exposed to this endpoint, by
   design (an allow-list, not a block-list — there is no field this module could accidentally expose
   by forgetting to block it).
@@ -103,7 +103,7 @@ POST /agriware/api/v1/products
 ## 8. Warehouse synchronization
 
 ```bash
-POST /agriware/api/v1/warehouses
+POST /cool_agristock/api/v1/warehouses
 {"external_id": "WH-ANYAMA", "name": "Anyama Warehouse", "code": "ANY"}
 ```
 
@@ -115,7 +115,7 @@ sequence structure internally) — plan your codes before your first sync, not a
 ## 9. Supplier synchronization
 
 ```bash
-POST /agriware/api/v1/suppliers
+POST /cool_agristock/api/v1/suppliers
 {"external_id": "SUP-001", "name": "Cooperative Agricole Anyama", "country_code": "CI"}
 ```
 
@@ -126,7 +126,7 @@ across companies.
 ## 10. Lot synchronization
 
 ```bash
-POST /agriware/api/v1/lots
+POST /cool_agristock/api/v1/lots
 {"external_id": "MAIZE-LOT-001", "product_external_id": "MAIZE-001", "name": "MAIZE-2026-H1"}
 ```
 
@@ -149,7 +149,7 @@ expiration tracking.
 ## 11. Initial inventory import
 
 ```bash
-POST /agriware/api/v1/inventory-adjustments
+POST /cool_agristock/api/v1/inventory-adjustments
 {
   "external_reference": "INITIAL-2026-001",
   "warehouse_external_id": "WH-ANYAMA",
@@ -168,7 +168,7 @@ for exactly why).
 ## 12. Receipt synchronization
 
 ```bash
-POST /agriware/api/v1/receipts
+POST /cool_agristock/api/v1/receipts
 {
   "external_reference": "WMS-REC-001",
   "warehouse_external_id": "WH-ANYAMA",
@@ -180,7 +180,7 @@ POST /agriware/api/v1/receipts
 This only **creates a draft** incoming stock movement — it does not add stock yet. Validate it
 separately (same as before this schema existed):
 ```bash
-POST /agriware/api/v1/receipts/{receipt_id}/validate
+POST /cool_agristock/api/v1/receipts/{receipt_id}/validate
 {"external_reference": "WMS-REC-001", "received_quantities": [{"product_id": 2, "quantity": 3000, "lot_external_id": "MAIZE-LOT-001"}]}
 ```
 `product_id` here is the **numeric** id the creation call returned in its own `lines[].product_id`
@@ -188,7 +188,7 @@ POST /agriware/api/v1/receipts/{receipt_id}/validate
 (see [WMS_TRANSACTION_SYNCHRONIZATION.md](WMS_TRANSACTION_SYNCHRONIZATION.md) for why). Only after
 this second call does Odoo's actual on-hand quantity increase.
 
-Check status anytime with `GET /agriware/api/v1/receipts/WMS-REC-001`.
+Check status anytime with `GET /cool_agristock/api/v1/receipts/WMS-REC-001`.
 
 ## 13. Dispatch synchronization
 

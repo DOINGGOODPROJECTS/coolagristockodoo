@@ -15,7 +15,7 @@ promises.** No prospect has been contacted as of this writing (see
 |---|---|---|
 | Qualified prospects (list) | 20 | Companies matching the target-segment criteria below, added to `commercial/LEAD_TRACKER.csv` with status `NEW` — not yet contacted. This is a *list-qualification*, distinct from a lead reaching `QUALIFIED` status in the tracker (see Terminology note). |
 | Discovery conversations | 10 | A real conversation (call, video, or substantive email exchange) using the questionnaire in [INTEGRATION_SERVICES.md](INTEGRATION_SERVICES.md#customer-requirements-questionnaire) or its [French version](PROSPECTION_CLIENTS_FR.md#d-questionnaire-de-découverte-client). |
-| Technical compatibility assessments | 5 | Of the 10 discovery conversations, the subset where enough information exists to judge whether the prospect's WMS can speak AgriWare Connector's documented API, or would need Package 3 (custom adapter). |
+| Technical compatibility assessments | 5 | Of the 10 discovery conversations, the subset where enough information exists to judge whether the prospect's WMS can speak Cool Agristock's documented API, or would need Package 3 (custom adapter). |
 | Commercial proposals | 2 | A written scope + indicative price (from `COMMERCIAL_STRATEGY.md` section 5, re-derived per the real discovery, not quoted verbatim) sent to a prospect. |
 | Potential paid pilot | 1 | One prospect agrees to a paid engagement (any package). This is the actual validation signal the whole 30 days is designed to produce. |
 

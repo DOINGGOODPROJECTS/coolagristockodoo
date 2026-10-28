@@ -9,26 +9,26 @@ shipped in Phase B ([PRODUCT_SYNCHRONIZATION.md's Supported units](PRODUCT_SYNCH
 — that set still works, unchanged, as a fallback; this is the richer mechanism layered on top of
 it, exactly as that document said would happen "in Phase D."
 
-## The model: `agriware.uom.mapping`
+## The model: `cool_agristock.uom.mapping`
 
 | Field | Type | Notes |
 |---|---|---|
 | `company_id` | Many2one `res.company`, required | Defaults to the current company. |
-| `external_system_id` | Many2one `agriware.external.system`, required | Scopes the mapping, same pattern as every other model in this project. |
+| `external_system_id` | Many2one `cool_agristock.external.system`, required | Scopes the mapping, same pattern as every other model in this project. |
 | `external_unit_code` | Char, required | The WMS's own unit code, e.g. `bag_50kg`. Free text — not restricted to a fixed list, since different WMS systems name units differently. |
 | `uom_id` | Many2one `uom.uom`, required | An **existing** Odoo unit of measure. Never created or guessed by this module — see [No invented conversion factors](#no-invented-conversion-factors) below. |
 | `active` | Boolean, default `True` | Standard archive pattern. |
 | `description` | Text | Free-text notes — e.g. "this WMS's 50kg bag, fertilizer products only." |
 
 **Uniqueness:** `unique(company_id, external_system_id, external_unit_code)` — a real database
-constraint, confirmed present via `\d agriware_uom_mapping` against a live install, not just
+constraint, confirmed present via `\d cool_agristock_uom_mapping` against a live install, not just
 declared in code. Two different companies (or two different external systems within the same
 company) may use the identical code with no conflict.
 
 ## No invented conversion factors
 
 **This is the central design constraint, and it's enforced structurally, not by convention.**
-`agriware.uom.mapping` has no conversion-factor field of its own at all — it only has `uom_id`, a
+`cool_agristock.uom.mapping` has no conversion-factor field of its own at all — it only has `uom_id`, a
 reference to a real, already-existing `uom.uom` record. Whatever conversion factor that Odoo UOM
 carries (set through Odoo's own Settings → Technical → Units of Measure, or by Odoo core/OCA
 modules) is what applies — this module never calculates, stores, or overrides one.
@@ -63,9 +63,9 @@ correct, safe outcome rather than fabricating one.
 
 ## Administrator interface
 
-A new **UOM Mappings** menu (under **AgriWare Connector → External Systems**, Administrator-only,
+A new **UOM Mappings** menu (under **Cool Agristock → External Systems**, Administrator-only,
 same access pattern as External Systems and ID Mappings) lets an administrator register, edit, and
-deactivate mappings. Full CRUD for Administrators; **no access at all** for the AgriWare API User
+deactivate mappings. Full CRUD for Administrators; **no access at all** for the Cool Agristock API User
 group — mappings are read only through the `resolve_unit()` service, server-side, during product
 synchronization, never editable by an API caller.
 
@@ -73,7 +73,7 @@ synchronization, never editable by an API caller.
 
 `controllers/products.py`'s unit resolution now checks, in order:
 
-1. **`agriware.uom.mapping.resolve_unit(company, external_system, unit_code)`** — an
+1. **`cool_agristock.uom.mapping.resolve_unit(company, external_system, unit_code)`** — an
    administrator-configured mapping, scoped to the caller's company and external system.
 2. **The Phase B hardcoded set** (`kg`, `g`, `ton`/`t`, `l`/`liter`/`litre`, `unit`/`units`/`pcs`) —
    consulted only if step 1 found nothing, for full backward compatibility.
@@ -113,9 +113,9 @@ touch the existing-product UOM-change restriction at all.
 
 ## Verification performed
 
-- **Database constraint confirmed present** via `\d agriware_uom_mapping` against a live install —
+- **Database constraint confirmed present** via `\d cool_agristock_uom_mapping` against a live install —
   not just declared in code.
-- **Admin-only access confirmed**: both the AgriWare API User group and a plain internal user
+- **Admin-only access confirmed**: both the Cool Agristock API User group and a plain internal user
   without the Administrator group are rejected (`AccessError`) attempting direct model access.
 - **`resolve_unit()` confirmed correct** for the found, not-found, and inactive-mapping cases.
 - **Full product-sync integration demonstrated live over real HTTP**, with direct PostgreSQL

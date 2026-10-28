@@ -1,6 +1,6 @@
 # Customer Support Guide
 
-How to get help with AgriWare Connector, and what to include so your report can actually be acted
+How to get help with Cool Agristock, and what to include so your report can actually be acted
 on.
 
 **The public channel for all non-sensitive technical issues is GitHub Issues:**
@@ -11,7 +11,7 @@ There is no service-level agreement (SLA) or guaranteed response time on GitHub 
 and maintainer responses are best-effort.
 
 For **paid professional services** specifically (not general technical support), contact
-**Cool Agristock**, the team behind AgriWare Connector, by email: <team@agricarecentres.com>. See
+**Cool Agristock**, the team behind Cool Agristock, by email: <team@agricarecentres.com>. See
 [PROFESSIONAL_SERVICES.md](PROFESSIONAL_SERVICES.md) and [INTEGRATION_SERVICES.md](INTEGRATION_SERVICES.md).
 
 **Never paste a real API key, password, or other credential into a GitHub issue.** Issues are
@@ -38,7 +38,7 @@ Open an issue titled `[Install] <short description>`. Include:
 
 Open an issue titled `[API] <short description>`. Include:
 
-- The endpoint and HTTP method (e.g. `POST /agriware/api/v1/receipts`).
+- The endpoint and HTTP method (e.g. `POST /cool_agristock/api/v1/receipts`).
 - The HTTP status code and the full JSON response body (`status`/`message`).
 - The request body you sent, with `external_reference` kept but any real product/partner
   identifiers replaced with placeholders if they reveal business data you don't want public.
@@ -59,7 +59,7 @@ Open an issue titled `[Bug] <short description>` using this template:
 
 ```markdown
 **Environment**
-- AgriWare Connector version (see Apps > AgriWare Connector):
+- Cool Agristock version (see Apps > Cool Agristock):
 - Odoo version:
 - Hosting (self-hosted / Odoo.sh / Odoo Online):
 - Installed from (Marketplace zip / Git source):

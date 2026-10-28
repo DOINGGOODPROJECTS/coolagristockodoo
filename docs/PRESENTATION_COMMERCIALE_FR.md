@@ -1,13 +1,13 @@
-# AgriWare Connector — Présentation commerciale
+# Cool Agristock — Présentation commerciale
 
 *Document destiné aux agro-industries et aux intégrateurs Odoo intéressés par une connexion entre
 leur WMS (système de gestion d'entrepôt) et Odoo 19. Toutes les affirmations ci-dessous reflètent
 exactement les fonctionnalités documentées et vérifiées du module — aucune fonctionnalité non
 implémentée n'y est annoncée.*
 
-## 1. Que fait AgriWare Connector ?
+## 1. Que fait Cool Agristock ?
 
-AgriWare Connector est une application Odoo 19 gratuite et open-source qui permet à un système de
+Cool Agristock est une application Odoo 19 gratuite et open-source qui permet à un système de
 gestion d'entrepôt (WMS) externe compatible d'échanger des informations de produits, d'entrepôts et
 de stocks avec Odoo Inventory, via une API REST documentée. Le WMS externe peut :
 
@@ -15,7 +15,7 @@ de stocks avec Odoo Inventory, via une API REST documentée. Le WMS externe peut
 - créer et valider des réceptions de marchandises (livraisons entrantes) ;
 - créer et valider des expéditions (livraisons sortantes).
 
-**AgriWare Connector n'est pas lui-même un WMS.** Il ne gère ni le rayonnage, ni les circuits de
+**Cool Agristock n'est pas lui-même un WMS.** Il ne gère ni le rayonnage, ni les circuits de
 préparation, ni le matériel de lecture de codes-barres — c'est la couche d'intégration entre un WMS
 existant et le module Inventaire d'Odoo.
 
@@ -31,7 +31,7 @@ existant et le module Inventaire d'Odoo.
 - Entreprises utilisant un ERP et un WMS distincts
 
 **Condition essentielle :** l'entreprise doit déjà utiliser (ou prévoir d'utiliser) Odoo 19, et
-disposer d'un WMS existant. **AgriWare Connector ne remplace pas un WMS et ne se connecte pas
+disposer d'un WMS existant. **Cool Agristock ne remplace pas un WMS et ne se connecte pas
 automatiquement à n'importe quel logiciel d'entrepôt** — le WMS doit pouvoir dialoguer avec l'API
 REST documentée, ou faire l'objet d'une adaptation technique (voir point 6).
 
@@ -45,10 +45,10 @@ REST documentée, ou faire l'objet d'une adaptation technique (voir point 6).
 
 ## 4. Comment cela s'intègre-t-il avec Odoo 19 ?
 
-Le WMS externe appelle l'API REST d'AgriWare Connector (jamais l'inverse) :
+Le WMS externe appelle l'API REST de Cool Agristock (jamais l'inverse) :
 
 ```text
-WMS externe  --(clé API, HTTPS)-->  AgriWare Connector  --(ORM Odoo)-->  Odoo 19 Inventaire
+WMS externe  --(clé API, HTTPS)-->  Cool Agristock  --(ORM Odoo)-->  Odoo 19 Inventaire
 ```
 
 Chaque échange est **initié par le WMS**, pas par Odoo. Il n'y a pas de synchronisation automatique
@@ -56,7 +56,7 @@ ou planifiée : le WMS appelle l'API quand il en a besoin.
 
 ## 5. Pourquoi l'application est-elle gratuite ?
 
-AgriWare Connector est publié sous licence open-source LGPL-3.0, sans frais de licence, sans
+Cool Agristock est publié sous licence open-source LGPL-3.0, sans frais de licence, sans
 abonnement obligatoire, maintenant et pour toujours. Le code source est public sur GitHub. Une
 entreprise disposant déjà des compétences techniques internes peut télécharger, installer et
 connecter son propre WMS sans payer quoi que ce soit à Cool Agristock.
@@ -64,7 +64,7 @@ connecter son propre WMS sans payer quoi que ce soit à Cool Agristock.
 ## 6. Quels services professionnels sont optionnels ?
 
 Pour les entreprises qui souhaitent une assistance pratique plutôt que de tout faire elles-mêmes,
-Cool Agristock, l'équipe à l'origine d'AgriWare Connector, propose séparément :
+Cool Agristock, l'équipe à l'origine de Cool Agristock, propose séparément :
 
 - Installation et configuration d'Odoo
 - Intégration WMS de base (si le WMS parle déjà l'API documentée)

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cool_agristock_api_key_list" model="ir.ui.view">
+        <field name="name">cool_agristock.api.key.list</field>
+        <field name="model">cool_agristock.api.key</field>
+        <field name="arch" type="xml">
+            <list string="API Keys" create="0" delete="0">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="external_system_id"/>
+                <field name="create_date" string="Created"/>
+                <field name="never_expires"/>
+                <field name="expiration_date"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'expired'"
+                       decoration-muted="state == 'revoked'"/>
+                <button name="action_revoke" type="object" string="Revoke"
+                        invisible="state != 'active'"
+                        confirm="Revoking this key takes effect immediately. The integration using it will stop being able to authenticate. Continue?"/>
+                <button name="action_create_replacement" type="object" string="Create New"
+                        invisible="state == 'active'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_api_key_form" model="ir.ui.view">
+        <field name="name">cool_agristock.api.key.form</field>
+        <field name="model">cool_agristock.api.key</field>
+        <field name="arch" type="xml">
+            <form string="API Key" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_revoke" type="object" string="Revoke"
+                            class="btn-primary"
+                            invisible="state != 'active'"
+                            confirm="Revoking this key takes effect immediately. The integration using it will stop being able to authenticate. Continue?"/>
+                    <button name="action_create_replacement" type="object" string="Create New"
+                            class="btn-primary"
+                            invisible="state == 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,expired,revoked"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="integration_user_id"/>
+                        <field name="external_system_id"/>
+                        <field name="create_date" string="Created"/>
+                        <field name="never_expires"/>
+                        <field name="expiration_date"/>
+                        <field name="revoked_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_api_keys" model="ir.actions.act_window">
+        <field name="name">API Keys</field>
+        <field name="res_model">cool_agristock.api.key</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No API keys yet.
+            </p>
+            <p>
+                Use "Generate API Key" to create one for your warehouse
+                management system integration.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_api_key_generate_wizard_form" model="ir.ui.view">
+        <field name="name">cool_agristock.api.key.generate.wizard.form</field>
+        <field name="model">cool_agristock.api.key.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate API Key">
+                <group>
+                    <field name="name" placeholder="e.g. Main Warehouse Integration"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="external_system_id"/>
+                    <field name="never_expires"/>
+                    <field name="expiration_date" invisible="never_expires" required="not never_expires"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object"
+                            string="Generate" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_api_key_generate_wizard" model="ir.actions.act_window">
+        <field name="name">Generate API Key</field>
+        <field name="res_model">cool_agristock.api.key.generate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_cool_agristock_api_key_generate_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_cool_agristock_api_management"
+        name="API Management"
+        parent="menu_cool_agristock_root"
+        sequence="20"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+    <menuitem
+        id="menu_cool_agristock_api_keys"
+        name="API Keys"
+        parent="menu_cool_agristock_api_management"
+        action="action_cool_agristock_api_keys"
+        sequence="10"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+    <menuitem
+        id="menu_cool_agristock_api_key_generate"
+        name="Generate API Key"
+        parent="menu_cool_agristock_api_management"
+        action="action_cool_agristock_api_key_generate_wizard"
+        sequence="20"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+</odoo>

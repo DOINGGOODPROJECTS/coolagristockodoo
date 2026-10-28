@@ -6,12 +6,12 @@ endpoints that do not exist yet, and a phased plan for building them. See
 [WMS_FIRST_INTEGRATION_PLAN.md](WMS_FIRST_INTEGRATION_PLAN.md) for the detailed functional design
 each schema below implements.
 
-All proposed endpoints keep the existing prefix, `/agriware/api/v1/` — **no new version segment is
+All proposed endpoints keep the existing prefix, `/cool_agristock/api/v1/` — **no new version segment is
 introduced**; see [API compatibility & versioning](#api-compatibility--versioning) for why.
 
 ## Proposed endpoint schemas
 
-### `POST /agriware/api/v1/products`
+### `POST /cool_agristock/api/v1/products`
 
 Request:
 ```json
@@ -38,7 +38,7 @@ Response `409` (external_id already mapped):
 {"status": "error", "message": "external_id already mapped", "product_id": 101}
 ```
 
-### `PATCH /agriware/api/v1/products/{external_id}`
+### `PATCH /cool_agristock/api/v1/products/{external_id}`
 
 Request (partial — only fields to change):
 ```json
@@ -53,7 +53,7 @@ Response `404` (no such external_id mapped for this company/system):
 {"status": "error", "message": "No product mapped for this external_id"}
 ```
 
-### `POST /agriware/api/v1/warehouses`
+### `POST /cool_agristock/api/v1/warehouses`
 
 Request:
 ```json
@@ -64,11 +64,11 @@ Response `201`:
 {"status": "success", "warehouse_id": 3, "external_id": "WMS-WH-ANYAMA", "name": "Anyama Depot"}
 ```
 
-### `PATCH /agriware/api/v1/warehouses/{external_id}`
+### `PATCH /cool_agristock/api/v1/warehouses/{external_id}`
 
 Same shape as the product `PATCH` — partial body, allow-listed fields only (`name`, `code`).
 
-### `POST /agriware/api/v1/suppliers`
+### `POST /cool_agristock/api/v1/suppliers`
 
 Request:
 ```json
@@ -86,11 +86,11 @@ Response `201`:
 {"status": "success", "supplier_id": 37, "external_id": "WMS-SUPPLIER-014", "name": "Cooperative Agricole d'Anyama"}
 ```
 
-### `PATCH /agriware/api/v1/suppliers/{external_id}`
+### `PATCH /cool_agristock/api/v1/suppliers/{external_id}`
 
 Same partial-update shape as products/warehouses, allow-listed fields only.
 
-### `POST /agriware/api/v1/lots`
+### `POST /cool_agristock/api/v1/lots`
 
 **Status: IMPLEMENTED** as sketched below, with two corrections to match what actually shipped —
 see [LOT_BATCH_SYNCHRONIZATION.md](LOT_BATCH_SYNCHRONIZATION.md) for the full as-built reference.
@@ -119,7 +119,7 @@ Response `404` (product external_id not found):
 {"status": "error", "message": "Product not found"}
 ```
 
-### `GET /agriware/api/v1/lots`
+### `GET /cool_agristock/api/v1/lots`
 
 Response `200`:
 ```json
@@ -130,13 +130,13 @@ Response `200`:
 }
 ```
 
-### `POST /agriware/api/v1/inventory-adjustments`
+### `POST /cool_agristock/api/v1/inventory-adjustments`
 
 **Status: IMPLEMENTED** as sketched below, with field names corrected to match what actually
 shipped — see [INITIAL_INVENTORY_IMPORT.md](INITIAL_INVENTORY_IMPORT.md) for the full as-built
 reference (the sketch originally in this section used `counted_quantity` and a
-`agriware.inventory.import.log` model name; the shipped implementation uses `quantity`/`unit` and
-`agriware.inventory.import` — documented here as the correction it is, not silently).
+`cool_agristock.inventory.import.log` model name; the shipped implementation uses `quantity`/`unit` and
+`cool_agristock.inventory.import` — documented here as the correction it is, not silently).
 
 Request:
 ```json
@@ -199,17 +199,17 @@ silent precedence rule.
 [EXTERNAL_ID_MAPPING.md](EXTERNAL_ID_MAPPING.md) for full documentation of what shipped.
 
 - **Technical tasks:** ~~create the generic mapping model~~ done, plus an explicit
-  `agriware.external.system` model (not originally scoped this precisely, but needed so mappings
+  `cool_agristock.external.system` model (not originally scoped this precisely, but needed so mappings
   can be scoped independently of any one API key's lifecycle — see
   [EXTERNAL_ID_MAPPING.md](EXTERNAL_ID_MAPPING.md#external-system-identity)); the
   resolve/create/update/remove service as model methods on
-  `agriware.external.id.mapping`, not a separate mixin.
+  `cool_agristock.external.id.mapping`, not a separate mixin.
 - **Files changed:** `models/external_system.py`, `models/external_id_mapping.py` (new);
-  `models/__init__.py`; `security/agriware_security.xml`, `security/ir.model.access.csv`;
+  `models/__init__.py`; `security/cool_agristock_security.xml`, `security/ir.model.access.csv`;
   `views/external_system_views.xml` (new); `tests/test_external_systems.py`,
   `tests/test_external_id_mapping.py` (new); `tests/__init__.py`; `__manifest__.py` (data entry +
   version bump).
-- **Database models:** `agriware.external.system`, `agriware.external.id.mapping` (both new).
+- **Database models:** `cool_agristock.external.system`, `cool_agristock.external.id.mapping` (both new).
 - **API endpoints:** none — confirmed, this phase shipped no REST routes, exactly as scoped.
 - **Security requirements:** implemented as designed — company-scoped `ir.rule` on both new models;
   `ir.model.access.csv` grants the Administrator group full access to `external.system` and
@@ -240,7 +240,7 @@ silent precedence rule.
 [PRODUCT_SYNCHRONIZATION.md](PRODUCT_SYNCHRONIZATION.md) for the full as-built reference.
 
 - **Technical tasks:** done, plus one addition not originally scoped here: binding an
-  `agriware.api.key` to an `agriware.external.system` (Phase 3 of the implementation task), since
+  `cool_agristock.api.key` to an `cool_agristock.external.system` (Phase 3 of the implementation task), since
   "resolve external system from the authenticated key" required it and nothing had built that
   binding yet. UOM resolution shipped as a small hardcoded set now (not the Phase D table) — the
   sequencing question is resolved: Phase B shipped first, Phase D's richer table remains future
@@ -267,7 +267,7 @@ silent precedence rule.
 - **Dependencies:** Phase A — confirmed sufficient, nothing else was needed.
 - **Risks, as anticipated vs. actual:** anticipated "low, closely mirrors existing patterns" — not
   quite true in practice. Two real issues surfaced only by testing against the installed Odoo 19,
-  not by code review: (1) `stock.group_stock_user` (implied by AgriWare API User) has **no**
+  not by code review: (1) `stock.group_stock_user` (implied by Cool Agristock API User) has **no**
   `product.product` create/write access at all, unlike `stock.picking`/`stock.move` — had to be
   granted explicitly; (2) granting `product.product` access alone wasn't sufficient either —
   creating a `product.product` without an existing template also needs `create` access to the
@@ -296,7 +296,7 @@ See [WAREHOUSE_SYNCHRONIZATION.md](WAREHOUSE_SYNCHRONIZATION.md) for the full as
 - **Security requirements:** **not** `has_access()` as originally sketched. `stock.warehouse`
   creation cascades into `stock.location`, `stock.picking.type`, `stock.route`, `stock.rule`, and
   `ir.sequence` — confirmed by reading `stock.warehouse.create()` directly — and none of those
-  models has any native create access for the AgriWare API User group (verified empirically,
+  models has any native create access for the Cool Agristock API User group (verified empirically,
   the same way the Phase B product.template gap was found). Granting broad access across all of
   them to match Phase B's pattern would hand the API User group standing write access to routing/
   picking-type configuration, which Phase 7 explicitly forbids. Instead: the controller performs
@@ -337,19 +337,19 @@ security fix, not yet merged). See [SUPPLIER_SYNCHRONIZATION.md](SUPPLIER_SYNCHR
   code. Country lookup resolution shipped as planned.
 - **Files changed:** `controllers/suppliers.py`, `models/uom_mapping.py`,
   `views/uom_mapping_views.xml` (new); `controllers/__init__.py`, `models/__init__.py`,
-  `security/ir.model.access.csv`, `security/agriware_security.xml`, `__manifest__.py` (version
+  `security/ir.model.access.csv`, `security/cool_agristock_security.xml`, `__manifest__.py` (version
   bump); `controllers/products.py` (UOM-mapping integration); `tests/test_supplier_sync.py`,
   `tests/test_uom_mapping.py` (new); `tests/__init__.py`. No seed data file — mappings are
   administrator-created from scratch, not pre-populated, since the whole point is that this
   module never assumes what a "bag" weighs.
-- **Database models:** `agriware.uom.mapping` (new) — shipped as a **database-backed model**, as
+- **Database models:** `cool_agristock.uom.mapping` (new) — shipped as a **database-backed model**, as
   approved (see [ARCHITECTURE.md's Approved decisions](ARCHITECTURE.md#approved-decisions), item 7).
 - **API endpoints:** `POST /suppliers`, `PATCH /suppliers/{external_id}`, plus a `GET /suppliers`
   not originally itemized in this roadmap's Phase D row but present in the implementation task and
   shipped, matching the read-endpoint pattern already established for products/warehouses.
 - **Security requirements:** **not** `has_access()` as originally sketched — checked empirically
   (the same way the Phase B/C ACL gaps were found) and confirmed `res.partner` has no native
-  create/write access for the AgriWare API User group either. Rather than grant a standing
+  create/write access for the Cool Agristock API User group either. Rather than grant a standing
   `ir.model.access.csv` row — which would hand the API User group broad write access to the
   *entire* contacts/partner directory, arguably Odoo's single most widely-shared model — the
   controller uses the same gated `sudo()` pattern as Phase C's warehouses. This directly resolves
@@ -386,13 +386,13 @@ See [INITIAL_INVENTORY_IMPORT.md](INITIAL_INVENTORY_IMPORT.md) for the full as-b
   handoff is therefore fully manual in this phase — see
   [INITIAL_INVENTORY_IMPORT.md's Native adjustment handoff](INITIAL_INVENTORY_IMPORT.md#native-adjustment-handoff-phase-11--deferred-by-design-not-by-oversight)
   for the complete reasoning, confirmed against source rather than assumed.
-- **Files changed:** `models/inventory_import.py` (new — `agriware.inventory.import` +
-  `agriware.inventory.import.line`, not `agriware.inventory.import.log` as originally sketched);
+- **Files changed:** `models/inventory_import.py` (new — `cool_agristock.inventory.import` +
+  `cool_agristock.inventory.import.line`, not `cool_agristock.inventory.import.log` as originally sketched);
   `controllers/inventory_import.py` (new); `models/__init__.py`, `controllers/__init__.py`;
-  `security/ir.model.access.csv`, `security/agriware_security.xml`; `views/inventory_import_views.xml`
+  `security/ir.model.access.csv`, `security/cool_agristock_security.xml`; `views/inventory_import_views.xml`
   (new — an Odoo-native review screen under Inventory → Operations, not a REST `GET`/`PATCH`);
   `__manifest__.py` (version bump); `tests/test_inventory_import.py` (new); `tests/__init__.py`.
-- **Database models:** `agriware.inventory.import`, `agriware.inventory.import.line` (both new).
+- **Database models:** `cool_agristock.inventory.import`, `cool_agristock.inventory.import.line` (both new).
 - **API endpoints:** `POST /inventory-adjustments` only — deliberately no `GET`/`PATCH`; review
   happens in Odoo's own backend, matching the UOM Mappings precedent from Phase D.
 - **Security requirements:** not `has_access('create')` on `stock.quant` as originally sketched —
@@ -463,9 +463,9 @@ reference.
 - **Files changed:** `controllers/receipts.py`, `controllers/dispatches.py` (both substantially
   extended, legacy code path preserved verbatim inside its own method); `controllers/receipt_validation.py`,
   `controllers/dispatch_validation.py` (one small fix — see Risks); `models/wms_transaction.py`
-  (new); `models/__init__.py`, `security/ir.model.access.csv`, `security/agriware_security.xml`,
+  (new); `models/__init__.py`, `security/ir.model.access.csv`, `security/cool_agristock_security.xml`,
   `__manifest__.py` (version bump); `tests/test_transaction_sync.py` (new); `tests/__init__.py`.
-- **Database models:** `agriware.wms.transaction` (new) — not originally scoped in this sketch
+- **Database models:** `cool_agristock.wms.transaction` (new) — not originally scoped in this sketch
   ("none new"), added because the existing advisory-lock/`origin`-match duplicate protection has no
   real database-level uniqueness and no `external_system_id` dimension; see
   [WMS_TRANSACTION_SYNCHRONIZATION.md's Transaction identity](WMS_TRANSACTION_SYNCHRONIZATION.md#transaction-identity)
@@ -483,10 +483,10 @@ reference.
 - **Dependencies:** Phases A-D — confirmed sufficient, plus Phase F for lot resolution.
 - **Risks, as anticipated vs. actual:** anticipated "low... mostly wiring" — mostly true, but one
   real compatibility bug surfaced only by testing, not by code review: `/validate`'s existing guard
-  checked only for the legacy `AGRIWARE-RCPT-`/`AGRIWARE-DISP-` prefix, which a Phase G
+  checked only for the legacy `COOL_AGRISTOCK-RCPT-`/`COOL_AGRISTOCK-DISP-` prefix, which a Phase G
   `external_reference` would never match — a WMS-first receipt could be created but never
-  validated. Fixed by also recognizing a real `agriware.wms.transaction` row as proof of
-  AgriWare ownership.
+  validated. Fixed by also recognizing a real `cool_agristock.wms.transaction` row as proof of
+  Cool Agristock ownership.
 - **Acceptance criteria:** met, and demonstrated live — see
   [WMS_TRANSACTION_SYNCHRONIZATION.md's Verification performed](WMS_TRANSACTION_SYNCHRONIZATION.md#verification-performed):
   an existing numeric-ID integration (the full pre-Phase-G test suite) continues to pass unchanged;
@@ -525,7 +525,7 @@ reference.
   files in a way that changes behavior (Phase F, the lot-rejection removal) only changes behavior
   for the specific product-tracking case that previously always failed — a client that never sends
   a lot-tracked product sees no change at all.
-- **No existing route is renamed or removed.** The `/agriware/api/v1/` prefix is unchanged
+- **No existing route is renamed or removed.** The `/cool_agristock/api/v1/` prefix is unchanged
   throughout; **no `v2` is introduced** by this roadmap, because nothing in it breaks an existing
   request/response contract.
 - **Recommended module version bump:** Odoo module versions follow

@@ -13,7 +13,7 @@ Everything in this document remains accurate for lines that don't use it.
 ## What this is, and what it deliberately is not
 
 A WMS can submit its own count of what it believes is on hand for a product at a warehouse.
-AgriWare Connector stages that observation, reconciles it against Odoo's actual on-hand quantity,
+Cool Agristock stages that observation, reconciles it against Odoo's actual on-hand quantity,
 and surfaces the difference to a human. **It never writes to `stock.quant.quantity`, never calls
 `action_apply_inventory()`, and never creates a `stock.move`.** Applying an approved import to real
 stock remains a separate, manual action in Odoo's own native Inventory Adjustment screen — see
@@ -22,12 +22,12 @@ Odoo 19's actual source rather than assuming older-version behavior carries over
 
 ## The models
 
-### `agriware.inventory.import`
+### `cool_agristock.inventory.import`
 
 | Field | Type | Notes |
 |---|---|---|
 | `company_id` | Many2one `res.company`, required | |
-| `external_system_id` | Many2one `agriware.external.system`, required | |
+| `external_system_id` | Many2one `cool_agristock.external.system`, required | |
 | `external_reference` | Char, required | The WMS's own batch identifier, e.g. `INITIAL-2026-001`. |
 | `warehouse_id` | Many2one `stock.warehouse`, required | Resolved at submission time. |
 | `location_id` | Many2one `stock.location`, required | Always `warehouse_id.lot_stock_id` — see [Location mapping](#location-mapping). |
@@ -41,7 +41,7 @@ Odoo 19's actual source rather than assuming older-version behavior carries over
 **Unique constraint:** `(company_id, external_system_id, external_reference)` — a real database
 constraint, the import's identity (Phase 13).
 
-### `agriware.inventory.import.line`
+### `cool_agristock.inventory.import.line`
 
 | Field | Type | Notes |
 |---|---|---|
@@ -58,7 +58,7 @@ constraint, the import's identity (Phase 13).
 
 ## Endpoint
 
-### `POST /agriware/api/v1/inventory-adjustments`
+### `POST /cool_agristock/api/v1/inventory-adjustments`
 
 ```json
 {
@@ -94,13 +94,13 @@ precedent set by UOM Mappings in Phase D (an admin-only Odoo interface, not a RE
 ### Validation is all-or-nothing
 
 The entire request is resolved and validated — warehouse, every product, every unit, every
-conversion — **before any `agriware.inventory.import` row is created.** A single invalid line
+conversion — **before any `cool_agristock.inventory.import` row is created.** A single invalid line
 rejects the whole batch with no partial import left behind. This is why `error_message` on the
 line model is always empty: there is currently no code path that stores a line in an error state.
 
 ## Resolution and rejection rules (Phase 6)
 
-Reuses `agriware.external.id.mapping.resolve_mapping()`, exactly as products/warehouses/suppliers
+Reuses `cool_agristock.external.id.mapping.resolve_mapping()`, exactly as products/warehouses/suppliers
 do. Because that service is already scoped to `(company, external_system)`, cross-company and
 cross-system isolation fall out for free, with no special-case code: a product or warehouse mapped
 under a different company or a different external system (even within the same company) simply
@@ -136,7 +136,7 @@ shelf-level granularity, that is explicitly out of scope for this phase — see
 
 ## UOM validation (Phase 8)
 
-Reuses Phase D's `agriware.uom.mapping.resolve_unit()` with the same hardcoded fallback as product
+Reuses Phase D's `cool_agristock.uom.mapping.resolve_unit()` with the same hardcoded fallback as product
 synchronization — identical precedence rule, same two-step resolution already documented in
 [UOM_MAPPING.md](UOM_MAPPING.md#integration-with-product-synchronization).
 
@@ -171,7 +171,7 @@ side by side, with stale lines highlighted.
 
 - **Approve** and **Reject** are restricted to Odoo's own native **Inventory Manager** group
   (`stock.group_stock_manager`) — reused deliberately rather than inventing a parallel
-  AgriWare-specific authorization concept for a decision that is already an inventory-management
+  Cool Agristock-specific authorization concept for a decision that is already an inventory-management
   action in Odoo's own terms.
 - **Recalculate** (read-level, any `stock.group_stock_user`) refreshes every line against current
   stock without changing the approve/reject decision.
@@ -200,7 +200,7 @@ Concurrent submissions are handled the same way every other phase's creation rac
 application-level pre-check for the common case, with `env.cr.savepoint()` plus the database
 constraint as the actual concurrency safety net — **verified directly** with a forced-race test at
 the model level (mirrors
-[test_external_id_mapping.py's `test_concurrent_mapping_creation_enforced_by_database`](../agriware_connector/tests/test_external_id_mapping.py)).
+[test_external_id_mapping.py's `test_concurrent_mapping_creation_enforced_by_database`](../cool_agristock/tests/test_external_id_mapping.py)).
 
 ## Lot and serial safety (Phase 14)
 
@@ -224,7 +224,7 @@ execution, no automatic stock changes," which this phase requires.
 
 **Per the task's own explicit permission** ("if native handoff cannot be implemented safely within
 this phase: keep the import in staging models, document the limitation, do not substitute unsafe
-direct SQL writes") — this phase keeps every import in `agriware.inventory.import`/`.line` only.
+direct SQL writes") — this phase keeps every import in `cool_agristock.inventory.import`/`.line` only.
 
 **Instructions for the inventory manager, to actually apply an approved import:** open
 **Inventory → Operations → Physical Inventory**, filter to the product and location shown on the
@@ -236,8 +236,8 @@ never substitutes a shortcut for that screen.
 ## Security
 
 Identical authentication/authorization pattern to every other write endpoint: Bearer token →
-AgriWare API User group → `resolve_authorized_external_system()`, server-derived, never trusting a
-client-supplied `external_system_id`. `res_model`/`sudo()` usage for `agriware.inventory.import`
+Cool Agristock API User group → `resolve_authorized_external_system()`, server-derived, never trusting a
+client-supplied `external_system_id`. `res_model`/`sudo()` usage for `cool_agristock.inventory.import`
 creation mirrors Phase C/D's gated pattern (the controller performs the full auth + resolution
 chain itself, then a single already-authorized `sudo()` create) rather than a standing
 `ir.model.access.csv` grant to the API User group for a model whose approval workflow is an
@@ -249,7 +249,7 @@ internal Odoo decision, not something a WMS should ever directly manipulate.
 |---|---|
 | 400 | Invalid JSON, missing/invalid top-level or line field, unsupported field, negative quantity, unsupported unit |
 | 401 | Missing/invalid/revoked/expired API key |
-| 403 | Not an AgriWare API User; key not bound to an active external system; inactive external system |
+| 403 | Not a Cool Agristock API User; key not bound to an active external system; inactive external system |
 | 404 | Unknown `warehouse_external_id`; unknown `product_external_id` |
 | 409 | `external_reference` reused with different content |
 | 422 | Lot/serial-tracked product; incompatible unit conversion; warehouse has no resolvable stock location |

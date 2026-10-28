@@ -25,7 +25,7 @@ export function buildMetadata({
       title,
       description,
       url: path,
-      siteName: "AgriWare Connector",
+      siteName: "Cool Agristock",
       locale,
       type: "website",
       images: ["/images/icon.png"],

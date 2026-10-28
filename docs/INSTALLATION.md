@@ -1,7 +1,7 @@
 # Installation Guide
 
 This guide is for a business that wants to connect its existing Warehouse Management System (WMS)
-to Odoo 19 using AgriWare Connector. It assumes **no prior Odoo development experience** — only
+to Odoo 19 using Cool Agristock. It assumes **no prior Odoo development experience** — only
 that you (or someone at your organization) has administrator access to your Odoo 19 instance.
 
 If you only need the short version, see [QUICK_START.md](QUICK_START.md). For the full REST API
@@ -10,7 +10,7 @@ your WMS side, see [WMS_INTEGRATION.md](WMS_INTEGRATION.md).
 
 ## Before you start: how is your Odoo hosted?
 
-How you get AgriWare Connector onto your instance depends on your hosting:
+How you get Cool Agristock onto your instance depends on your hosting:
 
 | Hosting | Supported? |
 |---|---|
@@ -22,42 +22,42 @@ The remaining steps are verified for a self-hosted Odoo 19 environment where a t
 can place files on the server. If that isn't you, forward this guide to whoever manages your Odoo
 hosting.
 
-## 1. Download AgriWare Connector from Odoo Apps
+## 1. Download Cool Agristock from Odoo Apps
 
 Open the marketplace listing:
 
-<https://apps.odoo.com/apps/modules/19.0/agriware_connector>
+<https://apps.odoo.com/apps/modules/19.0/cool_agristock>
 
 Click **Download for v 19.0**. This downloads a single zip file
-(`agriware_connector-19.0.1.0.0.zip`) containing everything the module needs.
+(`cool_agristock-19.0.1.0.0.zip`) containing everything the module needs.
 
 ## 2. Extract the package and place it in your Odoo addons path
 
-AgriWare Connector depends on four Odoo Community Association (OCA) modules — `component`,
+Cool Agristock depends on four Odoo Community Association (OCA) modules — `component`,
 `component_event`, `connector`, `queue_job`. **You do not need to download or clone these
 separately.** The marketplace zip you downloaded in step 1 already bundles all four, at exactly
-the versions AgriWare Connector requires (`component` 19.0.1.0.1, `component_event` 19.0.1.0.0,
+the versions Cool Agristock requires (`component` 19.0.1.0.1, `component_event` 19.0.1.0.0,
 `connector` 19.0.1.0.0, `queue_job` 19.0.2.1.6). This was verified directly: installing straight
 from this zip's contents, with no other files added, succeeded cleanly in a from-scratch Odoo 19
 test environment.
 
-1. Extract the zip. You'll see five top-level folders: `agriware_connector`, `component`,
+1. Extract the zip. You'll see five top-level folders: `cool_agristock`, `component`,
    `component_event`, `connector`, `queue_job`.
 2. Copy **all five folders** into your Odoo addons directory (the folder your `odoo.conf`'s
    `addons_path` already includes, or a new folder you add to it). Keep every folder — removing
-   any of the four dependency folders will make AgriWare Connector refuse to install with a
+   any of the four dependency folders will make Cool Agristock refuse to install with a
    missing-dependency error.
 3. Restart the Odoo service so it picks up the new addons path contents.
 
-## 3. Install AgriWare Connector in Odoo 19
+## 3. Install Cool Agristock in Odoo 19
 
 1. Log in to Odoo as an administrator.
 2. Enable developer mode (**Settings → General Settings**, scroll to the bottom, **Activate the
    developer mode**).
 3. Go to the **Apps** menu.
 4. Click **Update Apps List** (top-left), then **Update**.
-5. Search for **AgriWare Connector**.
-6. Click **Install**. Odoo installs AgriWare Connector together with the bundled `component`,
+5. Search for **Cool Agristock**.
+6. Click **Install**. Odoo installs Cool Agristock together with the bundled `component`,
    `component_event`, `connector`, and `queue_job` modules in one step — no separate dependency
    installation step is needed.
 
@@ -72,28 +72,28 @@ Odoo's own **Settings** access must grant the right group to the right people:
 
 1. Go to **Settings → Users & Companies → Users**.
 2. Open the user who should manage API keys (commonly, you — the business owner or IT contact).
-3. Under **Access Rights**, find **AgriWare Connector** and set it to **Administrator**.
+3. Under **Access Rights**, find **Cool Agristock** and set it to **Administrator**.
 4. Click **Save**.
 
-This grants the **AgriWare Administrator** group, which is required to generate, revoke, or replace
-API keys. (The separate **AgriWare API User** group is assigned automatically to a dedicated
+This grants the **Cool Agristock Administrator** group, which is required to generate, revoke, or replace
+API keys. (The separate **Cool Agristock API User** group is assigned automatically to a dedicated
 integration account the first time you generate a key — see step 6 — you do not assign it to a
 human yourself.)
 
 ## 5. Open API Management
 
 In the main Odoo app switcher (top-left, the grid icon, or the app menu bar), open
-**AgriWare Connector → API Management**. You should see two entries:
+**Cool Agristock → API Management**. You should see two entries:
 
 - **API Keys** — the list of keys you've generated, with their status.
 - **Generate API Key** — the form to create a new one.
 
-If you don't see **AgriWare Connector** in your app list at all, your user is missing the
+If you don't see **Cool Agristock** in your app list at all, your user is missing the
 Administrator access right from step 4.
 
 ## 6. Generate an API key
 
-1. Go to **AgriWare Connector → API Management → Generate API Key**.
+1. Go to **Cool Agristock → API Management → Generate API Key**.
 2. Enter an **Integration Name** that identifies this connection (e.g. "Main Warehouse WMS").
 3. If you work with more than one company in this Odoo database, choose the **Company** this key
    belongs to.
@@ -122,8 +122,8 @@ it from the **API Keys** list and generate a replacement.
 
 In your WMS's integration settings, enter:
 
-- **API base URL** — your Odoo instance's address followed by `/agriware/api/v1`, for example
-  `https://your-odoo-instance.example.com/agriware/api/v1`.
+- **API base URL** — your Odoo instance's address followed by `/cool_agristock/api/v1`, for example
+  `https://your-odoo-instance.example.com/cool_agristock/api/v1`.
 - **API key** — the value you copied in step 8.
 - **Authentication method** — Bearer token: every request must carry an
   `Authorization: Bearer <your-api-key>` header.
@@ -138,19 +138,19 @@ With a terminal (or your WMS's "test connection" feature, if it has one), check 
 endpoint first — it needs no API key:
 
 ```bash
-curl -s https://your-odoo-instance.example.com/agriware/api/v1/health
+curl -s https://your-odoo-instance.example.com/cool_agristock/api/v1/health
 ```
 
 Expected response:
 
 ```json
-{"status": "success", "service": "AgriWare Connector", "api_version": "1.0", "message": "AgriWare API is running"}
+{"status": "success", "service": "Cool Agristock", "api_version": "1.0", "message": "Cool Agristock API is running"}
 ```
 
 Then confirm your API key works against a real, protected endpoint:
 
 ```bash
-curl -s https://your-odoo-instance.example.com/agriware/api/v1/products \
+curl -s https://your-odoo-instance.example.com/cool_agristock/api/v1/products \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -161,7 +161,7 @@ A successful response looks like:
 ```
 
 If you instead get a `401 Unauthorized` HTML page, the Bearer token is missing, mistyped, expired,
-or revoked. If you get `{"status": "error", "message": "Access denied: AgriWare API User role
+or revoked. If you get `{"status": "error", "message": "Access denied: Cool Agristock API User role
 required"}`, the key's underlying integration user is missing the required group — this should not
 happen with a key generated through the wizard in step 6, so contact support if it does.
 
@@ -169,15 +169,15 @@ happen with a key generated through the wizard in step 6, so contact support if 
 
 | Symptom | Likely cause |
 |---|---|
-| AgriWare Connector doesn't appear after Update Apps List | One or more of the five extracted folders isn't in the addons path, or Odoo wasn't restarted after adding them. |
+| Cool Agristock doesn't appear after Update Apps List | One or more of the five extracted folders isn't in the addons path, or Odoo wasn't restarted after adding them. |
 | Install fails citing a missing dependency | One of the bundled `component`, `component_event`, `connector`, `queue_job` folders was skipped during extraction or copying — re-extract the zip and copy all five folders together. |
-| **AgriWare Connector** menu is missing after install | Your user doesn't have the AgriWare Administrator access right (step 4). |
+| **Cool Agristock** menu is missing after install | Your user doesn't have the Cool Agristock Administrator access right (step 4). |
 | `401 Unauthorized` (HTML, not JSON) | Bad, missing, expired, or revoked API key. |
-| `403` JSON error | Authenticated, but the key's integration user lacks the AgriWare API User group — shouldn't occur with wizard-generated keys. |
+| `403` JSON error | Authenticated, but the key's integration user lacks the Cool Agristock API User group — shouldn't occur with wizard-generated keys. |
 
 ## Getting help
 
-AgriWare Connector itself is free and open-source — see
+Cool Agristock itself is free and open-source — see
 [Free software and paid services](../README.md#free-software-and-paid-services) for what's
 included at no cost, and what optional paid services (custom WMS integration, installation help,
 support) are available. The project's GitHub Issues page is the current contact channel:

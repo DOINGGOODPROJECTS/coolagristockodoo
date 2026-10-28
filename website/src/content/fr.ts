@@ -5,29 +5,29 @@ const DOCS_BASE = `${GITHUB_REPO}/blob/19.0/docs`;
 
 export const fr: Dictionary = {
   meta: {
-    siteName: "AgriWare Connector",
+    siteName: "Cool Agristock",
     home: {
-      title: "AgriWare Connector — Intégration d'entrepôt pour Odoo (gratuit et open-source)",
+      title: "Cool Agristock — Intégration d'entrepôt pour Odoo (gratuit et open-source)",
       description:
         "Application Odoo 19 gratuite et open-source qui connecte un système de gestion d'entrepôt (WMS) externe compatible à Odoo Inventaire via une API REST documentée.",
     },
     product: {
-      title: "Présentation du produit — AgriWare Connector",
+      title: "Présentation du produit — Cool Agristock",
       description:
-        "Compatibilité Odoo 19, capacités de l'API REST, authentification, opérations prises en charge et limitations actuelles d'AgriWare Connector.",
+        "Compatibilité Odoo 19, capacités de l'API REST, authentification, opérations prises en charge et limitations actuelles de Cool Agristock.",
     },
     services: {
-      title: "Services professionnels — AgriWare Connector",
+      title: "Services professionnels — Cool Agristock",
       description:
-        "Services professionnels optionnels et payants pour AgriWare Connector : installation, intégration WMS, adaptateurs personnalisés et support.",
+        "Services professionnels optionnels et payants pour Cool Agristock : installation, intégration WMS, adaptateurs personnalisés et support.",
     },
     documentation: {
-      title: "Documentation — AgriWare Connector",
-      description: "Guides d'installation, référence API et ressources de support pour AgriWare Connector.",
+      title: "Documentation — Cool Agristock",
+      description: "Guides d'installation, référence API et ressources de support pour Cool Agristock.",
     },
     contact: {
-      title: "Contact — Assistance intégration AgriWare Connector",
-      description: "Demander une assistance pour l'intégration d'AgriWare Connector.",
+      title: "Contact — Assistance intégration Cool Agristock",
+      description: "Demander une assistance pour l'intégration de Cool Agristock.",
     },
   },
   nav: {
@@ -43,13 +43,13 @@ export const fr: Dictionary = {
     tagline: "Une application Odoo 19 gratuite et open-source qui connecte un WMS externe à l'Inventaire Odoo.",
     freeOpenSource: "Gratuit et open-source (LGPL-3.0) — sans frais de licence, jamais.",
     githubLabel: "Voir le code source sur GitHub",
-    rights: "Ce site fait la promotion d'AgriWare Connector ; il est indépendant du module Odoo lui-même.",
+    rights: "Ce site fait la promotion de Cool Agristock ; il est indépendant du module Odoo lui-même.",
   },
   home: {
     hero: {
       headline: "Connectez votre système de gestion d'entrepôt à Odoo",
       subheadline:
-        "AgriWare Connector est une application d'intégration gratuite et open-source qui permet à un système de gestion d'entrepôt (WMS) externe compatible d'échanger des informations de stock avec Odoo 19.",
+        "Cool Agristock est une application d'intégration gratuite et open-source qui permet à un système de gestion d'entrepôt (WMS) externe compatible d'échanger des informations de stock avec Odoo 19.",
       downloadCta: "Télécharger gratuitement",
       requestCta: "Demander une assistance intégration",
     },
@@ -66,15 +66,15 @@ export const fr: Dictionary = {
     solution: {
       title: "La solution",
       description:
-        "AgriWare Connector expose une API REST au-dessus de l'Inventaire Odoo 19. Votre WMS existant appelle cette API pour lire les données de produits, d'entrepôts et de stocks, et pour créer et valider les réceptions et expéditions.",
+        "Cool Agristock expose une API REST au-dessus de l'Inventaire Odoo 19. Votre WMS existant appelle cette API pour lire les données de produits, d'entrepôts et de stocks, et pour créer et valider les réceptions et expéditions.",
       diagram: {
         wms: "WMS externe",
         api: "API REST",
-        connector: "AgriWare Connector",
+        connector: "Cool Agristock",
         odoo: "Odoo 19 Inventaire",
       },
       initiatedNote:
-        "Chaque requête est initiée par le WMS externe. AgriWare Connector n'appelle jamais votre WMS — il n'y a aucune synchronisation automatique ou planifiée.",
+        "Chaque requête est initiée par le WMS externe. Cool Agristock n'appelle jamais votre WMS — il n'y a aucune synchronisation automatique ou planifiée.",
     },
     features: {
       title: "Fonctionnalités clés",
@@ -93,8 +93,8 @@ export const fr: Dictionary = {
     howItWorks: {
       title: "Comment ça marche",
       steps: [
-        "Installez AgriWare Connector depuis la marketplace Odoo Apps.",
-        "Générez une clé API depuis AgriWare Connector → API Management.",
+        "Installez Cool Agristock depuis la marketplace Odoo Apps.",
+        "Générez une clé API depuis Cool Agristock → API Management.",
         "Configurez votre WMS externe compatible avec l'URL de base de l'API et la clé.",
         "Échangez les informations d'entrepôt prises en charge : produits, entrepôts, fournisseurs, correspondances d'unités de mesure, lots et numéros de série, imports d'inventaire, réceptions, expéditions et statut des transactions.",
       ],
@@ -102,9 +102,9 @@ export const fr: Dictionary = {
     services: {
       title: "Services professionnels",
       intro:
-        "AgriWare Connector lui-même reste toujours gratuit. Pour les entreprises qui souhaitent un accompagnement, des services payants optionnels sont proposés séparément.",
+        "Cool Agristock lui-même reste toujours gratuit. Pour les entreprises qui souhaitent un accompagnement, des services payants optionnels sont proposés séparément.",
       items: [
-        { name: "Installation et configuration Odoo", description: "Installation et configuration d'AgriWare Connector sur votre instance Odoo 19." },
+        { name: "Installation et configuration Odoo", description: "Installation et configuration de Cool Agristock sur votre instance Odoo 19." },
         { name: "Intégration WMS", description: "Connexion de votre WMS spécifique à l'API REST documentée." },
         { name: "Développement d'adaptateur WMS personnalisé", description: "Construction d'une couche de traduction pour un WMS qui ne parle pas nativement l'API." },
         { name: "Support technique et maintenance", description: "Assistance continue au-delà du support communautaire." },
@@ -121,29 +121,29 @@ export const fr: Dictionary = {
   product: {
     title: "Présentation du produit",
     intro:
-      "AgriWare Connector intègre un WMS externe existant et compatible avec l'application Inventaire d'Odoo 19, via une API REST.",
+      "Cool Agristock intègre un WMS externe existant et compatible avec l'application Inventaire d'Odoo 19, via une API REST.",
     overview: {
       title: "Ce que c'est",
-      body: "AgriWare Connector n'est pas lui-même un système de gestion d'entrepôt. Il ne gère ni le rayonnage, ni les circuits de préparation, ni le matériel de lecture de codes-barres — c'est la couche d'intégration entre un WMS existant et le module Inventaire d'Odoo. Le WMS externe appelle cette API pour lire les données de produits, d'entrepôts et de stocks d'Odoo, et pour transmettre les réceptions entrantes et expéditions sortantes dans le flux de stock standard d'Odoo.",
+      body: "Cool Agristock n'est pas lui-même un système de gestion d'entrepôt. Il ne gère ni le rayonnage, ni les circuits de préparation, ni le matériel de lecture de codes-barres — c'est la couche d'intégration entre un WMS existant et le module Inventaire d'Odoo. Le WMS externe appelle cette API pour lire les données de produits, d'entrepôts et de stocks d'Odoo, et pour transmettre les réceptions entrantes et expéditions sortantes dans le flux de stock standard d'Odoo.",
     },
     version: {
       title: "Version Odoo prise en charge",
-      body: "Odoo 19. AgriWare Connector dépend de quatre modules de l'Odoo Community Association (OCA) — component, component_event, connector et queue_job — qui sont inclus dans le téléchargement de la marketplace Odoo Apps : aucune installation séparée n'est nécessaire pour une installation depuis la marketplace.",
+      body: "Odoo 19. Cool Agristock dépend de quatre modules de l'Odoo Community Association (OCA) — component, component_event, connector et queue_job — qui sont inclus dans le téléchargement de la marketplace Odoo Apps : aucune installation séparée n'est nécessaire pour une installation depuis la marketplace.",
     },
     architecture: {
       title: "Architecture d'intégration",
-      body: "Chaque requête de cette intégration est initiée par le WMS externe ; Odoo n'appelle jamais le WMS. Toutes les données résident finalement dans la base PostgreSQL d'Odoo — AgriWare Connector n'ajoute aucun entrepôt de données séparé.",
+      body: "Chaque requête de cette intégration est initiée par le WMS externe ; Odoo n'appelle jamais le WMS. Toutes les données résident finalement dans la base PostgreSQL d'Odoo — Cool Agristock n'ajoute aucun entrepôt de données séparé.",
       diagram: {
         wms: "WMS externe",
         api: "HTTPS + clé API",
-        connector: "AgriWare Connector",
+        connector: "Cool Agristock",
         odoo: "Odoo 19 Inventaire",
         db: "PostgreSQL",
       },
     },
     api: {
       title: "Capacités de l'API REST",
-      body: "AgriWare Connector expose une API REST versionnée, enracinée à /agriware/api/v1. Toutes les réponses du contrôleur partagent une forme cohérente {\"status\": \"success\" | \"error\", ...}.",
+      body: "Cool Agristock expose une API REST versionnée, enracinée à /cool_agristock/api/v1. Toutes les réponses du contrôleur partagent une forme cohérente {\"status\": \"success\" | \"error\", ...}.",
       capabilities: [
         "GET /health — contrôle de santé public, aucune authentification requise",
         "GET /products — récupération de jusqu'à 100 produits ; POST /products et PATCH /products/{external_id} — création et mise à jour des produits",
@@ -160,7 +160,7 @@ export const fr: Dictionary = {
     },
     auth: {
       title: "Authentification et contrôle d'accès",
-      body: "Chaque endpoint protégé requiert un en-tête Authorization: Bearer portant une véritable clé API Odoo. Les clés sont générées et gérées en libre-service, à l'intérieur d'Odoo, par les utilisateurs du groupe AgriWare Administrator — sans intervention d'un développeur. L'utilisateur sous-jacent de la clé authentifiée doit également appartenir au groupe AgriWare API User pour appeler l'API. Les clés API sont isolées par entreprise grâce à des règles d'enregistrement.",
+      body: "Chaque endpoint protégé requiert un en-tête Authorization: Bearer portant une véritable clé API Odoo. Les clés sont générées et gérées en libre-service, à l'intérieur d'Odoo, par les utilisateurs du groupe Cool Agristock Administrator — sans intervention d'un développeur. L'utilisateur sous-jacent de la clé authentifiée doit également appartenir au groupe Cool Agristock API User pour appeler l'API. Les clés API sont isolées par entreprise grâce à des règles d'enregistrement.",
     },
     operations: {
       title: "Opérations d'inventaire prises en charge",
@@ -192,18 +192,18 @@ export const fr: Dictionary = {
       items: [
         {
           src: "/images/screenshot_apps_listing.png",
-          alt: "AgriWare Connector listé dans l'écran Apps d'Odoo",
-          caption: "AgriWare Connector listé dans l'écran Apps d'Odoo.",
+          alt: "Cool Agristock listé dans l'écran Apps d'Odoo",
+          caption: "Cool Agristock listé dans l'écran Apps d'Odoo.",
         },
         {
           src: "/images/screenshot_api_management.png",
-          alt: "Écran API Management d'AgriWare Connector affichant une clé API en libre-service",
+          alt: "Écran API Management de Cool Agristock affichant une clé API en libre-service",
           caption:
             "L'écran API Management, où un utilisateur professionnel autorisé génère, consulte et révoque ses propres clés API.",
         },
         {
           src: "/images/screenshot_api_health.png",
-          alt: "Réponse du contrôle de santé de l'API REST d'AgriWare Connector",
+          alt: "Réponse du contrôle de santé de l'API REST de Cool Agristock",
           caption: "Le endpoint de contrôle de santé de l'API REST, confirmé en ligne et fonctionnel.",
         },
       ],
@@ -212,24 +212,24 @@ export const fr: Dictionary = {
   services: {
     title: "Services professionnels",
     intro:
-      "Le logiciel d'AgriWare Connector est, et restera toujours, gratuit et open-source. Ces services payants optionnels sont réalisés par des personnes, pour les entreprises souhaitant un accompagnement pratique au-delà de la documentation.",
+      "Le logiciel de Cool Agristock est, et restera toujours, gratuit et open-source. Ces services payants optionnels sont réalisés par des personnes, pour les entreprises souhaitant un accompagnement pratique au-delà de la documentation.",
     freeNote:
       "Rien ci-dessous ne débloque une fonctionnalité par ailleurs restreinte — chaque capacité documentée de l'API REST est déjà gratuite. Ce sont des services, pas des paliers de licence logicielle.",
     packages: [
       {
         name: "1. Installation et configuration Odoo",
         description:
-          "Installation d'AgriWare Connector et de ses dépendances OCA incluses sur votre instance Odoo 19, attribution des droits utilisateur, et génération de la première clé API.",
+          "Installation de Cool Agristock et de ses dépendances OCA incluses sur votre instance Odoo 19, attribution des droits utilisateur, et génération de la première clé API.",
       },
       {
         name: "2. Intégration WMS de base",
         description:
-          "Configuration de votre WMS existant face à l'API REST d'AgriWare Connector lorsqu'il parle déjà un protocole compatible, et validation de la connexion de bout en bout.",
+          "Configuration de votre WMS existant face à l'API REST de Cool Agristock lorsqu'il parle déjà un protocole compatible, et validation de la connexion de bout en bout.",
       },
       {
         name: "3. Développement d'adaptateur WMS personnalisé",
         description:
-          "Construction d'une couche de traduction entre le protocole natif de votre WMS et l'API REST d'AgriWare Connector, pour les WMS qui ne peuvent pas la parler directement.",
+          "Construction d'une couche de traduction entre le protocole natif de votre WMS et l'API REST de Cool Agristock, pour les WMS qui ne peuvent pas la parler directement.",
       },
       {
         name: "4. Personnalisation des flux d'inventaire",
@@ -242,7 +242,7 @@ export const fr: Dictionary = {
           "Assistance continue et dédiée, au-delà du support communautaire au mieux-effort, pour les entreprises souhaitant une continuité après la mise en production de leur intégration.",
       },
     ],
-    optionalNote: "Chaque service ci-dessus est entièrement optionnel. Utiliser AgriWare Connector vous-même, gratuitement, reste pleinement pris en charge.",
+    optionalNote: "Chaque service ci-dessus est entièrement optionnel. Utiliser Cool Agristock vous-même, gratuitement, reste pleinement pris en charge.",
     noPricingNote:
       "Les tarifs sont discutés au cas par cas selon le périmètre — aucune grille tarifaire n'est publiée ici.",
     cta: "Demander une assistance intégration",

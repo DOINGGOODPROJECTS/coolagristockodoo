@@ -1,7 +1,7 @@
-# AgriWare Connector — Website
+# Cool Agristock — Website
 
-A marketing/documentation website for AgriWare Connector. **This is entirely separate from the
-Odoo addon** in `../agriware_connector/` — it has its own dependencies, build process, and
+A marketing/documentation website for Cool Agristock. **This is entirely separate from the
+Odoo addon** in `../cool_agristock/` — it has its own dependencies, build process, and
 deployment target, and shares nothing with it besides reused brand assets (icon, screenshots) and
 links out to the same GitHub documentation.
 
@@ -55,7 +55,7 @@ website/
     content/              en.ts / fr.ts dictionaries + getDictionary()
     types/content.ts       the Dictionary type both languages must satisfy
     lib/metadata.ts        shared SEO/Open Graph metadata builder
-  public/images/          reused, already-verified AgriWare Connector screenshots + icon
+  public/images/          reused, already-verified Cool Agristock screenshots + icon
 ```
 
 ## Known limitations (honest, not hidden)

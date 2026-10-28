@@ -1,4 +1,4 @@
-# AgriWare Connector navigation
+# Cool Agristock navigation
 
 The connector opens on **Overview**, followed by five operational areas. It uses
 Odoo Inventory's existing records, permissions, searches and workflows.
@@ -65,7 +65,7 @@ staged review API remains available and does not change stock automatically.
 
 ## Upgrade and verification
 
-Upgrade `agriware_connector` with Odoo 19. The module is listed as an application.
+Upgrade `cool_agristock` with Odoo 19. The module is listed as an application.
 The menu layout preserves XML identifiers for existing installations and does not
 modify the native Inventory menus. The unused intermediate WMS category is
 inactive; its functional screen is moved directly under Integrations & Configuration.

@@ -1,0 +1,176 @@
+<section style="max-width: 760px; margin: 0 auto; font-family: -apple-system, Helvetica, Arial, sans-serif; color: #2b2b2b; line-height: 1.5;">
+
+    <h1 style="font-size: 28px; margin-bottom: 4px;">Cool Agristock</h1>
+    <p style="font-size: 16px; color: #6a6a6a; margin-top: 0;">
+        Connect Odoo 19 Inventory with Cool Agristock, an open-source warehouse management system for
+        agribusinesses.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Who it's for</h2>
+    <p>
+        Agricultural cooperatives, agribusinesses, processors, and input distributors &mdash; originally
+        built for businesses operating in C&ocirc;te d'Ivoire and other African markets, though nothing
+        restricts it to any particular region &mdash; that already use Odoo 19 and run a compatible
+        external warehouse management system (WMS) they need to keep in sync with Odoo Inventory,
+        instead of re-entering receipts and dispatches by hand in both places.
+    </p>
+
+    <h2 style="font-size: 20px;">What it does</h2>
+    <p>
+        Cool Agristock is a free, open-source Odoo 19 application that enables businesses to
+        connect compatible external Warehouse Management Systems (WMS) to Odoo Inventory through a
+        secure REST API. It exposes that API so the WMS can read and write product, warehouse, and
+        supplier data; configure unit-of-measure mappings; create and resolve lots and serial
+        numbers; stage initial inventory counts for human review; and create and validate incoming
+        receipts and outgoing dispatches &mdash; including lot/serial-tracked products &mdash;
+        without a human re-keying anything into Odoo. Cool Agristock remains a standalone application;
+        this module is the bridge between the two systems.
+    </p>
+    <p>
+        Initial stock counts from your WMS are staged in Odoo for review, not applied
+        automatically. An Inventory Manager compares the WMS's count against Odoo's own records
+        and decides what to do &mdash; applying an approved count to actual stock is a separate,
+        manual action in Odoo's native Inventory Adjustment screen. This keeps a human in the loop
+        for every change to your real inventory levels.
+    </p>
+    <p>
+        Businesses generate and manage their own API keys directly inside the application &mdash;
+        creating, naming, revoking, and replacing them without needing Cool Agristock's developers or an
+        external administrator. Each key can be given an expiration date or left to remain valid
+        until manually revoked. Using the generated credentials and the documented REST API,
+        businesses with a compatible WMS can configure their own integration independently; a WMS
+        that isn't natively compatible with this API may require custom integration services (see
+        below).
+    </p>
+
+    <h2 style="font-size: 20px;">Key features</h2>
+    <ul>
+        <li>REST API for products, warehouses, suppliers, and on-hand inventory, addressed by your own external IDs</li>
+        <li>Unit-of-measure mapping for units Odoo doesn't ship with by default</li>
+        <li>Lot and serial number creation and resolution for traceable products</li>
+        <li>Staged initial inventory import, reviewed and applied manually by an Inventory Manager &mdash; never applied automatically</li>
+        <li>Create and validate stock receipts (incoming deliveries), including lot/serial-tracked products</li>
+        <li>Create and validate stock dispatches (outgoing deliveries), including lot/serial-tracked products</li>
+        <li>Look up the status of a receipt or dispatch by your own external reference</li>
+        <li>Self-service API key management: generate, name, set an expiration or make permanent, view status, revoke, and replace keys, without needing Odoo System Administrator access</li>
+        <li>Dedicated role-based access group for external integrations, with multi-company isolation</li>
+        <li>Concurrency-safe duplicate protection on receipt/dispatch creation</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Security and Permissions</h2>
+    <ul>
+        <li>Self-service API key generation: an authorized business user creates, names, and manages API keys directly inside Cool Agristock &mdash; no developer or external administrator involvement is needed</li>
+        <li>Authorized user access: only users in the <strong>Cool Agristock Administrator</strong> group can generate, revoke, or replace API keys; only users in the <strong>Cool Agristock API User</strong> group (or a group that implies it) can call the REST API itself</li>
+        <li>API key expiration and revocation: a key can be given an expiration date or left to remain valid until manually revoked; revocation takes effect immediately, enforced by Odoo's own API key infrastructure</li>
+        <li>Bearer-token authentication: every protected endpoint requires a valid Odoo API key sent as an <code>Authorization: Bearer</code> header</li>
+        <li>Multi-company security controls: API key records are isolated per company by record rules, so one company's administrators can never view or revoke another company's keys</li>
+        <li>Secure communication recommended: deploy behind HTTPS in any environment beyond local development, since Bearer tokens sent over plain HTTP are visible on the network path</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Known Limitations</h2>
+    <ul>
+        <li>The external WMS must support the documented REST API, or use an adapter, to integrate &mdash; not every warehouse system is automatically compatible</li>
+        <li>No automatic or scheduled synchronization: every request is initiated by the external WMS</li>
+        <li>Initial inventory imports are staged for human review &mdash; applying a reviewed count to actual Odoo stock still requires one manual step in Odoo's own Inventory Adjustment screen, by design</li>
+        <li>Partial receipt and dispatch processing is not currently supported; quantities must match exactly</li>
+        <li>Warehouse-specific access controls are not currently implemented; access is scoped by company only</li>
+        <li>Pagination is not currently supported on list endpoints</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Optional professional services (paid)</h2>
+    <p>
+        Cool Agristock itself is, and remains, free and open-source. For businesses that want
+        help going further, the team behind Cool Agristock separately offers
+        optional paid services:
+    </p>
+    <ul>
+        <li>Custom WMS integration for systems not natively compatible with this API</li>
+        <li>Installation and configuration</li>
+        <li>Development of WMS adapters</li>
+        <li>Technical support and maintenance</li>
+        <li>Custom development</li>
+    </ul>
+    <p>
+        Contact: <a href="mailto:team@agricarecentres.com">team@agricarecentres.com</a>
+    </p>
+
+    <h2 style="font-size: 20px;">Screenshots</h2>
+    <p>
+        <img src="screenshot_apps_listing.png" alt="Cool Agristock listed in Odoo's Apps screen"
+             style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 6px;"/>
+    </p>
+    <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
+        Cool Agristock listed in Odoo's Apps screen.
+    </p>
+    <p>
+        <img src="screenshot_api_management.png" alt="Cool Agristock API Management screen listing a self-service API key"
+             style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 6px;"/>
+    </p>
+    <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
+        The API Management screen, where an authorized business user generates, views, and
+        revokes their own API keys. The key's secret value is shown only once, at the moment it
+        is generated, and is never displayed again afterward.
+    </p>
+    <p>
+        <img src="screenshot_api_health.png" alt="Cool Agristock REST API health check response"
+             style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 6px;"/>
+    </p>
+    <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
+        The REST API's health check endpoint, confirmed live and responding.
+    </p>
+
+    <h2 style="font-size: 20px;">How it fits together</h2>
+    <div style="max-width: 420px; margin: 0 auto;">
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Business / Authorized Odoo User</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Cool Agristock</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">API Management</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Generate API Key</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">External WMS</div>
+        <div style="text-align: center; font-size: 13px; color: #6a6a6a; line-height: 1.2;">REST API</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1; margin-top: -4px;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Cool Agristock</div>
+        <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
+        <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Odoo 19 Inventory</div>
+    </div>
+
+    <h2 style="font-size: 20px;">Requirements</h2>
+    <ul>
+        <li>Odoo 19</li>
+        <li>OCA <code>connector</code>, <code>component</code>, <code>component_event</code>, and <code>queue_job</code> modules</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Data &amp; integration</h2>
+    <p>
+        This module does not send any data anywhere on its own. It only responds to requests from
+        whichever external system an authorized business user explicitly connects by generating an
+        API key, and only for the data categories documented above (products, warehouses,
+        suppliers, UOM mappings, lots and serial numbers, inventory, receipts, and dispatches). No
+        data is shared with Cool Agristock's authors or any third party.
+    </p>
+
+    <h2 style="font-size: 20px;">Documentation</h2>
+    <p>
+        Full installation steps, the complete API reference (authentication, every endpoint,
+        request/response examples, and error codes), and security notes ship with the module's
+        source code as <code>README.md</code> and <code>docs/API.md</code>. Odoo's marketplace
+        description only supports links to a short allow-list of destinations, so the GitHub
+        locations are given here as plain text to copy rather than as clickable links:
+    </p>
+    <ul>
+        <li>README: <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo/blob/19.0/README.md</code></li>
+        <li>API Documentation: <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo/blob/19.0/docs/API.md</code></li>
+        <li>Customer Onboarding: <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo/blob/19.0/docs/CUSTOMER_ONBOARDING.md</code></li>
+        <li>Support: <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo/blob/19.0/docs/SUPPORT.md</code></li>
+        <li>Professional Services: <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo/blob/19.0/docs/PROFESSIONAL_SERVICES.md</code></li>
+    </ul>
+
+    <h2 style="font-size: 20px;">License</h2>
+    <p>LGPL-3.0</p>
+
+</section>
