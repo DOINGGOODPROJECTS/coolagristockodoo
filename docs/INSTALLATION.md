@@ -182,4 +182,4 @@ AgriWare Connector itself is free and open-source — see
 included at no cost, and what optional paid services (custom WMS integration, installation help,
 support) are available. The project's GitHub Issues page is the current contact channel:
 
-<https://github.com/DOINGGOODPROJECTS/agriwareodoo/issues>
+<https://github.com/DOINGGOODPROJECTS/coolagristockodoo/issues>

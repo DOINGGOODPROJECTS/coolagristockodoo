@@ -5,7 +5,7 @@ on.
 
 **The public channel for all non-sensitive technical issues is GitHub Issues:**
 
-<https://github.com/DOINGGOODPROJECTS/agriwareodoo/issues>
+<https://github.com/DOINGGOODPROJECTS/coolagristockodoo/issues>
 
 There is no service-level agreement (SLA) or guaranteed response time on GitHub Issues; community
 and maintainer responses are best-effort.

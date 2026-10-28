@@ -14,7 +14,7 @@ between AgriWare and Odoo.
     """,
     "category": "Inventory/Inventory",
     "author": "Cool Agristock",
-    "website": "https://github.com/DOINGGOODPROJECTS/agriwareodoo",
+    "website": "https://github.com/DOINGGOODPROJECTS/coolagristockodoo",
     "license": "LGPL-3",
     "images": [
         "static/description/apps_listing_screenshot.png",

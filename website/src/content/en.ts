@@ -1,6 +1,6 @@
 import type { Dictionary } from "@/types/content";
 
-const GITHUB_REPO = "https://github.com/DOINGGOODPROJECTS/agriwareodoo";
+const GITHUB_REPO = "https://github.com/DOINGGOODPROJECTS/coolagristockodoo";
 const DOCS_BASE = `${GITHUB_REPO}/blob/19.0/docs`;
 
 export const en: Dictionary = {

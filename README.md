@@ -180,8 +180,8 @@ does not currently use their job-queue or synchronization features (see
 **1. Clone the repository**
 
 ```bash
-git clone git@github.com:DOINGGOODPROJECTS/agriwareodoo.git
-cd agriwareodoo
+git clone git@github.com:DOINGGOODPROJECTS/coolagristockodoo.git
+cd coolagristockodoo
 ```
 
 **2. Configure environment variables**
@@ -450,7 +450,7 @@ replacement, and company-level isolation).
 ## Contributing
 
 This project is developed in the open on GitHub:
-https://github.com/DOINGGOODPROJECTS/agriwareodoo
+https://github.com/DOINGGOODPROJECTS/coolagristockodoo
 
 To contribute: open an issue describing the change you'd like to make or the bug you've found,
 fork the repository, and open a pull request against `main`. Please run the automated test suite
