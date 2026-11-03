@@ -5,6 +5,8 @@ class CoolAgristockDashboard(models.TransientModel):
     _name = "cool_agristock.dashboard"
     _description = "Cool Agristock Dashboard"
 
+    name = fields.Char(default="Overview")
+
     active_system_count = fields.Integer(compute="_compute_metrics")
     active_api_key_count = fields.Integer(compute="_compute_metrics")
     receipt_count = fields.Integer(compute="_compute_metrics")
