@@ -107,81 +107,106 @@
 
     <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
 
-    <h2 style="font-size: 20px;">Résumé &mdash; Français</h2>
-    <p style="margin-bottom: 4px;"><strong>Fonctionnalités principales</strong></p>
-    <ul>
-        <li>API REST pour produits, entrep&ocirc;ts, fournisseurs et stock, r&eacute;f&eacute;renc&eacute;s par vos propres identifiants externes</li>
-        <li>Correspondance d'unit&eacute;s de mesure, gestion des lots et num&eacute;ros de s&eacute;rie, r&eacute;ceptions et exp&eacute;ditions (y compris produits trac&eacute;s)</li>
-        <li>Import initial du stock mis en attente pour validation humaine &mdash; jamais appliqu&eacute; automatiquement</li>
-        <li>Gestion autonome des cl&eacute;s API (cr&eacute;ation, expiration, r&eacute;vocation) sans administrateur syst&egrave;me</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>S&eacute;curit&eacute;</strong></p>
-    <ul>
-        <li>Cl&eacute;s API g&eacute;n&eacute;r&eacute;es et g&eacute;r&eacute;es par l'entreprise elle-m&ecirc;me, prot&eacute;g&eacute;es par jeton Bearer</li>
-        <li>Acc&egrave;s r&eacute;serv&eacute; aux groupes <strong>Cool Agristock Administrator</strong> / <strong>Cool Agristock API User</strong></li>
-        <li>Isolation multi-soci&eacute;t&eacute; : une soci&eacute;t&eacute; ne peut jamais voir ni r&eacute;voquer les cl&eacute;s d'une autre</li>
-        <li>HTTPS recommand&eacute; en dehors d'un usage local</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Limites connues</strong></p>
-    <ul>
-        <li>Le WMS externe doit prendre en charge l'API document&eacute;e (ou un adaptateur)</li>
-        <li>Aucune synchronisation automatique : chaque requ&ecirc;te est initi&eacute;e par le WMS</li>
-        <li>Traitement partiel des r&eacute;ceptions/exp&eacute;ditions non pris en charge (quantit&eacute;s exactes requises)</li>
-        <li>Pagination non disponible sur les listes</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Pr&eacute;requis</strong></p>
-    <ul>
-        <li>Odoo 19</li>
-        <li>Modules OCA : <code>connector</code>, <code>component</code>, <code>component_event</code>, <code>queue_job</code></li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Donn&eacute;es et confidentialit&eacute;</strong></p>
-    <p>
-        Le module n'envoie aucune donn&eacute;e de lui-m&ecirc;me ; il r&eacute;pond uniquement aux
-        requ&ecirc;tes du syst&egrave;me externe connect&eacute; via une cl&eacute; API.
-    </p>
-    <p style="margin-bottom: 4px;"><strong>Documentation</strong></p>
-    <p>
-        README et r&eacute;f&eacute;rence API compl&egrave;te sur GitHub :
-        <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo</code>
-    </p>
-
-    <h2 style="font-size: 20px;">Summary &mdash; English</h2>
-    <p style="margin-bottom: 4px;"><strong>Key features</strong></p>
-    <ul>
-        <li>REST API for products, warehouses, suppliers and inventory, addressed by your own external IDs</li>
-        <li>UOM mapping, lot/serial handling, receipts and dispatches, including tracked products</li>
-        <li>Initial inventory import staged for human review &mdash; never applied automatically</li>
-        <li>Self-service API key management, no System Administrator required</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Security</strong></p>
-    <ul>
-        <li>API keys generated and managed by the business itself, protected by Bearer token</li>
-        <li>Access restricted to the <strong>Cool Agristock Administrator</strong> / <strong>Cool Agristock API User</strong> groups</li>
-        <li>Multi-company isolation: one company can never view or revoke another's keys</li>
-        <li>HTTPS recommended outside local development</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Known limitations</strong></p>
-    <ul>
-        <li>The external WMS must support the documented API, or use an adapter</li>
-        <li>No automatic sync: every request is initiated by the WMS</li>
-        <li>Partial receipt/dispatch processing not supported (exact quantities required)</li>
-        <li>Pagination not available on list endpoints</li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Requirements</strong></p>
-    <ul>
-        <li>Odoo 19</li>
-        <li>OCA modules: <code>connector</code>, <code>component</code>, <code>component_event</code>, <code>queue_job</code></li>
-    </ul>
-    <p style="margin-bottom: 4px;"><strong>Data &amp; privacy</strong></p>
-    <p>
-        The module sends no data anywhere on its own; it only responds to requests from the
-        external system an authorized user connects via an API key.
-    </p>
-    <p style="margin-bottom: 4px;"><strong>Documentation</strong></p>
-    <p>
-        Full README and API reference on GitHub:
-        <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo</code>
-    </p>
+    <style>
+        .cas-lang-tabs input[name="cas-lang-tab"] { display: none; }
+        .cas-lang-tabs .cas-lang-panel { display: none; }
+        #cas-tab-fr:checked ~ .cas-lang-panels #cas-panel-fr { display: block; }
+        #cas-tab-en:checked ~ .cas-lang-panels #cas-panel-en { display: block; }
+        .cas-lang-tabs .cas-lang-nav label {
+            display: inline-block; padding: 8px 18px; cursor: pointer;
+            border-bottom: 3px solid transparent; color: #6a6a6a; font-weight: 600;
+            font-size: 15px;
+        }
+        #cas-tab-fr:checked ~ .cas-lang-nav label[for="cas-tab-fr"],
+        #cas-tab-en:checked ~ .cas-lang-nav label[for="cas-tab-en"] {
+            color: #875A7B; border-bottom-color: #875A7B;
+        }
+    </style>
+    <div class="cas-lang-tabs">
+        <input type="radio" name="cas-lang-tab" id="cas-tab-fr" checked="checked"/>
+        <input type="radio" name="cas-lang-tab" id="cas-tab-en"/>
+        <div class="cas-lang-nav" style="border-bottom: 1px solid #e0e0e0; margin-bottom: 16px;">
+            <label for="cas-tab-fr">Fran&ccedil;ais</label><label for="cas-tab-en">English</label>
+        </div>
+        <div class="cas-lang-panels">
+            <div class="cas-lang-panel" id="cas-panel-fr">
+                <p style="margin-bottom: 4px;"><strong>Fonctionnalit&eacute;s principales</strong></p>
+                <ul>
+                    <li>API REST pour produits, entrep&ocirc;ts, fournisseurs et stock, r&eacute;f&eacute;renc&eacute;s par vos propres identifiants externes</li>
+                    <li>Correspondance d'unit&eacute;s de mesure, gestion des lots et num&eacute;ros de s&eacute;rie, r&eacute;ceptions et exp&eacute;ditions (y compris produits trac&eacute;s)</li>
+                    <li>Import initial du stock mis en attente pour validation humaine &mdash; jamais appliqu&eacute; automatiquement</li>
+                    <li>Gestion autonome des cl&eacute;s API (cr&eacute;ation, expiration, r&eacute;vocation) sans administrateur syst&egrave;me</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>S&eacute;curit&eacute;</strong></p>
+                <ul>
+                    <li>Cl&eacute;s API g&eacute;n&eacute;r&eacute;es et g&eacute;r&eacute;es par l'entreprise elle-m&ecirc;me, prot&eacute;g&eacute;es par jeton Bearer</li>
+                    <li>Acc&egrave;s r&eacute;serv&eacute; aux groupes <strong>Cool Agristock Administrator</strong> / <strong>Cool Agristock API User</strong></li>
+                    <li>Isolation multi-soci&eacute;t&eacute; : une soci&eacute;t&eacute; ne peut jamais voir ni r&eacute;voquer les cl&eacute;s d'une autre</li>
+                    <li>HTTPS recommand&eacute; en dehors d'un usage local</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Limites connues</strong></p>
+                <ul>
+                    <li>Le WMS externe doit prendre en charge l'API document&eacute;e (ou un adaptateur)</li>
+                    <li>Aucune synchronisation automatique : chaque requ&ecirc;te est initi&eacute;e par le WMS</li>
+                    <li>Traitement partiel des r&eacute;ceptions/exp&eacute;ditions non pris en charge (quantit&eacute;s exactes requises)</li>
+                    <li>Pagination non disponible sur les listes</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Pr&eacute;requis</strong></p>
+                <ul>
+                    <li>Odoo 19</li>
+                    <li>Modules OCA : <code>connector</code>, <code>component</code>, <code>component_event</code>, <code>queue_job</code></li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Donn&eacute;es et confidentialit&eacute;</strong></p>
+                <p>
+                    Le module n'envoie aucune donn&eacute;e de lui-m&ecirc;me ; il r&eacute;pond uniquement aux
+                    requ&ecirc;tes du syst&egrave;me externe connect&eacute; via une cl&eacute; API.
+                </p>
+                <p style="margin-bottom: 4px;"><strong>Documentation</strong></p>
+                <p>
+                    README et r&eacute;f&eacute;rence API compl&egrave;te sur GitHub :
+                    <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo</code>
+                </p>
+            </div>
+            <div class="cas-lang-panel" id="cas-panel-en">
+                <p style="margin-bottom: 4px;"><strong>Key features</strong></p>
+                <ul>
+                    <li>REST API for products, warehouses, suppliers and inventory, addressed by your own external IDs</li>
+                    <li>UOM mapping, lot/serial handling, receipts and dispatches, including tracked products</li>
+                    <li>Initial inventory import staged for human review &mdash; never applied automatically</li>
+                    <li>Self-service API key management, no System Administrator required</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Security</strong></p>
+                <ul>
+                    <li>API keys generated and managed by the business itself, protected by Bearer token</li>
+                    <li>Access restricted to the <strong>Cool Agristock Administrator</strong> / <strong>Cool Agristock API User</strong> groups</li>
+                    <li>Multi-company isolation: one company can never view or revoke another's keys</li>
+                    <li>HTTPS recommended outside local development</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Known limitations</strong></p>
+                <ul>
+                    <li>The external WMS must support the documented API, or use an adapter</li>
+                    <li>No automatic sync: every request is initiated by the WMS</li>
+                    <li>Partial receipt/dispatch processing not supported (exact quantities required)</li>
+                    <li>Pagination not available on list endpoints</li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Requirements</strong></p>
+                <ul>
+                    <li>Odoo 19</li>
+                    <li>OCA modules: <code>connector</code>, <code>component</code>, <code>component_event</code>, <code>queue_job</code></li>
+                </ul>
+                <p style="margin-bottom: 4px;"><strong>Data &amp; privacy</strong></p>
+                <p>
+                    The module sends no data anywhere on its own; it only responds to requests from the
+                    external system an authorized user connects via an API key.
+                </p>
+                <p style="margin-bottom: 4px;"><strong>Documentation</strong></p>
+                <p>
+                    Full README and API reference on GitHub:
+                    <code>github.com/DOINGGOODPROJECTS/cool_agristockodoo</code>
+                </p>
+            </div>
+        </div>
+    </div>
 
     <h2 style="font-size: 20px;">License</h2>
     <p>LGPL-3.0</p>
