@@ -1,68 +1,60 @@
 <section style="max-width: 760px; margin: 0 auto; font-family: -apple-system, Helvetica, Arial, sans-serif; color: #2b2b2b; line-height: 1.5;">
 
     <h1 style="font-size: 28px; margin-bottom: 4px;">Cool Agristock</h1>
-    <p style="font-size: 16px; color: #6a6a6a; margin-top: 0;">
-        Connect Odoo 19 Inventory with Cool Agristock, an open-source warehouse management system for
-        agribusinesses.
+
+    <h3 style="font-size: 16px; margin-bottom: 4px;">Connectez votre WMS agricole &agrave; Odoo Inventory</h3>
+    <p>
+        Cool Agristock est une application gratuite et open source pour Odoo 19 qui permet de
+        connecter des syst&egrave;mes externes de gestion d'entrep&ocirc;t (WMS) compatibles &agrave;
+        Odoo Inventory via une API REST s&eacute;curis&eacute;e. Con&ccedil;ue pour les entreprises
+        agricoles, elle simplifie les op&eacute;rations de gestion des stocks, r&eacute;duit la saisie
+        manuelle et am&eacute;liore la coh&eacute;rence des donn&eacute;es entre les syst&egrave;mes.
+    </p>
+
+    <h3 style="font-size: 16px; margin-bottom: 4px;">Connect Your Agricultural WMS to Odoo Inventory</h3>
+    <p style="color: #6a6a6a;">
+        Cool Agristock is a free, open-source Odoo 19 application that connects compatible external
+        Warehouse Management Systems (WMS) to Odoo Inventory through a secure REST API. Designed for
+        agribusinesses, it simplifies inventory operations, reduces manual data entry, and improves
+        warehouse data consistency.
     </p>
 
     <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
 
-    <h2 style="font-size: 20px;">Who it's for</h2>
-    <p>
-        Agricultural cooperatives, agribusinesses, processors, and input distributors &mdash; built for
-        businesses in Africa and other emerging markets, though nothing restricts it to any
-        particular region &mdash; that already use Odoo 19 and run a compatible
-        external warehouse management system (WMS) they need to keep in sync with Odoo Inventory,
-        instead of re-entering receipts and dispatches by hand in both places.
-    </p>
-
-    <h2 style="font-size: 20px;">What it does</h2>
-    <p>
-        Cool Agristock is a free, open-source Odoo 19 application that enables businesses to
-        connect compatible external Warehouse Management Systems (WMS) to Odoo Inventory through a
-        secure REST API. It exposes that API so the WMS can read and write product, warehouse, and
-        supplier data; configure unit-of-measure mappings; create and resolve lots and serial
-        numbers; stage initial inventory counts for human review; and create and validate incoming
-        receipts and outgoing dispatches &mdash; including lot/serial-tracked products &mdash;
-        without a human re-keying anything into Odoo. Cool Agristock remains a standalone application;
-        this module is the bridge between the two systems.
-    </p>
-    <p>
-        Initial stock counts from your WMS are staged in Odoo for review, not applied
-        automatically. An Inventory Manager compares the WMS's count against Odoo's own records
-        and decides what to do &mdash; applying an approved count to actual stock is a separate,
-        manual action in Odoo's native Inventory Adjustment screen. This keeps a human in the loop
-        for every change to your real inventory levels.
-    </p>
-    <p>
-        Businesses generate and manage their own API keys directly inside the application &mdash;
-        creating, naming, revoking, and replacing them without needing Cool Agristock's developers or an
-        external administrator. Each key can be given an expiration date or left to remain valid
-        until manually revoked. Using the generated credentials and the documented REST API,
-        businesses with a compatible WMS can configure their own integration independently; a WMS
-        that isn't natively compatible with this API may require custom integration services (see
-        below).
-    </p>
-
-    <h2 style="font-size: 20px;">Optional professional services (paid)</h2>
-    <p>
-        Cool Agristock itself is, and remains, free and open-source. For businesses that want
-        help going further, the team behind Cool Agristock separately offers
-        optional paid services:
-    </p>
+    <h2 style="font-size: 20px;">&Agrave; qui s'adresse cette solution&nbsp;?</h2>
     <ul>
-        <li>Custom WMS integration for systems not natively compatible with this API</li>
-        <li>Installation and configuration</li>
-        <li>Development of WMS adapters</li>
-        <li>Technical support and maintenance</li>
-        <li>Custom development</li>
+        <li>Coop&eacute;ratives agricoles</li>
+        <li>Entreprises agroalimentaires et transformateurs</li>
+        <li>Exploitants d'entrep&ocirc;ts et d'installations de stockage</li>
+        <li>Distributeurs d'intrants agricoles</li>
+        <li>Toute organisation g&eacute;rant des stocks agricoles</li>
     </ul>
     <p>
-        Contact: <a href="mailto:team@agricarecentres.com">team@agricarecentres.com</a>
+        Particuli&egrave;rement adapt&eacute;e aux entreprises qui utilisent d&eacute;j&agrave; Odoo 19
+        avec un syst&egrave;me externe de gestion d'entrep&ocirc;t (WMS) et souhaitent synchroniser les
+        informations sur les produits, les r&eacute;ceptions, les exp&eacute;ditions et les
+        op&eacute;rations de stockage, sans multiplier les saisies manuelles. Bien que d&eacute;velopp&eacute;e
+        en tenant compte des besoins des entreprises agricoles en Afrique et dans d'autres march&eacute;s
+        &eacute;mergents, cette solution peut &ecirc;tre utilis&eacute;e par des entreprises compatibles
+        partout dans le monde.
     </p>
 
-    <h2 style="font-size: 20px;">Screenshots</h2>
+    <h2 style="font-size: 20px;">Who Is It For?</h2>
+    <ul>
+        <li>Agricultural cooperatives</li>
+        <li>Agribusinesses and food processors</li>
+        <li>Warehouse and storage facility operators</li>
+        <li>Agricultural input distributors</li>
+        <li>Any organization managing agricultural inventory</li>
+    </ul>
+    <p>
+        Particularly suited to organizations that already use Odoo 19 alongside an external Warehouse
+        Management System (WMS) and need to keep product information, stock receipts, dispatches, and
+        warehouse records consistent across both platforms without duplicating manual work. While
+        developed with the operational needs of agribusinesses in Africa and other emerging markets in
+        mind, Cool Agristock can be used by compatible businesses worldwide.
+    </p>
+
     <p>
         <img src="screenshot_apps_listing.png" alt="Cool Agristock listed in Odoo's Apps screen"
              style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 6px;"/>
@@ -70,14 +62,58 @@
     <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
         Cool Agristock listed in Odoo's Apps screen.
     </p>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Fonctionnalit&eacute;s principales</h2>
+    <ul>
+        <li>&Eacute;change de donn&eacute;es sur les produits, les entrep&ocirc;ts et les fournisseurs</li>
+        <li>Correspondance des unit&eacute;s de mesure</li>
+        <li>Tra&ccedil;abilit&eacute; par lots et num&eacute;ros de s&eacute;rie</li>
+        <li>Traitement automatis&eacute; des r&eacute;ceptions et des exp&eacute;ditions de marchandises</li>
+        <li>Inventaires initiaux soumis &agrave; la v&eacute;rification d'un responsable &mdash; les
+            ajustements r&eacute;els des stocks restent manuels, via la fonctionnalit&eacute; native
+            d'ajustement des stocks d'Odoo</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Key Features</h2>
+    <ul>
+        <li>Product, warehouse, and supplier data exchange</li>
+        <li>Unit-of-measure mapping</li>
+        <li>Lot and serial number tracking</li>
+        <li>Automated processing of incoming stock receipts and outgoing dispatches</li>
+        <li>Initial inventory counts from external systems staged for manager review &mdash; actual
+            stock adjustments are always applied manually, through Odoo's native Inventory
+            Adjustment functionality</li>
+    </ul>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">API REST s&eacute;curis&eacute;e et gestion des cl&eacute;s API</h2>
+    <ul>
+        <li>API REST s&eacute;curis&eacute;e et document&eacute;e pour l'&eacute;change des donn&eacute;es
+            d'entrep&ocirc;t et de stock</li>
+        <li>G&eacute;n&eacute;ration, nommage, r&eacute;vocation et remplacement des cl&eacute;s API
+            directement depuis l'application</li>
+        <li>Param&egrave;tres d'expiration flexibles pour une gestion s&eacute;curis&eacute;e et
+            autonome des acc&egrave;s</li>
+    </ul>
+
+    <h2 style="font-size: 20px;">Secure REST API &amp; API Key Management</h2>
+    <ul>
+        <li>Secure, documented REST API for seamless warehouse and inventory data exchange</li>
+        <li>Generate, name, revoke, and replace API keys directly within the application</li>
+        <li>Flexible expiration settings for secure and independent access management</li>
+    </ul>
+
     <p>
         <img src="screenshot_api_management.png" alt="Cool Agristock API Management screen listing a self-service API key"
              style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 6px;"/>
     </p>
     <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
-        The API Management screen, where an authorized business user generates, views, and
-        revokes their own API keys. The key's secret value is shown only once, at the moment it
-        is generated, and is never displayed again afterward.
+        The API Management screen, where an authorized business user generates, views, and revokes
+        their own API keys. The key's secret value is shown only once, at the moment it is generated,
+        and is never displayed again afterward.
     </p>
     <p>
         <img src="screenshot_api_health.png" alt="Cool Agristock REST API health check response"
@@ -85,6 +121,75 @@
     </p>
     <p style="font-size: 13px; color: #6a6a6a; margin-top: -8px;">
         The REST API's health check endpoint, confirmed live and responding.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Pr&eacute;requis techniques</h2>
+    <ul>
+        <li>Un serveur Odoo 19 existant avec l'application Inventaire install&eacute;e</li>
+        <li>Un acc&egrave;s administrateur pour la configuration</li>
+        <li>Un syst&egrave;me externe de gestion d'entrep&ocirc;t (WMS) compatible, capable de
+            communiquer via l'API REST</li>
+        <li>Modules OCA : <code>connector</code>, <code>component</code>, <code>component_event</code>,
+            <code>queue_job</code></li>
+    </ul>
+
+    <h2 style="font-size: 20px;">System Requirements</h2>
+    <ul>
+        <li>An existing Odoo 19 server with the Inventory application installed</li>
+        <li>Administrator access for configuration</li>
+        <li>A compatible external WMS capable of communicating through the REST API</li>
+        <li>OCA modules: <code>connector</code>, <code>component</code>, <code>component_event</code>,
+            <code>queue_job</code></li>
+    </ul>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Services professionnels optionnels</h2>
+    <p>Cool Agristock est gratuit. Des services professionnels payants sont propos&eacute;s en option :</p>
+    <ul>
+        <li>Int&eacute;gration de WMS personnalis&eacute;s</li>
+        <li>Installation et configuration</li>
+        <li>D&eacute;veloppement d'adaptateurs</li>
+        <li>D&eacute;ploiement de serveurs Odoo</li>
+        <li>Assistance technique et maintenance</li>
+        <li>D&eacute;veloppement sur mesure</li>
+        <li>H&eacute;bergement g&eacute;r&eacute;</li>
+    </ul>
+    <p>Ces services sont enti&egrave;rement facultatifs.</p>
+
+    <h2 style="font-size: 20px;">Optional Professional Services</h2>
+    <p>Cool Agristock is free. Optional paid services include:</p>
+    <ul>
+        <li>Custom WMS integration</li>
+        <li>Installation and configuration</li>
+        <li>Adapter development</li>
+        <li>Odoo server deployment</li>
+        <li>Technical support and maintenance</li>
+        <li>Custom development</li>
+        <li>Managed hosting</li>
+    </ul>
+    <p>These services are entirely optional.</p>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Pourquoi choisir Cool Agristock&nbsp;?</h2>
+    <p>
+        Cool Agristock r&eacute;duit les doubles saisies, am&eacute;liore la coh&eacute;rence des
+        stocks, renforce la tra&ccedil;abilit&eacute; des produits et simplifie les op&eacute;rations
+        d'entrep&ocirc;t tout en maintenant un contr&ocirc;le humain sur les ajustements de stock. Son
+        architecture open source permet aux entreprises d'int&eacute;grer leurs syst&egrave;mes
+        compatibles de mani&egrave;re autonome, sans frais de licence ni obligation de souscrire &agrave;
+        des services professionnels.
+    </p>
+
+    <h2 style="font-size: 20px;">Why Choose Cool Agristock?</h2>
+    <p>
+        Cool Agristock reduces duplicate data entry, improves inventory consistency, strengthens
+        product traceability, and simplifies warehouse operations while maintaining human oversight of
+        stock adjustments. Its open-source architecture enables businesses to integrate compatible
+        systems independently without mandatory licensing or professional service fees.
     </p>
 
     <h2 style="font-size: 20px;">How it fits together</h2>
@@ -104,6 +209,23 @@
         <div style="text-align: center; font-size: 20px; color: #875A7B; line-height: 1;">&#9660;</div>
         <div style="background: #f6f6f6; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 16px; text-align: center; font-weight: bold;">Odoo 19 Inventory</div>
     </div>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;"/>
+
+    <h2 style="font-size: 20px;">Contact et assistance</h2>
+    <p>
+        Pour toute demande d'installation, d'int&eacute;gration personnalis&eacute;e, d'assistance
+        technique ou de services professionnels, contactez-nous &agrave; l'adresse suivante :
+    </p>
+
+    <h2 style="font-size: 20px;">Contact &amp; Support</h2>
+    <p>
+        For installation, custom integration, technical support, or professional services, contact us
+        at:
+    </p>
+    <p>
+        <strong>Email:</strong> <a href="mailto:team@agricarecentres.com">team@agricarecentres.com</a>
+    </p>
 
     <h2 style="font-size: 20px;">License</h2>
     <p>LGPL-3.0</p>
