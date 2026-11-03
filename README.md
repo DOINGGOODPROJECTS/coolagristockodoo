@@ -66,7 +66,7 @@ integration is initiated by the external system.
 - Businesses already using Odoo 19
 - Businesses with existing external WMS software
 
-The project originated for agribusinesses operating in Côte d'Ivoire and other African markets,
+The project originated for agribusinesses operating in Africa and other emerging markets,
 but nothing in the module restricts it to any particular country or region.
 
 ## Key features
