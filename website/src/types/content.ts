@@ -60,6 +60,11 @@ export interface Dictionary {
       diagram: { wms: string; api: string; connector: string; odoo: string };
       initiatedNote: string;
     };
+    video: {
+      title: string;
+      description: string;
+      youtubeId: string;
+    };
     features: {
       title: string;
       items: string[];

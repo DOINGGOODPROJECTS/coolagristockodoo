@@ -19,7 +19,7 @@ export function HomeView({ lang, dict }: { lang: Lang; dict: Dictionary }) {
           <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">{d.hero.subheadline}</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="https://apps.odoo.com/apps/modules/19.0/agriware_connector"
+              href="https://apps.odoo.com/apps/modules/19.0/cool_agristock"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full rounded-md bg-brand-600 px-6 py-3 text-base font-semibold text-white hover:bg-brand-700 sm:w-auto"
@@ -33,6 +33,21 @@ export function HomeView({ lang, dict }: { lang: Lang; dict: Dictionary }) {
               {d.hero.requestCta}
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* SECTION 1b: Video */}
+      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
+        <h2 className="text-center text-2xl font-bold text-gray-900">{d.video.title}</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">{d.video.description}</p>
+        <div className="mx-auto mt-8 aspect-video max-w-3xl overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+          <iframe
+            className="h-full w-full"
+            src={`https://www.youtube-nocookie.com/embed/${d.video.youtubeId}`}
+            title={d.video.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
         </div>
       </section>
 
@@ -135,7 +150,7 @@ export function HomeView({ lang, dict }: { lang: Lang; dict: Dictionary }) {
           <p className="mx-auto mt-3 max-w-xl text-brand-50">{d.cta.description}</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="https://apps.odoo.com/apps/modules/19.0/agriware_connector"
+              href="https://apps.odoo.com/apps/modules/19.0/cool_agristock"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full rounded-md bg-white px-6 py-3 text-base font-semibold text-brand-800 hover:bg-brand-50 sm:w-auto"

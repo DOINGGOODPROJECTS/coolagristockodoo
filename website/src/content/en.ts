@@ -76,6 +76,11 @@ export const en: Dictionary = {
       initiatedNote:
         "Every request is initiated by the external WMS. Cool Agristock never calls out to your WMS — there is no scheduled or automatic synchronization.",
     },
+    video: {
+      title: "See It In Action",
+      description: "A 1-minute walkthrough of how Cool Agristock connects your WMS to Odoo 19 Inventory.",
+      youtubeId: "M2m_Fh4nFWI",
+    },
     features: {
       title: "Key Features",
       items: [
