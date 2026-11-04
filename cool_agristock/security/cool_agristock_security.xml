@@ -52,6 +52,18 @@
 
     </record>
 
+    <!-- Every System Administrator automatically gets Cool Agristock
+         Administrator access too, so the Integrations & Configuration
+         menu and API Management are visible right after install without
+         a separate manual group assignment. Business users who are not
+         System Administrators can still be granted
+         group_cool_agristock_administrator individually, without needing
+         full System Administrator rights. -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids"
+               eval="[(4, ref('cool_agristock.group_cool_agristock_administrator'))]"/>
+    </record>
+
     <!-- Each company only ever sees and manages its own API keys. -->
     <record id="rule_cool_agristock_api_key_company" model="ir.rule">
         <field name="name">Cool Agristock API Key: multi-company</field>
