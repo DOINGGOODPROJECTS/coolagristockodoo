@@ -65,7 +65,7 @@ export function Header({ lang, dict }: { lang: Lang; dict: Dictionary }) {
             {dict.nav.switchLabel}
           </Link>
           <a
-            href="https://apps.odoo.com/apps/modules/19.0/agriware_connector"
+            href="https://apps.odoo.com/apps/modules/19.0/cool_agristock"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
@@ -113,7 +113,7 @@ export function Header({ lang, dict }: { lang: Lang; dict: Dictionary }) {
               {dict.nav.switchLabel}
             </Link>
             <a
-              href="https://apps.odoo.com/apps/modules/19.0/agriware_connector"
+              href="https://apps.odoo.com/apps/modules/19.0/cool_agristock"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 rounded-md bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white"

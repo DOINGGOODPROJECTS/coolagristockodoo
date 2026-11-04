@@ -76,6 +76,11 @@ export const fr: Dictionary = {
       initiatedNote:
         "Chaque requête est initiée par le WMS externe. Cool Agristock n'appelle jamais votre WMS — il n'y a aucune synchronisation automatique ou planifiée.",
     },
+    video: {
+      title: "Voir en action",
+      description: "Une présentation d'une minute de la connexion entre votre WMS et Odoo 19 Inventaire via Cool Agristock.",
+      youtubeId: "_v4UA-694Xg",
+    },
     features: {
       title: "Fonctionnalités clés",
       items: [
