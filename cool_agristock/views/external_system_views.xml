@@ -30,6 +30,9 @@
                         confirm="Disable this connection? Its API keys stay valid, but the connection will show as Inactive until re-enabled."/>
                 <button name="action_activate" type="object"
                         string="Enable" icon="fa-check" invisible="active"/>
+                <button name="action_delete_connection" type="object"
+                        string="Delete" icon="fa-trash"
+                        confirm="Permanently delete this connection? Its API key(s) will be revoked immediately. This only works if nothing has synchronized through it yet -- otherwise, use Disable instead to keep its history."/>
             </list>
         </field>
     </record>
@@ -68,6 +71,9 @@
                             confirm="Disable this connection? Its API keys stay valid, but the connection will show as Inactive until re-enabled."/>
                     <button name="action_activate" type="object"
                             string="Enable" invisible="active"/>
+                    <button name="action_delete_connection" type="object"
+                            string="Delete"
+                            confirm="Permanently delete this connection? Its API key(s) will be revoked immediately. This only works if nothing has synchronized through it yet -- otherwise, use Disable instead to keep its history."/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Inactive" bg_color="text-bg-danger" invisible="active"/>

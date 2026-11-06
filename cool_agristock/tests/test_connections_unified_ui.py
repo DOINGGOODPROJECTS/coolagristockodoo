@@ -203,6 +203,109 @@ class TestConnectionTestAction(TransactionCase):
 
 
 @tagged("-at_install", "post_install")
+class TestConnectionDeletion(TransactionCase):
+    """Permanent delete, distinct from Disable (action_deactivate). Only
+    ever allowed when nothing real is linked to the connection yet --
+    otherwise the real audit trail (mappings, transactions, imports)
+    would be silently orphaned against their own ondelete='restrict'
+    intent."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        admin_group = cls.env.ref("cool_agristock.group_cool_agristock_administrator")
+        cls.admin_user = cls.env["res.users"].create({
+            "name": "Deletion Test Admin",
+            "login": "cool_agristock_deletion_test_admin",
+            "group_ids": [(6, 0, [cls.env.ref("base.group_user").id, admin_group.id])],
+            "company_ids": [(6, 0, [cls.env.company.id])],
+            "company_id": cls.env.company.id,
+        })
+        cls.plain_user = cls.env["res.users"].create({
+            "name": "Deletion Test Plain User",
+            "login": "cool_agristock_deletion_test_plain_user",
+            "group_ids": [(6, 0, [cls.env.ref("base.group_user").id])],
+        })
+
+    def test_delete_connection_with_no_history_succeeds(self):
+        connection = self.env["cool_agristock.external.system"].create({
+            "name": "Unused Connection", "code": "unused_connection",
+        })
+        connection_id = connection.id
+
+        result = connection.with_user(self.admin_user).action_delete_connection()
+
+        self.assertEqual(result["type"], "ir.actions.act_window_close")
+        self.assertFalse(
+            self.env["cool_agristock.external.system"].sudo().search(
+                [("id", "=", connection_id)]
+            )
+        )
+
+    def test_delete_connection_revokes_its_api_keys_first(self):
+        connection = self.env["cool_agristock.external.system"].create({
+            "name": "Connection With Key", "code": "connection_with_key",
+        })
+        _raw, key = self.env["cool_agristock.api.key"].with_user(
+            self.admin_user
+        ).generate_key(name="key", company=self.env.company, external_system=connection)
+
+        connection.with_user(self.admin_user).action_delete_connection()
+
+        self.assertEqual(key.state, "revoked")
+
+    def test_delete_blocked_when_mappings_exist(self):
+        connection = self.env["cool_agristock.external.system"].create({
+            "name": "Connection With Mapping", "code": "connection_with_mapping",
+        })
+        product = self.env["product.product"].create({"name": "Mapped Product"})
+        self.env["cool_agristock.external.id.mapping"].sudo().create_mapping(
+            self.env.company, connection, "product.product", "EXT-1", product.id,
+        )
+
+        with self.assertRaises(UserError):
+            connection.with_user(self.admin_user).action_delete_connection()
+
+        self.assertTrue(
+            self.env["cool_agristock.external.system"].sudo().search(
+                [("id", "=", connection.id)]
+            )
+        )
+
+    def test_delete_blocked_when_transaction_history_exists(self):
+        connection = self.env["cool_agristock.external.system"].create({
+            "name": "Connection With Transaction", "code": "connection_with_transaction",
+        })
+        warehouse = self.env["stock.warehouse"].search(
+            [("company_id", "=", self.env.company.id)], limit=1,
+        )
+        picking_type = warehouse.in_type_id
+        picking = self.env["stock.picking"].create({
+            "picking_type_id": picking_type.id,
+            "location_id": picking_type.default_location_src_id.id,
+            "location_dest_id": picking_type.default_location_dest_id.id,
+        })
+        self.env["cool_agristock.wms.transaction"].sudo().create({
+            "company_id": self.env.company.id,
+            "external_system_id": connection.id,
+            "picking_id": picking.id,
+            "transaction_type": "receipt",
+            "external_reference": "WMS-DEL-TEST",
+            "request_hash": "hash-del-test",
+        })
+
+        with self.assertRaises(UserError):
+            connection.with_user(self.admin_user).action_delete_connection()
+
+    def test_delete_requires_admin(self):
+        connection = self.env["cool_agristock.external.system"].create({
+            "name": "Unauthorized Delete Attempt", "code": "unauthorized_delete_attempt",
+        })
+        with self.assertRaises(AccessError):
+            connection.with_user(self.plain_user).action_delete_connection()
+
+
+@tagged("-at_install", "post_install")
 class TestApiActivityLog(CoolAgristockApiCommon):
     """Confirms activity is actually recorded.
 

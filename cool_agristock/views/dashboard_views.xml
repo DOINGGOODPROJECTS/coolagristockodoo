@@ -9,29 +9,65 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>Cool Agristock Overview</h1>
-                        <p>Live counts for the active companies. The API is inbound: connected WMS clients call Odoo.</p>
+                        <p class="text-muted">
+                            The API is inbound: connected WMS clients call Odoo. Every number
+                            below is clickable and opens the real records behind it.
+                        </p>
                     </div>
-                    <group string="API Configuration" col="4">
-                        <field name="active_system_count" string="Registered Active WMS Systems"/>
-                        <field name="active_api_key_count" string="Active API Keys"/>
-                    </group>
-                    <group string="WMS Transaction Activity" col="4">
-                        <field name="receipt_count" string="Receipts Created"/>
-                        <field name="dispatch_count" string="Dispatches Created"/>
-                        <field name="completed_transaction_count" string="Completed Operations"/>
-                        <field name="cancelled_transaction_count" string="Cancelled Operations"/>
-                        <field name="last_transaction_at" string="Latest Transaction"/>
-                    </group>
-                    <group string="Inventory Review" col="2">
-                        <field name="pending_import_count" string="Counts Awaiting Review"/>
-                        <field name="rejected_import_count" string="Rejected Counts"/>
-                        <field name="mapping_count" string="Catalog Records Linked to WMS"/>
-                    </group>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_connections" type="object" class="oe_stat_button" icon="fa-link">
+                            <field name="active_system_count" widget="statinfo" string="Active WMS Systems"/>
+                        </button>
+                        <button name="action_open_connections" type="object" class="oe_stat_button" icon="fa-key">
+                            <field name="active_api_key_count" widget="statinfo" string="Active API Keys"/>
+                        </button>
+                        <button name="action_open_receipts" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="receipt_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                        <button name="action_open_dispatches" type="object" class="oe_stat_button" icon="fa-send">
+                            <field name="dispatch_count" widget="statinfo" string="Dispatches"/>
+                        </button>
+                        <button name="action_open_completed_transactions" type="object" class="oe_stat_button"
+                                icon="fa-check-circle" groups="cool_agristock.group_cool_agristock_administrator">
+                            <field name="completed_transaction_count" widget="statinfo" string="Completed Operations"/>
+                        </button>
+                        <button name="action_open_cancelled_transactions" type="object" class="oe_stat_button"
+                                icon="fa-ban" groups="cool_agristock.group_cool_agristock_administrator">
+                            <field name="cancelled_transaction_count" widget="statinfo" string="Cancelled Operations"/>
+                        </button>
+                        <button name="action_open_pending_imports" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="pending_import_count" widget="statinfo" string="Counts Awaiting Review"/>
+                        </button>
+                        <button name="action_open_rejected_imports" type="object" class="oe_stat_button" icon="fa-times-circle">
+                            <field name="rejected_import_count" widget="statinfo" string="Rejected Counts"/>
+                        </button>
+                        <button name="action_open_mappings" type="object" class="oe_stat_button"
+                                icon="fa-sitemap" groups="cool_agristock.group_cool_agristock_administrator">
+                            <field name="mapping_count" widget="statinfo" string="Catalog Records Linked to WMS"/>
+                        </button>
+                    </div>
+
+                    <div class="o_horizontal_separator">Charts</div>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <button name="action_open_activity_chart" type="object"
+                                class="btn btn-outline-primary d-flex align-items-center gap-2"
+                                groups="cool_agristock.group_cool_agristock_administrator">
+                            <i class="fa fa-bar-chart"/> Receipt &amp; Dispatch Activity Over Time
+                        </button>
+                        <button name="action_open_category_chart" type="object"
+                                class="btn btn-outline-primary d-flex align-items-center gap-2">
+                            <i class="fa fa-pie-chart"/> Products by Category
+                        </button>
+                    </div>
+
                     <div class="alert alert-info" role="alert">
-                        API request failures are returned to the WMS client and are not stored as synchronization error records.
-                        Transaction counts above come from real Odoo picking records linked to WMS references.
+                        Active keys indicate configured API access, not a live connection test --
+                        WMS clients initiate requests, and activity only shows once one actually
+                        has. API request failures are returned to the client directly and are
+                        not stored as separate error records.
                     </div>
-                    <p>Active keys indicate configured API access, not a live connection test. WMS clients initiate requests; no heartbeat is tracked.</p>
+
                     <group string="Recent Completed Operations" groups="cool_agristock.group_cool_agristock_administrator">
                         <field name="recent_transaction_ids" nolabel="1">
                             <list create="0" edit="0" delete="0">
@@ -43,16 +79,16 @@
                             </list>
                         </field>
                     </group>
-                    <group string="Quick Access" col="4">
-                        <button name="action_open_products" type="object" string="Products" class="btn-primary"/>
-                        <button name="action_open_inventory" type="object" string="Inventory Overview"/>
-                        <button name="action_open_warehouses" type="object" string="Warehouses"/>
-                        <button name="action_open_lots" type="object" string="Lots &amp; Serial Numbers"/>
-                        <button name="action_open_receipts" type="object" string="Goods Received"/>
-                        <button name="action_open_dispatches" type="object" string="Dispatches &amp; Deliveries"/>
-                        <button name="action_open_suppliers" type="object" string="Supplier Records"/>
-                        <button name="action_open_inventory_imports" type="object" string="Inventory Imports"/>
-                    </group>
+
+                    <div class="o_horizontal_separator">Quick Access</div>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <button name="action_open_products" type="object" string="Products" class="btn btn-primary"/>
+                        <button name="action_open_inventory" type="object" string="Inventory Overview" class="btn btn-secondary"/>
+                        <button name="action_open_warehouses" type="object" string="Warehouses" class="btn btn-secondary"/>
+                        <button name="action_open_lots" type="object" string="Lots &amp; Serial Numbers" class="btn btn-secondary"/>
+                        <button name="action_open_suppliers" type="object" string="Supplier Records" class="btn btn-secondary"/>
+                        <button name="action_open_inventory_imports" type="object" string="Inventory Imports" class="btn btn-secondary"/>
+                    </div>
                 </sheet>
             </form>
         </field>
@@ -64,6 +100,43 @@
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_cool_agristock_dashboard_form"/>
         <field name="target">current</field>
+    </record>
+
+    <!-- Real, interactive native charts: not custom widgets. A plain
+         Odoo graph view, fully drag/zoom/group-by/measure-switchable. -->
+    <record id="view_cool_agristock_wms_transaction_activity_graph" model="ir.ui.view">
+        <field name="name">cool_agristock.wms.transaction.activity.graph</field>
+        <field name="model">cool_agristock.wms.transaction</field>
+        <field name="arch" type="xml">
+            <graph string="Receipt &amp; Dispatch Activity" type="bar" stacked="True">
+                <field name="create_date" type="row" interval="week"/>
+                <field name="transaction_type" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_activity_chart" model="ir.actions.act_window">
+        <field name="name">Receipt &amp; Dispatch Activity</field>
+        <field name="res_model">cool_agristock.wms.transaction</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="view_cool_agristock_wms_transaction_activity_graph"/>
+    </record>
+
+    <record id="view_cool_agristock_product_category_graph" model="ir.ui.view">
+        <field name="name">cool_agristock.product.template.category.graph</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <graph string="Products by Category" type="pie">
+                <field name="categ_id" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_category_chart" model="ir.actions.act_window">
+        <field name="name">Products by Category</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="view_cool_agristock_product_category_graph"/>
     </record>
 
     <record id="view_cool_agristock_wms_transaction_list" model="ir.ui.view">
