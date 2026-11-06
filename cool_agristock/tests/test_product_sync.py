@@ -228,6 +228,74 @@ class TestCoolAgristockProductSync(CoolAgristockApiCommon):
         ])
         self.assertFalse(quants)
 
+    # -- Product categories ----------------------------------------------------
+    # Whatever category name the external WMS sends on sync becomes a real
+    # product.category -- get-or-create by exact name, never a fabricated
+    # or mapped taxonomy. This is what lets a non-developer later browse
+    # "Product Categories" and see genuine post-sync groupings.
+
+    def test_create_product_with_new_category_creates_category(self):
+        response = self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-NEW", "name": "Categorized Product",
+            "category": "Fertilizers",
+        })
+        self.assertEqual(response.status_code, 201)
+        body = self._body(response)
+        self.assertEqual(body["category"], "Fertilizers")
+        product = self.env["product.product"].sudo().browse(body["product_id"])
+        self.assertEqual(product.categ_id.name, "Fertilizers")
+
+    def test_create_product_with_existing_category_reuses_it(self):
+        category = self.env["product.category"].sudo().create({"name": "Seeds"})
+
+        response = self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-REUSE", "name": "Seed Product",
+            "category": "Seeds",
+        })
+        body = self._body(response)
+        product = self.env["product.product"].sudo().browse(body["product_id"])
+        self.assertEqual(product.categ_id, category)
+
+    def test_create_product_without_category_leaves_it_unset(self):
+        response = self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-NONE", "name": "No Category Product",
+        })
+        body = self._body(response)
+        self.assertIsNone(body["category"])
+
+    def test_create_product_blank_category_rejected(self):
+        response = self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-BLANK", "name": "Blank Category",
+            "category": "   ",
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_product_category(self):
+        create_response = self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-UPDATE", "name": "Recategorize Me",
+            "category": "Fertilizers",
+        })
+        product_id = self._body(create_response)["product_id"]
+
+        update_response = self._patch(
+            self.bound_raw_key, "AGRI-CATEG-UPDATE", {"category": "Pesticides"},
+        )
+        self.assertEqual(update_response.status_code, 200)
+        self.assertEqual(self._body(update_response)["category"], "Pesticides")
+
+        product = self.env["product.product"].sudo().browse(product_id)
+        self.assertEqual(product.categ_id.name, "Pesticides")
+
+    def test_update_product_blank_category_rejected(self):
+        self._post(self.bound_raw_key, {
+            "external_id": "AGRI-CATEG-UPDATE-BLANK", "name": "Keep Category",
+            "category": "Fertilizers",
+        })
+        response = self._patch(
+            self.bound_raw_key, "AGRI-CATEG-UPDATE-BLANK", {"category": ""},
+        )
+        self.assertEqual(response.status_code, 400)
+
     # -- Product updates ------------------------------------------------------
 
     def test_update_product(self):

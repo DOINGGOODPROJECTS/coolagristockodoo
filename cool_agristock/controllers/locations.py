@@ -8,6 +8,7 @@ from odoo.http import Response, request
 from .api_security import (
     require_cool_agristock_api_user,
     resolve_authorized_external_system,
+    log_api_activity,
 )
 
 _logger = logging.getLogger(__name__)
@@ -50,6 +51,7 @@ class CoolAgristockLocationsAPI(http.Controller):
         type="http", auth="bearer", methods=["GET"],
         csrf=False, readonly=True, save_session=False,
     )
+    @log_api_activity
     def get_locations(self, **kwargs):
         _, error = self._authenticate()
         if error:
@@ -97,6 +99,7 @@ class CoolAgristockLocationsAPI(http.Controller):
         type="http", auth="bearer", methods=["POST"],
         csrf=False, save_session=False,
     )
+    @log_api_activity
     def create_location(self, **kwargs):
         system, error = self._authenticate(write=True)
         if error:
@@ -229,6 +232,7 @@ class CoolAgristockLocationsAPI(http.Controller):
         type="http", auth="bearer", methods=["PATCH"],
         csrf=False, save_session=False,
     )
+    @log_api_activity
     def update_location(self, external_id, **kwargs):
         system, error = self._authenticate(write=True)
         if error:

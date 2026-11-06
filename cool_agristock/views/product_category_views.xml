@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Shows how many products landed in each category: the same
+         native product.category.product_count field Odoo already
+         computes, just surfaced here so a non-developer browsing
+         "Product Categories" can immediately see which categories are
+         actually populated (e.g. after a WMS sync), without opening
+         each one. -->
+    <record id="view_cool_agristock_product_category_list" model="ir.ui.view">
+        <field name="name">cool_agristock.product.category.list</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_list_view"/>
+        <field name="arch" type="xml">
+            <field name="display_name" position="after">
+                <field name="product_count" string="Products"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

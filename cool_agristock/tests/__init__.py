@@ -18,3 +18,4 @@ from . import test_uom_mapping
 from . import test_inventory_import
 from . import test_lot_sync
 from . import test_transaction_sync
+from . import test_connections_unified_ui

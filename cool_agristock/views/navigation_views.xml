@@ -46,6 +46,18 @@
               action="stock.action_product_production_lot_form"
               sequence="30"
               groups="stock.group_stock_user"/>
+    <!-- Lets a non-developer browse products grouped the same way the
+         external WMS grouped them: cool_agristock's product sync
+         (controllers/products.py) resolves each synced product's
+         "category" field to this same product.category model, so this
+         view reflects real post-sync categories, never a fabricated
+         taxonomy. -->
+    <menuitem id="menu_cool_agristock_product_categories"
+              name="Product Categories"
+              parent="menu_cool_agristock_products_inventory_root"
+              action="product.product_category_action_form"
+              sequence="35"
+              groups="stock.group_stock_user"/>
 
     <menuitem id="menu_cool_agristock_warehouses"
               name="Warehouses"
@@ -103,16 +115,21 @@
               sequence="40"
               groups="cool_agristock.group_cool_agristock_administrator"/>
 
+    <!-- API Management (API Keys / Generate API Key) and the standalone
+         "Connected WMS Systems" entry are both retired as separate
+         navigation items: their functionality is consolidated into the
+         unified Connections screen (see external_system_views.xml),
+         reachable from a connection's smart buttons. The underlying
+         actions/views/models are untouched; only these menu links are
+         deactivated, keeping the XML IDs for upgrade compatibility. -->
     <record id="menu_cool_agristock_api_management" model="ir.ui.menu">
-        <field name="parent_id" ref="menu_cool_agristock_configuration_root"/>
+        <field name="active" eval="False"/>
     </record>
-    <!-- Keep the old category XML ID for upgrades, but remove its redundant level. -->
     <record id="menu_cool_agristock_external_systems_root" model="ir.ui.menu">
         <field name="active" eval="False"/>
     </record>
     <record id="menu_cool_agristock_external_systems" model="ir.ui.menu">
-        <field name="name">Connected WMS Systems</field>
-        <field name="parent_id" ref="menu_cool_agristock_integrations_root"/>
+        <field name="active" eval="False"/>
     </record>
     <record id="menu_cool_agristock_root" model="ir.ui.menu">
         <field name="web_icon">cool_agristock,static/description/icon.png</field>

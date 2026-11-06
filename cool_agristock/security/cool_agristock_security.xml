@@ -112,4 +112,11 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
+    <!-- Each company only ever sees its own API activity log entries. -->
+    <record id="rule_cool_agristock_api_activity_log_company" model="ir.rule">
+        <field name="name">Cool Agristock API Activity Log: multi-company</field>
+        <field name="model_id" ref="model_cool_agristock_api_activity_log"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
 </odoo>
