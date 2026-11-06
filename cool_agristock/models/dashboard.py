@@ -101,3 +101,41 @@ class CoolAgristockDashboard(models.TransientModel):
 
     def action_open_inventory_imports(self):
         return self._open_action("cool_agristock.action_cool_agristock_inventory_imports")
+
+    def action_open_pending_imports(self):
+        action = self._open_action("cool_agristock.action_cool_agristock_inventory_imports")
+        action["domain"] = [("state", "in", ("pending_review", "stale"))]
+        return action
+
+    def action_open_rejected_imports(self):
+        action = self._open_action("cool_agristock.action_cool_agristock_inventory_imports")
+        action["domain"] = [("state", "=", "rejected")]
+        return action
+
+    def action_open_connections(self):
+        return self._open_action("cool_agristock.action_cool_agristock_external_systems")
+
+    def action_open_mappings(self):
+        return self._open_action("cool_agristock.action_cool_agristock_external_id_mappings")
+
+    def action_open_completed_transactions(self):
+        action = self._open_action("cool_agristock.action_cool_agristock_wms_transactions")
+        action["domain"] = [("picking_id.state", "=", "done")]
+        return action
+
+    def action_open_cancelled_transactions(self):
+        return self._open_action("cool_agristock.action_cool_agristock_cancelled_transactions")
+
+    def action_open_activity_chart(self):
+        """A real, interactive native chart: receipts vs. dispatches over
+        time, from cool_agristock.wms.transaction -- the same company-
+        scoped, picking-backed records the rest of this dashboard counts.
+        Not a custom widget: Odoo's own graph view, fully drag/zoom/
+        group-by/measure-switchable out of the box."""
+        return self._open_action("cool_agristock.action_cool_agristock_activity_chart")
+
+    def action_open_category_chart(self):
+        """Real post-sync category distribution: product.template grouped
+        by categ_id, the same categories cool_agristock's product sync
+        get-or-creates from whatever the external WMS sends."""
+        return self._open_action("cool_agristock.action_cool_agristock_category_chart")

@@ -183,6 +183,57 @@ class CoolAgristockExternalSystem(models.Model):
         self._check_can_manage()
         self.write({"active": False})
 
+    def action_delete_connection(self):
+        """Permanently remove a connection, not just archive it.
+
+        Refuses when real synchronized data (products, warehouses,
+        inventory counts, stock movements) is already linked to this
+        connection -- that data's own "external_system_id" is
+        ondelete="restrict" by design, so it must never be silently
+        orphaned or cascaded away. "Disable" (action_deactivate) is the
+        right tool once a connection has real history; delete is only
+        for connections with nothing attached yet (e.g. created by
+        mistake, or never actually used).
+
+        Any of this connection's API keys are revoked first -- a
+        deleted connection must never leave a live, still-authenticating
+        key behind.
+        """
+        self._check_can_manage()
+
+        blocking_models = (
+            ("cool_agristock.external.id.mapping", _("synchronized catalog records")),
+            ("cool_agristock.wms.transaction", _("receipt/dispatch history")),
+            ("cool_agristock.uom.mapping", _("unit of measure mappings")),
+            ("cool_agristock.inventory.import", _("inventory counts")),
+        )
+
+        for record in self:
+            blockers = []
+            for model_name, label in blocking_models:
+                if self.env[model_name].sudo().search_count(
+                    [("external_system_id", "=", record.id)]
+                ):
+                    blockers.append(label)
+
+            if blockers:
+                raise UserError(_(
+                    "\"%(name)s\" can't be deleted: it already has "
+                    "%(blockers)s linked to it. Disable it instead to "
+                    "keep that history while stopping further access.",
+                    name=record.name, blockers=", ".join(blockers),
+                ))
+
+            record.api_key_ids.filtered(
+                lambda k: k.state != "revoked"
+            ).action_revoke()
+
+        self.unlink()
+        # Closes the form view cleanly if called from there (the record it
+        # was showing no longer exists); a no-op for the list view, whose
+        # own row refresh already drops the deleted row.
+        return {"type": "ir.actions.act_window_close"}
+
     def action_open_api_keys(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id(
