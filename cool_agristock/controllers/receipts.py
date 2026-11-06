@@ -8,7 +8,7 @@ import psycopg2
 from odoo import http
 from odoo.http import request, Response
 from odoo.exceptions import AccessError, ValidationError
-from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system
+from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system, log_api_activity
 from .products import SUPPORTED_UNITS as HARDCODED_UNITS
 
 _logger = logging.getLogger(__name__)
@@ -61,6 +61,7 @@ class CoolAgristockReceiptsAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def get_receipt_status(self, external_reference, **kwargs):
         if not require_cool_agristock_api_user():
             return self.json_response({
@@ -119,6 +120,7 @@ class CoolAgristockReceiptsAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def create_receipt(self, **kwargs):
 
         # Require an API key, not a browser session.

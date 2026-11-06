@@ -4,7 +4,7 @@ import logging
 from odoo import http
 from odoo.http import request, Response
 from odoo.exceptions import AccessError, ValidationError
-from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system
+from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system, log_api_activity
 
 _logger = logging.getLogger(__name__)
 
@@ -15,14 +15,14 @@ _logger = logging.getLogger(__name__)
 # other ERP-specific setting) is never settable through these endpoints,
 # by construction -- there is no block-list to accidentally miss a field
 # on.
-CREATE_ALLOWED_FIELDS = {"name", "default_code", "barcode", "description", "unit"}
+CREATE_ALLOWED_FIELDS = {"name", "default_code", "barcode", "description", "unit", "category"}
 
 # PATCH deliberately excludes "unit": changing a product's unit of
 # measure after creation is unsafe once stock or transactions reference
 # it (see docs/PRODUCT_SYNCHRONIZATION.md's Known limitations) -- not
 # implemented safely yet, so not exposed at all rather than exposed
 # without the safety check it would need.
-UPDATE_ALLOWED_FIELDS = {"name", "default_code", "barcode", "description"}
+UPDATE_ALLOWED_FIELDS = {"name", "default_code", "barcode", "description", "category"}
 
 # Small, explicit, hardcoded set of unambiguous units -- verified to
 # exist in this installed Odoo 19 by checking env.ref() directly, not
@@ -53,6 +53,22 @@ class CoolAgristockProductsAPI(http.Controller):
             status=status,
             content_type="application/json",
         )
+
+    @staticmethod
+    def _resolve_category(env, category_name):
+        """Get-or-create a product.category by exact name.
+
+        The category a synced product lands in is whatever name the
+        external WMS sends -- never invented, never mapped against a
+        fixed Odoo taxonomy. Categories are global in Odoo (no
+        company scoping on product.category), so this is a plain
+        name match/create, not company-filtered.
+        """
+        Category = env["product.category"]
+        category = Category.search([("name", "=", category_name)], limit=1)
+        if not category:
+            category = Category.create({"name": category_name})
+        return category
 
     def _authenticate(self):
         """Shared auth + authorization-resolution for both endpoints.
@@ -99,6 +115,7 @@ class CoolAgristockProductsAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def create_product(self, **kwargs):
 
         external_system, error = self._authenticate()
@@ -142,11 +159,17 @@ class CoolAgristockProductsAPI(http.Controller):
                 {"status": "error", "message": "Invalid or missing name"}, 400,
             )
 
-        for field in ("default_code", "barcode", "description"):
+        for field in ("default_code", "barcode", "description", "category"):
             if field in payload and not isinstance(payload[field], str):
                 return self.json_response(
                     {"status": "error", "message": "Invalid %s" % field}, 400,
                 )
+
+        category_name = payload.get("category")
+        if category_name is not None and not category_name.strip():
+            return self.json_response(
+                {"status": "error", "message": "category cannot be empty"}, 400,
+            )
 
         unit_code = payload.get("unit")
         if unit_code is not None and not isinstance(unit_code, str):
@@ -198,7 +221,7 @@ class CoolAgristockProductsAPI(http.Controller):
             else:
                 uom = env.ref(DEFAULT_UNIT_XMLID)
 
-            product = Product.create({
+            product_values = {
                 "name": name.strip(),
                 "default_code": payload.get("default_code") or False,
                 "barcode": payload.get("barcode") or False,
@@ -208,7 +231,13 @@ class CoolAgristockProductsAPI(http.Controller):
                 "is_storable": True,
                 "tracking": "none",
                 "company_id": False,
-            })
+            }
+            if category_name is not None:
+                product_values["categ_id"] = self._resolve_category(
+                    env, category_name.strip()
+                ).id
+
+            product = Product.create(product_values)
 
             mapping, created = Mapping.create_mapping(
                 external_system.company_id, external_system,
@@ -235,6 +264,7 @@ class CoolAgristockProductsAPI(http.Controller):
                 "product_id": product.id,
                 "external_id": external_id,
                 "name": product.name,
+                "category": product.categ_id.name or None,
             }, 201)
 
         except AccessError:
@@ -258,6 +288,7 @@ class CoolAgristockProductsAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def update_product(self, external_id, **kwargs):
 
         external_system, error = self._authenticate()
@@ -288,7 +319,7 @@ class CoolAgristockProductsAPI(http.Controller):
                 {"status": "error", "message": "No fields to update"}, 400,
             )
 
-        for field in ("name", "default_code", "barcode", "description"):
+        for field in ("name", "default_code", "barcode", "description", "category"):
             if field in payload and not isinstance(payload[field], str):
                 return self.json_response(
                     {"status": "error", "message": "Invalid %s" % field}, 400,
@@ -297,6 +328,11 @@ class CoolAgristockProductsAPI(http.Controller):
         if "name" in payload and not payload["name"].strip():
             return self.json_response(
                 {"status": "error", "message": "name cannot be empty"}, 400,
+            )
+
+        if "category" in payload and not payload["category"].strip():
+            return self.json_response(
+                {"status": "error", "message": "category cannot be empty"}, 400,
             )
 
         try:
@@ -333,6 +369,10 @@ class CoolAgristockProductsAPI(http.Controller):
                 values["barcode"] = payload["barcode"] or False
             if "description" in payload:
                 values["description"] = payload["description"] or False
+            if "category" in payload:
+                values["categ_id"] = self._resolve_category(
+                    env, payload["category"].strip()
+                ).id
 
             product.write(values)
 
@@ -341,6 +381,7 @@ class CoolAgristockProductsAPI(http.Controller):
                 "product_id": product.id,
                 "external_id": external_id,
                 "name": product.name,
+                "category": product.categ_id.name or None,
             }, 200)
 
         except AccessError:

@@ -1,19 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- "Connections" dashboard: cool_agristock.external.system relabeled
+         in the UI as a connection. Creation happens only through the
+         guided "Add Connection" wizard (connection_wizard.py), so direct
+         create is disabled here: a connection without an API key isn't
+         useful, and the wizard is what creates both together. -->
     <record id="view_cool_agristock_external_system_list" model="ir.ui.view">
         <field name="name">cool_agristock.external.system.list</field>
         <field name="model">cool_agristock.external.system</field>
         <field name="arch" type="xml">
-            <list string="External Systems">
-                <field name="name"/>
-                <field name="code"/>
+            <list string="Connections" create="0">
+                <field name="name" string="Connection Name"/>
+                <field name="wms_name"/>
+                <field name="primary_api_key_id" string="API Key"/>
+                <field name="connection_status" string="Status" widget="badge"
+                       decoration-success="connection_status == 'active'"
+                       decoration-info="connection_status == 'awaiting_first_connection'"
+                       decoration-warning="connection_status == 'no_active_key'"
+                       decoration-muted="connection_status == 'inactive'"/>
+                <field name="last_activity_at"/>
+                <field name="last_successful_sync_at"/>
+                <field name="next_key_expiration" string="Expiration"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-                <field name="active" widget="boolean_toggle"/>
-                <field name="allow_automatic_inventory_adjustments"/>
-                <field name="max_auto_inventory_delta"
-                       invisible="not allow_automatic_inventory_adjustments"/>
+                <button name="action_test_connection" type="object"
+                        string="Test" icon="fa-plug" title="Test Connection"/>
+                <button name="action_deactivate" type="object"
+                        string="Disable" icon="fa-ban" invisible="not active"
+                        confirm="Disable this connection? Its API keys stay valid, but the connection will show as Inactive until re-enabled."/>
+                <button name="action_activate" type="object"
+                        string="Enable" icon="fa-check" invisible="active"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_external_system_search" model="ir.ui.view">
+        <field name="name">cool_agristock.external.system.search</field>
+        <field name="model">cool_agristock.external.system</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Connection Name"/>
+                <field name="wms_name"/>
+                <field name="code"/>
+                <!-- connection_status is a non-stored computed field (its
+                     honesty depends on reading live API key / activity
+                     state), so it can't be used in a search domain;
+                     shown as a badge in the list instead. The "active"
+                     field is real/stored and filterable here. -->
+                <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+            </search>
         </field>
     </record>
 
@@ -21,15 +56,52 @@
         <field name="name">cool_agristock.external.system.form</field>
         <field name="model">cool_agristock.external.system</field>
         <field name="arch" type="xml">
-            <form string="External System">
+            <form string="Connection" create="0">
                 <header>
-                    <field name="active" widget="boolean_toggle"/>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="btn-primary"/>
+                    <button name="%(cool_agristock.action_cool_agristock_api_key_generate_wizard)d"
+                            type="action" string="Generate Additional Key"
+                            context="{'default_external_system_id': id, 'default_name': name}"/>
+                    <button name="action_deactivate" type="object"
+                            string="Disable" invisible="not active"
+                            confirm="Disable this connection? Its API keys stay valid, but the connection will show as Inactive until re-enabled."/>
+                    <button name="action_activate" type="object"
+                            string="Enable" invisible="active"/>
                 </header>
                 <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_api_keys" type="object"
+                                class="oe_stat_button" icon="fa-key">
+                            <field name="active_api_key_count" widget="statinfo" string="API Keys"/>
+                        </button>
+                        <button name="action_open_activity" type="object"
+                                class="oe_stat_button" icon="fa-list-alt">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Activity</span>
+                            </div>
+                        </button>
+                    </div>
                     <group>
-                        <field name="name" placeholder="e.g. Main Warehouse WMS"/>
-                        <field name="code" placeholder="e.g. primary_wms"/>
-                        <field name="company_id" groups="base.group_multi_company"/>
+                        <group>
+                            <field name="name" string="Connection Name" placeholder="e.g. Main Agricultural Warehouse"/>
+                            <field name="wms_name" placeholder="e.g. Cool Agristock WMS"/>
+                            <field name="code" placeholder="e.g. primary_wms"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="connection_status" widget="badge"
+                                   decoration-success="connection_status == 'active'"
+                                   decoration-info="connection_status == 'awaiting_first_connection'"
+                                   decoration-warning="connection_status == 'no_active_key'"
+                                   decoration-muted="connection_status == 'inactive'"/>
+                            <field name="last_activity_at"/>
+                            <field name="last_successful_sync_at"/>
+                            <field name="next_key_expiration" string="Next Key Expiration"/>
+                        </group>
+                    </group>
+                    <group string="Advanced Configuration (optional)">
                         <field name="allow_automatic_inventory_adjustments"/>
                         <field name="max_auto_inventory_delta"
                                invisible="not allow_automatic_inventory_adjustments"/>
@@ -43,18 +115,121 @@
     </record>
 
     <record id="action_cool_agristock_external_systems" model="ir.actions.act_window">
-        <field name="name">External Systems</field>
+        <field name="name">Connections</field>
         <field name="res_model">cool_agristock.external.system</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cool_agristock_external_system_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No external systems registered yet.
+                No connections yet.
             </p>
             <p>
-                Register the warehouse management system(s) this company
-                integrates with. Each registered system gets its own
-                namespace for external ID mappings, so rotating an API
-                key never affects existing mappings.
+                Use "Add Connection" to connect an external warehouse
+                management system to Odoo Inventory.
+            </p>
+        </field>
+    </record>
+
+    <!-- Guided "Add Connection" wizard -->
+    <record id="view_cool_agristock_connection_wizard_form" model="ir.ui.view">
+        <field name="name">cool_agristock.connection.wizard.form</field>
+        <field name="model">cool_agristock.connection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Connection">
+                <notebook>
+                    <page string="Connection">
+                        <group>
+                            <field name="name" placeholder="e.g. Main Agricultural Warehouse"/>
+                            <field name="wms_name" placeholder="e.g. Cool Agristock WMS"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="API Key">
+                            <field name="expiration_preset"/>
+                            <field name="expiration_date"
+                                   invisible="expiration_preset != 'custom'"
+                                   required="expiration_preset == 'custom'"/>
+                        </group>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                    </page>
+                    <page string="Advanced (optional)">
+                        <p class="text-muted">
+                            Cool Agristock's REST API is inbound-only: the external
+                            WMS calls Odoo, not the other way around. There is no
+                            outbound URL to configure here. Once the connection is
+                            created, configure your external WMS with:
+                        </p>
+                        <group>
+                            <field name="api_base_url" readonly="1"/>
+                            <field name="auth_header_example" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_generate" type="object"
+                            string="Generate &amp; Activate" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_connection_wizard" model="ir.actions.act_window">
+        <field name="name">Add Connection</field>
+        <field name="res_model">cool_agristock.connection.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- API activity log: read-only, system-generated. -->
+    <record id="view_cool_agristock_api_activity_log_list" model="ir.ui.view">
+        <field name="name">cool_agristock.api.activity.log.list</field>
+        <field name="model">cool_agristock.api.activity.log</field>
+        <field name="arch" type="xml">
+            <list string="Activity" create="0" edit="0" delete="0" default_order="create_date desc">
+                <field name="create_date" string="Timestamp"/>
+                <field name="external_system_id" string="Connection"/>
+                <field name="endpoint" string="API Operation"/>
+                <field name="http_status" string="HTTP Status"/>
+                <field name="success" widget="boolean_toggle" readonly="1"/>
+                <field name="error_category"/>
+                <field name="request_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cool_agristock_api_activity_log_search" model="ir.ui.view">
+        <field name="name">cool_agristock.api.activity.log.search</field>
+        <field name="model">cool_agristock.api.activity.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_system_id" string="Connection"/>
+                <field name="endpoint"/>
+                <field name="create_date" string="Date"/>
+                <filter name="successful" string="Successful" domain="[('success', '=', True)]"/>
+                <filter name="failed" string="Failed" domain="[('success', '=', False)]"/>
+                <group>
+                    <filter name="group_connection" string="Connection" context="{'group_by': 'external_system_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cool_agristock_api_activity_log" model="ir.actions.act_window">
+        <field name="name">Activity</field>
+        <field name="res_model">cool_agristock.api.activity.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cool_agristock_api_activity_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No API activity recorded yet.
+            </p>
+            <p>
+                Every authenticated request from a connected external WMS
+                is recorded here. Entries older than the configured
+                retention period are cleaned up automatically.
             </p>
         </field>
     </record>
@@ -115,6 +290,39 @@
             </p>
         </field>
     </record>
+
+    <!-- Unified Connections menu: the single place for all connection
+         management (overview, add, keys, activity). Replaces the former
+         separate "Connected WMS Systems" and "API Management" top-level
+         entries; their actions/views above are unchanged and still
+         reachable (from a connection's smart buttons), just no longer
+         separately menu-linked. -->
+    <menuitem
+        id="menu_cool_agristock_connections_root"
+        name="Connections"
+        parent="menu_cool_agristock_root"
+        action="action_cool_agristock_external_systems"
+        sequence="5"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+    <menuitem
+        id="menu_cool_agristock_connection_add"
+        name="Add Connection"
+        parent="menu_cool_agristock_connections_root"
+        action="action_cool_agristock_connection_wizard"
+        sequence="1"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
+
+    <menuitem
+        id="menu_cool_agristock_connections_list"
+        name="All Connections"
+        parent="menu_cool_agristock_connections_root"
+        action="action_cool_agristock_external_systems"
+        sequence="2"
+        groups="cool_agristock.group_cool_agristock_administrator"
+    />
 
     <menuitem
         id="menu_cool_agristock_external_systems_root"

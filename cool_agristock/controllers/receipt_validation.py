@@ -6,7 +6,7 @@ from odoo import http
 from odoo.http import request, Response
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.float_utils import float_compare
-from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system
+from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system, log_api_activity
 
 _logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ class CoolAgristockReceiptValidationAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def validate_receipt(self, receipt_id, **kwargs):
 
         authorization = request.httprequest.headers.get(

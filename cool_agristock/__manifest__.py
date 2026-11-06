@@ -1,6 +1,6 @@
 {
     "name": "Cool Agristock",
-    "version": "19.0.3.0.0",
+    "version": "19.0.5.0.0",
     "summary": "Connect Odoo with Cool Agristock Warehouse Management",
     "description": """
 Cool Agristock — Open-Source Warehouse Management for Agribusinesses.
@@ -34,6 +34,7 @@ between Cool Agristock and Odoo.
         "views/uom_mapping_views.xml",
         "views/inventory_import_views.xml",
         "views/dashboard_views.xml",
+        "views/product_category_views.xml",
         "views/navigation_views.xml",
         "views/suppliers_views.xml",
     ],

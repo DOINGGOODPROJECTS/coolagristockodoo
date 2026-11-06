@@ -3,7 +3,7 @@ import logging
 
 from odoo import http
 from odoo.http import request, Response
-from .api_security import require_cool_agristock_api_user
+from .api_security import require_cool_agristock_api_user, log_api_activity
 
 _logger = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ class CoolAgristockAPI(http.Controller):
         readonly=True,
         save_session=False,
     )
+    @log_api_activity
     def get_products(self, **kwargs):
 
         if not require_cool_agristock_api_user():
@@ -102,7 +103,7 @@ class CoolAgristockAPI(http.Controller):
             readonly=True,
             save_session=False,
         )
-
+    @log_api_activity
     def get_warehouses(self, **kwargs):
 
             if not require_cool_agristock_api_user():
@@ -166,6 +167,7 @@ class CoolAgristockAPI(http.Controller):
         readonly=True,
         save_session=False,
     )
+    @log_api_activity
     def get_inventory(self, **kwargs):
 
         if not require_cool_agristock_api_user():

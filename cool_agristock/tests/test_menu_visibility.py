@@ -39,6 +39,37 @@ class TestCoolAgristockMenuVisibility(TransactionCase):
             self.env.ref("cool_agristock.group_cool_agristock_administrator"),
         )
 
+    def test_connections_consolidation_retired_the_old_separate_menus(self):
+        """API Management and Connected WMS Systems are no longer separate
+        navigation items -- their function moved into the unified
+        Connections screen. The underlying menu records/actions are kept
+        (for upgrade compatibility and because their actions are still
+        reachable via smart buttons), just deactivated."""
+        for xml_id in (
+            "menu_cool_agristock_api_management",
+            "menu_cool_agristock_external_systems_root",
+            "menu_cool_agristock_external_systems",
+        ):
+            menu = self.env.ref(f"cool_agristock.{xml_id}")
+            self.assertFalse(menu.active, f"{xml_id} should be inactive now")
+
+    def test_connections_menu_is_the_single_entry_point(self):
+        menu = self.env.ref("cool_agristock.menu_cool_agristock_connections_root")
+        action = self.env.ref("cool_agristock.action_cool_agristock_external_systems")
+        self.assertEqual(menu.action, action)
+        self.assertEqual(action.res_model, "cool_agristock.external.system")
+        self.assertEqual(
+            menu.group_ids,
+            self.env.ref("cool_agristock.group_cool_agristock_administrator"),
+        )
+
+        add_connection_menu = self.env.ref("cool_agristock.menu_cool_agristock_connection_add")
+        self.assertEqual(add_connection_menu.parent_id, menu)
+        self.assertEqual(
+            add_connection_menu.action.res_model,
+            "cool_agristock.connection.wizard",
+        )
+
     def test_suppliers_menu_is_available_from_inventory_products(self):
         menu = self.env.ref("cool_agristock.menu_cool_agristock_suppliers")
         action = self.env.ref("cool_agristock.action_cool_agristock_suppliers")
@@ -79,11 +110,12 @@ class TestCoolAgristockMenuVisibility(TransactionCase):
             self.assertTrue(model.has_access("read"), action["name"])
             model.get_views([(False, "list"), (False, "form")])
         visible = self.env["ir.ui.menu"].with_user(user)._visible_menu_ids()
-        for name in ("dashboard", "products", "inventory", "stock_adjustments",
-                     "lots", "warehouses", "locations", "receipts", "dispatches",
-                     "stock_movements", "suppliers"):
+        for name in ("dashboard", "products", "product_categories", "inventory",
+                     "stock_adjustments", "lots", "warehouses", "locations",
+                     "receipts", "dispatches", "stock_movements", "suppliers"):
             self.assertIn(self.env.ref("cool_agristock.menu_cool_agristock_" + name).id, visible)
-        for name in ("api_management", "external_systems", "sync_history"):
+        for name in ("api_management", "external_systems", "sync_history",
+                     "connections_root", "connection_add", "connections_list"):
             self.assertNotIn(self.env.ref("cool_agristock.menu_cool_agristock_" + name).id, visible)
 
     def test_dashboard_metrics_are_scoped_to_selected_companies(self):

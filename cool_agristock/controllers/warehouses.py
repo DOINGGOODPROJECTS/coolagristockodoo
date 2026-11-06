@@ -4,7 +4,7 @@ import logging
 from odoo import http
 from odoo.http import request, Response
 from odoo.exceptions import AccessError, ValidationError
-from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system
+from .api_security import require_cool_agristock_api_user, resolve_authorized_external_system, log_api_activity
 
 _logger = logging.getLogger(__name__)
 
@@ -85,6 +85,7 @@ class CoolAgristockWarehousesAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def create_warehouse(self, **kwargs):
 
         external_system, error = self._authenticate()
@@ -239,6 +240,7 @@ class CoolAgristockWarehousesAPI(http.Controller):
         csrf=False,
         save_session=False,
     )
+    @log_api_activity
     def update_warehouse(self, external_id, **kwargs):
 
         external_system, error = self._authenticate()
